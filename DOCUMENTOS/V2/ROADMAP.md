@@ -1,0 +1,63 @@
+# Nekal V2 — Roadmap
+
+Aprobado el 15 de octubre de 2026. Entrega de tesis: **~10 de diciembre de 2026** (fecha exacta por confirmar).
+
+Objetivo: todo funcional y real (cuentas con mail, datos reales en Firebase), no pantallas de muestra.
+
+Fase 1 (migrar de Codex a Claude Code + kickoff) quedó terminada el 15/10.
+
+## Subproyectos
+
+Cada subproyecto tiene su propio ciclo: brainstorming → spec → plan → implementación. Los specs y planes van en `DOCUMENTOS/V2/`.
+
+| # | Subproyecto | Semanas | Estado |
+|---|---|---|---|
+| A | Sistema de diseño refinado | 1–2 (16–29 oct) | En brainstorming |
+| B | Espacio: General como raíz + rediseño del mapa | 1–2 (16–29 oct) | Pendiente |
+| C | Importar Google Calendar | 3–4 (30 oct–12 nov) | Pendiente |
+| D | Neka con IA (un solo agente) | 3–4 (30 oct–12 nov) | Pendiente |
+| E | Gamificación: puntaje + nivel, rating, logros, heatmap | 5 (13–19 nov) | Pendiente |
+| F | Amigos: cuentas, lista, perfil simple | 6–7 (20 nov–3 dic) | Pendiente |
+| G | Espacios compartidos con amigos | 6–7 (20 nov–3 dic) | Pendiente |
+| — | Prueba en iPhone, arreglos, presentación | hasta la entrega | Pendiente |
+
+### A · Sistema de diseño
+Refinar el estilo violeta actual con `apple-design` y `ui-ux-pro-max`: jerarquía tipográfica, espaciados, componentes, micro-interacciones. Se puede reemplazar lo que haga falta. Las pantallas que se rehacen después (Espacio) se pulen en su propio subproyecto.
+
+### B · Espacio
+El espacio **General** es la raíz con la que parte cada usuario: contiene todos los espacios que cree, y el usuario los ordena dentro de él. Grupos dentro de grupos: posible más adelante, no obligatorio. Elegir dirección visual a partir de `IDEAS_ESPACIODETRABAJO` (la investigación recomienda Territorios como vista habitual + Red para conexiones). Hoy los espacios son planos y el mapa muestra uno a la vez: cambia el modelo de datos.
+
+### C · Google Calendar
+Integración para que el usuario no parta de cero. Empezar por importar (lectura). Outlook usa el mismo diseño si queda tiempo.
+
+### D · Neka con IA
+Un solo agente de calendario, dentro del Chat que ya existe: entiende el calendario, detecta conflictos y **propone cambios que el usuario confirma** (patrón que la V1 ya usa). El widget conversacional aparte no es necesario.
+
+### E · Gamificación
+El nivel ya existe en V1 (1 nivel cada 100 puntos). Revisar la fórmula de puntaje y sumar: rating por categoría que sube al completar, logros que se desbloquean al cruzar umbrales, heatmap tipo GitHub por día cumplido y "progreso desde el día 1". Ideas de referencia (videos): chips de filtro, cards expandibles con heatmap, grilla de logros bloqueados con modal de revelado.
+
+### F · Amigos
+Botón de amigos → lista, agregar amigos, ver perfil simple del otro (nivel y algunos logros).
+
+### G · Espacios compartidos
+Espacios con amigos. Es el más complejo (hoy cada cuenta está aislada en Firebase). Si falta tiempo, recortar a algo simple (invitar a un amigo a un espacio), no eliminar.
+
+## Decisiones abiertas (se resuelven en el brainstorming de cada subproyecto)
+
+- Servidor para calendario e IA: Firebase Cloud Functions (plan Blaze, requiere tarjeta del usuario) o Firebase AI Logic (Gemini, sin servidor propio).
+- Proveedor de IA (Gemini vía Firebase o Claude vía servidor).
+- Google Calendar en modo prueba admite 100 usuarios; abrir al público requiere verificación de Google.
+
+## Después de la tesis / si sobra tiempo
+
+- Outlook Calendar.
+- WhatsApp: el mismo agente por otra puerta (audio → propuesta → confirmación).
+- Resumen diario corto con puntos de fricción.
+- Sugerencias proactivas de reordenamiento según dificultad y puntaje.
+- Logros por patrones reales (rachas, recuperarse tras un mal día).
+- IA conectada a un objeto físico (lámpara que cambia de color según pendientes).
+
+## Pendientes del usuario
+
+- Seguir juntando fotos y documentos del espacio de trabajo en `IDEAS_ESPACIODETRABAJO` (ronda nueva).
+- Confirmar la fecha exacta de entrega.
