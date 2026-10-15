@@ -1,0 +1,527 @@
+{
+  "date": "2026-10-15",
+  "originals": [
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/Ajustes.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/Ajustes.png",
+      "bytes": 119643,
+      "sha256": "9957D252C283A324C01E2C094BF8DB9138C46AF0D5E16CCD985C20075BFDC3E7",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/CALENDARIO/LINEA DE TIEMPO.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/CALENDARIO/LINEA DE TIEMPO.png",
+      "bytes": 144291,
+      "sha256": "4DA6CB5556F7287D4B4A2022F320A16FF58C1C0683636AACD082444010755BA5",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/CHAT.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/CHAT.png",
+      "bytes": 137096,
+      "sha256": "DE3CBCA98EEE89E886B596670DC35D737EF8535720C5658AF83FEC967769C4E7",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/ESPACIO DE TRABAJO.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/ESPACIO DE TRABAJO.png",
+      "bytes": 173042,
+      "sha256": "3FFE9A924CB2FAEE9E107E68F54BEF18055B92963603170D57D1DC77FCD868C5",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/PERFIL.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/PERFIL.png",
+      "bytes": 144292,
+      "sha256": "DC1A9ED0BBA2C725CFA57CD65FA2650E440B3574E808AEE7922A32A0C6ED34EE",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/FOTOSPROTOTIPOPDF/RESUMEN.png",
+      "current": "DOCUMENTOS/V0/PROTOTIPOS/RESUMEN.png",
+      "bytes": 129088,
+      "sha256": "00D2897ABEB7BF84005FE27BB2F0017717169C04FD15B24737F8AD07D489EF76",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose1.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose1.png",
+      "bytes": 34561,
+      "sha256": "776B98B37CB89C4AA55B222A40FD3A11E9BE92E4B98A291F00E4CEAA9BC1DC92",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose10.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose10.png",
+      "bytes": 31494,
+      "sha256": "F7F75E48FF112278445AF9F7A757275421DAF87D62B71255CFF03E91C94183F3",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose11.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose11.png",
+      "bytes": 34082,
+      "sha256": "8C106136DDFAD7A7EB74A2A83B68BD87DAC4B3AF83EACF1FF2884A4225562150",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose12.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose12.png",
+      "bytes": 32836,
+      "sha256": "D95DE38270988519FD215B127FA869203923E2EFC67750058CED3F41FC7CEA5D",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose13.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose13.png",
+      "bytes": 33540,
+      "sha256": "A14F2A948DA19896BB7D6C567F7BDB555026B7D39428EB56742D3886DC94B9FC",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose14.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose14.png",
+      "bytes": 40311,
+      "sha256": "8FB2FD226E61010AA077EC54C98D6A156D3805BC95C8131EBD5FCB59FD874DB6",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose15.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose15.png",
+      "bytes": 51537,
+      "sha256": "BBBEB8712D8168950814E1AA09DE6EDEF08A88DD755CDC94C264EAA1D27FC941",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose16.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose16.png",
+      "bytes": 34335,
+      "sha256": "CC2AC634849D80B5695EFA3F51DAA663588B1962B1DB1CB8D9BB7F73D58DB33E",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose17.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose17.png",
+      "bytes": 33588,
+      "sha256": "BEBE70027892644A3F0E84B9010570F81267CCA7C835032B2AB8DA941D7FF3E5",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose18.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose18.png",
+      "bytes": 34874,
+      "sha256": "9E6EF3DF57FC6A69E581612825FD31729BFDCE3622CA40C337407A254AECD6AB",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose2.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose2.png",
+      "bytes": 32099,
+      "sha256": "398AD06B1E987F609EC34C122A53284E0BCE93A9DB96402C29363D9375E5C027",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose3.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose3.png",
+      "bytes": 32668,
+      "sha256": "78DB704BF45C3581ECA2ED4AB2E3EF9F4C542C2D38C47A49BA9A85DCAEC63A3D",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose4.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose4.png",
+      "bytes": 31957,
+      "sha256": "11F4026DF258DF08657A952840BC58BED6B0F925BB8170A8FD6619FD9B805C8A",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose5.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose5.png",
+      "bytes": 34045,
+      "sha256": "7FD27D003B0A8EDE8F56BDD3E951335332F2A9DCAF9BD12982761E2DE70E707D",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose6.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose6.png",
+      "bytes": 34131,
+      "sha256": "56B4A2416B482B78BDB67FCE5C0D02F914ADFFACE78503BD3CCEDF6E42DA27C4",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose7.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose7.png",
+      "bytes": 32937,
+      "sha256": "668496DBF79F1760D3715177F1D270BE6625A3315D247345B8467DE5B882B708",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose8.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose8.png",
+      "bytes": 32590,
+      "sha256": "9B47646567E7A102F4F1D11996416BA8E2BBA034BC72D6167978B6422BDE5943",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/IMG_POSES/Neka_Pose9.png",
+      "current": "DOCUMENTOS/RECURSOS_COMPARTIDOS/POSES_NEKA/Neka_Pose9.png",
+      "bytes": 34422,
+      "sha256": "B967DA30A7D91AD7614033930AC60655D39E69A298BF90C1B58F90F0C7048D76",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/INFo_APP.pdf",
+      "current": "DOCUMENTOS/V0/INFo_APP.pdf",
+      "bytes": 1556756,
+      "sha256": "ACDB7E1A236C30DF29BF21A599042718099C3D4A1EAD6E68B87A6F1F30D6A1BF",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/PLAN_V1.md",
+      "current": "DOCUMENTOS/V1/PLAN_V1.md",
+      "bytes": 1275,
+      "sha256": "8D7B965664D0C0F5BB0AF264FAB84331CF5A4A035799D8A810D7BF29EB188A63",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/SINCRONIZACION.md",
+      "current": "PROYECTO/CONEXIONES/SINCRONIZACION.md",
+      "bytes": 9626,
+      "sha256": "ED0639E0F13DAB93E535171D5461FAC1E1057B821CB2F9DBEB1D5A2381FD213F",
+      "unchanged": true
+    },
+    {
+      "original": "documentacion/V1.md",
+      "current": "DOCUMENTOS/V1/V1.md",
+      "bytes": 14300,
+      "sha256": "802C2F8836F6510226214DD417F42B681DACFBF2863F10D61AEE100E5DCE51A9",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/01-islas-isometricas.png",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/01-islas-isometricas.png",
+      "bytes": 1770311,
+      "sha256": "27526F1AB623FC9AF1AA23EA16849DA2DCA3A0B73AC0C6FD3F7BA7C94ACC3026",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/02-red-de-circulos.png",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/02-red-de-circulos.png",
+      "bytes": 1580738,
+      "sha256": "B8F2547EBD0A2485D36C19BAF0C27EF4913A699FF7C537262458104D4493B401",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/03-territorios.png",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/03-territorios.png",
+      "bytes": 1426067,
+      "sha256": "750B0C68CD5E95981DF9801B1E10CDF271556E0A7DF99ED2762A9F8556A44569",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/04-universo-3d.png",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/04-universo-3d.png",
+      "bytes": 1732595,
+      "sha256": "46689EF2E13369D9A05C55BD67D6425CC74B9FD68E4CC31155182590FEA7B891",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/05-recorrido-movil.png",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/05-recorrido-movil.png",
+      "bytes": 1505858,
+      "sha256": "365E177F20F717C534323DE42A333AABECC2E7F4AE9731CCE293A0D2592C964E",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/INVESTIGACION.md",
+      "current": "IDEAS_ESPACIODETRABAJO/00_INVESTIGACION/INVESTIGACION.md",
+      "bytes": 20292,
+      "sha256": "000378851BBF28B6C3E05BEEE44E99C4C3592AC1E969568160CC34065CC4609B",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/PROMPTS.md",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/PROMPTS.md",
+      "bytes": 24846,
+      "sha256": "CF9F83083DBFEFE8D70038BCFC931ECBC5647BBD60224ED4E50C99798ACEE1B8",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/PRUEBAS_Y_ESCENARIO.md",
+      "current": "IDEAS_ESPACIODETRABAJO/00_INVESTIGACION/PRUEBAS_Y_ESCENARIO.md",
+      "bytes": 7509,
+      "sha256": "DF55E504136CD1A17E79C1B90EF097D9AAC617E30AE1795D21AA4B8E04318A80",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/README.md",
+      "current": "IDEAS_ESPACIODETRABAJO/02_RONDA_01_EXPLORACION/README.md",
+      "bytes": 4381,
+      "sha256": "B5CC5F5877BCC851F6A8736F47F9B7FC84F75A117FB9456D878490724D89331C",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-01-plataformas.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-01-plataformas.png",
+      "bytes": 129643,
+      "sha256": "0759B353FCBC835C2C020F673CAADBA0D63E2B1505DB0D1D078834F2566D67F6",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-02-red-clara.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-02-red-clara.png",
+      "bytes": 26831,
+      "sha256": "7902333C046ABB1092E0D9D7FF93CB1DF8B9DD1230A4AEEB7325F1FF6E7CE22F",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-03-nico-borja.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-03-nico-borja.png",
+      "bytes": 414053,
+      "sha256": "7A5E23532B7EFB40E1B3DA8C62AF2865EDEEAFA40A44BB671A9C6A29FE0072DA",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-04-grafo-analitico.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-04-grafo-analitico.png",
+      "bytes": 274467,
+      "sha256": "E2A9CC7A1BBB7C042EA5575EF4ADD03B31FE54C36101CAB21EC1A2E2684B7AF2",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-05-relaciones.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-05-relaciones.png",
+      "bytes": 301213,
+      "sha256": "DA7CFF69ED09F88BDFA242A88D5C5A45D6D61E4964DD0B587BAAD829898FABC1",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/referencia-06-radial.png",
+      "current": "IDEAS_ESPACIODETRABAJO/01_REFERENCIAS_INICIALES/referencia-06-radial.png",
+      "bytes": 533586,
+      "sha256": "DCCFBEA6C732B413C08EB0988813F7D4941ECDF9EB88ABF5FB506CA39393E3FF",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/01-cuadrados-fieles.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/01-cuadrados-fieles.png",
+      "bytes": 1566346,
+      "sha256": "220787C87B05E91CE15B386CAD4094B9B76192E2A1A5AF37271848F8E619DDB0",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/02-cuadrados-interfaz.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/02-cuadrados-interfaz.png",
+      "bytes": 1482877,
+      "sha256": "585CE8EA68CA08A5E776C2D21A0FD514E3A2514CECAE7CE7327ACD93B81F4377",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/03-cuadrados-lineales.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/03-cuadrados-lineales.png",
+      "bytes": 1161660,
+      "sha256": "F2BACF4DA632FD7100BDC8B459756E9C6AE38AE2AD49FA8AB3648E06F63E2057",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/04-red-oscura.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/04-red-oscura.png",
+      "bytes": 1672736,
+      "sha256": "B76255E8BC576EADEB81F22ED6F8AB2CD782B53F78086A76D8DCC5EDFCEC7D75",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/05-radial.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/05-radial.png",
+      "bytes": 1544490,
+      "sha256": "376157CDE5B052554BF26F9DDE2E50BC183D991D0404AEB8E02A1E5F65986676",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/PROMPTS.md",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/PROMPTS.md",
+      "bytes": 13512,
+      "sha256": "3AF48B525E2B2DF179F499AED05F4E26B11317EF67B7D8DB1B4F80FBF1A5D9CE",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/README.md",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/README.md",
+      "bytes": 3526,
+      "sha256": "740399FECF7240E10791466463415AC9E610E4DBD072D1E3521640719F291BCC",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/referencia-cuadrados.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/referencia-cuadrados.png",
+      "bytes": 129643,
+      "sha256": "0759B353FCBC835C2C020F673CAADBA0D63E2B1505DB0D1D078834F2566D67F6",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/referencia-radial.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/referencia-radial.png",
+      "bytes": 306850,
+      "sha256": "562266E8B83A81D2A684088C5D7F4B04AF2438E605B2E65C0508F11932F177FC",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-02-minimalista/referencia-red.png",
+      "current": "IDEAS_ESPACIODETRABAJO/03_RONDA_02_MINIMALISTA/referencia-red.png",
+      "bytes": 183410,
+      "sha256": "9F030FCE3CF39B3B6AEA4F707E48453D2CE062FE405D346089CAA6F30D3FD45A",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (1).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (1).png",
+      "bytes": 1732595,
+      "sha256": "46689EF2E13369D9A05C55BD67D6425CC74B9FD68E4CC31155182590FEA7B891",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (2).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (2).png",
+      "bytes": 1566346,
+      "sha256": "220787C87B05E91CE15B386CAD4094B9B76192E2A1A5AF37271848F8E619DDB0",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (3).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (3).png",
+      "bytes": 1770311,
+      "sha256": "27526F1AB623FC9AF1AA23EA16849DA2DCA3A0B73AC0C6FD3F7BA7C94ACC3026",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (4).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (4).png",
+      "bytes": 1580738,
+      "sha256": "B8F2547EBD0A2485D36C19BAF0C27EF4913A699FF7C537262458104D4493B401",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (5).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (5).png",
+      "bytes": 1426067,
+      "sha256": "750B0C68CD5E95981DF9801B1E10CDF271556E0A7DF99ED2762A9F8556A44569",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (6).png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/01_AVANCES/AVANCE (6).png",
+      "bytes": 1672736,
+      "sha256": "B76255E8BC576EADEB81F22ED6F8AB2CD782B53F78086A76D8DCC5EDFCEC7D75",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/01-volumenes-claros.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/01-volumenes-claros.png",
+      "bytes": 1498025,
+      "sha256": "28DECF9B88ED05E3B0EB1C48F019AC2F9DE53392C6D0F7486694BC3CD9959D0A",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/02-plataformas-por-niveles.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/02-plataformas-por-niveles.png",
+      "bytes": 1688458,
+      "sha256": "5AC1686309E9E4F27AB73EB41DF7752B5D80CBCB70638989EF673538C70F859A",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/03-islas-modulares.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/03-islas-modulares.png",
+      "bytes": 1548386,
+      "sha256": "B9E634D6DE65B9AFD12904219163DAABA69E9F2E0058B158D630CC1AE8116DC7",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/04-red-de-circulos.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/04-red-de-circulos.png",
+      "bytes": 1585381,
+      "sha256": "DC6F6E27F1F7DC6BAECAA2500FA540F6CAEA57FD270FAF604AF6E8192F933A41",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/05-territorios.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/05-territorios.png",
+      "bytes": 1543749,
+      "sha256": "A610E58254B05E5F293B17831DE60A17CA9DDBA880D680CB6C40E47063CB7BA2",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/06A-red-organica-plana.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/06A-red-organica-plana.png",
+      "bytes": 1650891,
+      "sha256": "6AEDA6B231B506809C5FF872AA60A51590203E499764BDC335A9F141F3E6051B",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/06B-red-organica-profundidad.png",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/06B-red-organica-profundidad.png",
+      "bytes": 1625258,
+      "sha256": "7BDDFEDAF62E96673E9DBDE9979D06DE621F2380D3EDEE96B6E24D909FD2D2D1",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/FUNCIONAMIENTO.md",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/FUNCIONAMIENTO.md",
+      "bytes": 7635,
+      "sha256": "556D9E53C5B2DD71A0722791020B760B68FC06E99344C93D1A6C038FF2C41798",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/PROMPTS.md",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/PROMPTS.md",
+      "bytes": 52516,
+      "sha256": "0DC32852D108C5A0AECE90A5C905940A9E2C2944D33068E19D64E9FAE7245A5D",
+      "unchanged": true
+    },
+    {
+      "original": "DOCUMENTACION2/ronda-03-NEKAL/finales/README.md",
+      "current": "IDEAS_ESPACIODETRABAJO/04_RONDA_03_NEKAL/02_PROPUESTAS_FINALES/README.md",
+      "bytes": 4080,
+      "sha256": "45137742FB4B47F82BE6ABEDDDB161A1C75A0C794E2B17F13F621BA5685EEEB8",
+      "unchanged": true
+    }
+  ],
+  "newGuides": [
+    {
+      "path": "PROYECTO/README.md",
+      "bytes": 1881,
+      "sha256": "EA8B0507B9D4D57F2FB926D515324B5CC3BFC39D3513DF75AEF06E49BFC850A3"
+    },
+    {
+      "path": "PROYECTO/REGLAS_Y_ARQUITECTURA.md",
+      "bytes": 2309,
+      "sha256": "F49B32F98806DFA577B8AE4571137489D9E2B258461D146B50823B0F2CC22174"
+    },
+    {
+      "path": "DOCUMENTOS/README.md",
+      "bytes": 853,
+      "sha256": "4E24B3938A0C61C0B71EA7F3BD3739BD57C6DE9B054AC685EEF858E28E876EE8"
+    },
+    {
+      "path": "DOCUMENTOS/V1/README.md",
+      "bytes": 1441,
+      "sha256": "B9F5E920D1BC6D7746DE1324F3110DC4A86BD4C6ACDBFA8518AE9F288331AFAF"
+    },
+    {
+      "path": "DOCUMENTOS/V1/SINCRONIZACION.md",
+      "bytes": 435,
+      "sha256": "C56E40B78F12A36009A0127D79B1B4F9DE8A981E3646160EF7CBEBE0B68EA889"
+    },
+    {
+      "path": "IDEAS_ESPACIODETRABAJO/README.md",
+      "bytes": 8348,
+      "sha256": "1813FEB30B6D66FFC7A18637984EA3F9C6EE7C87EC57279D102CDA0A1794AEB4"
+    },
+    {
+      "path": "PROYECTO/ORDEN.md",
+      "bytes": 18528,
+      "sha256": "A7A958FB6A9F77F1E8B5E4D60F1FA65DC69B2982F1CF51EF1C05746BB0EB6CDF"
+    }
+  ],
+  "protectedFilesVerified": 224,
+  "protectedDifferences": []
+}

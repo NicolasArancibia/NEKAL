@@ -1,0 +1,59 @@
+rules_version = '2';
+// Private account schema 2: typed entity envelopes, revision lock and immutable receipts.
+// The V1 snapshot is frozen at migration start and retained as a recovery source.
+// Profile roles are descriptive text only; authorization always uses the authenticated UID.
+service cloud.firestore {
+ match /databases/{database}/documents {
+ function owner(uid) {return request.auth != null && request.auth.uid == uid;}
+ function str(v,n) {return v is string && v.size() <= n;}
+ function ident(v) {return str(v,200) && v.size()>0;}
+ function fields(v,ks) {return v is map && v.keys().hasAll(ks) && v.keys().hasOnly(ks);}
+ function hour(v) {return v is int && v>=0 && v<=23;}
+ function step(v) {return fields(v,['id','title','done']) && ident(v.id) && str(v.title,1000) && v.done is bool;}
+ function reward(v,id) {return fields(v,['key','itemId','points','at','reason']) && ident(v.key) && v.itemId==id && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500);}
+function item(v) {return fields(v,["id","type","title","description","workspaceId","createdAt","startDate","updatedAt","dueAt","scheduledAt","duration","flexible","status","priority","location","content","category","visitReason","participants","agenda","countsForScore","difficulty","attachments","groupId","x","y","deletedAt"]) && ident(v.id) && ident(v.workspaceId) && str(v.groupId,200) && v.type in ['Nota','Idea','Evento','Visita','Meeting','Deadline','Goal','Tarea'] && str(v.title,160) && v.title.size()>0
+&& str(v.description,100000) && str(v.content,100000) && str(v.location,100000) && str(v.category,100000) && str(v.visitReason,100000) && str(v.participants,100000) && str(v.agenda,100000)
+&& str(v.createdAt,40) && str(v.startDate,40) && str(v.updatedAt,40) && str(v.dueAt,40) && str(v.scheduledAt,40) && str(v.deletedAt,40)
+&& v.duration is number && v.duration>=0 && v.duration<=1440 && v.flexible is bool && v.countsForScore is bool && v.difficulty in [1,2,3] && v.status in ['pendiente','en curso','completado'] && v.priority in ['baja','media','urgente'] && v.x is number && v.y is number && v.attachments is list && v.attachments.size()<=3 && (v.attachments.size()<1 || ident(v.attachments[0])) && (v.attachments.size()<2 || ident(v.attachments[1])) && (v.attachments.size()<3 || ident(v.attachments[2]));}
+function validValue(kind,id,v) {
+return (kind=='items' && item(v))
+|| (kind=='attachments' && fields(v,['id','itemId','name','mime','data']) && ident(v.id) && ident(v.itemId) && str(v.name,1000) && str(v.mime,200) && str(v.data,500000) && v.data.matches('data:.*'))
+|| (kind=='workspaces' && fields(v,['id','name','color']) && ident(v.id) && str(v.name,500) && str(v.color,50))
+|| (kind=='groups' && fields(v,['id','name','workspaceId']) && ident(v.id) && str(v.name,500) && ident(v.workspaceId))
+|| (kind=='messages' && fields(v,['id','text','isUser']) && ident(v.id) && str(v.text,100000) && v.isUser is bool)
+|| (kind=='rewards' && fields(v,['itemId']) && ident(v.itemId))
+|| (kind=='steps' && fields(v,['itemId','order','id','title','done']) && ident(v.itemId) && ident(v.id) && str(v.title,1000) && v.done is bool && v.order is int && v.order>=0 && v.order<5000)
+|| (kind=='dependencies' && fields(v,['itemId','targetId','order']) && ident(v.itemId) && ident(v.targetId) && v.order is int && v.order>=0 && v.order<5000)
+|| (kind=='rewardEntries' && fields(v,['key','itemId','points','at','reason','order']) && ident(v.key) && ident(v.itemId) && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500) && v.order is int && v.order>=0 && v.order<10000)
+|| (kind=='settings' && id=='profile' && fields(v,['name','roles']) && str(v.name,500) && str(v.roles,2000))
+|| (kind=='settings' && id=='preferences' && fields(v,['softAlerts','quiet','quietStart','quietEnd','dayStart','dayEnd']) && v.softAlerts is bool && v.quiet is bool && hour(v.quietStart) && hour(v.quietEnd) && hour(v.dayStart) && hour(v.dayEnd) && v.dayStart<v.dayEnd);
+}
+function validRecord(kind,id) {return fields(request.resource.data,['value','updatedAt']) && request.resource.data.updatedAt==request.time && validValue(kind,id,request.resource.data.value);}
+function migrating(uid) {return get(/databases/$(database)/documents/users/$(uid)/sync/meta).data.phase=='migrating';}
+function revisionWrite(uid) {
+let before=get(/databases/$(database)/documents/users/$(uid)/sync/meta).data;
+let after=getAfter(/databases/$(database)/documents/users/$(uid)/sync/meta).data;
+return before.phase=='ready' && after.phase=='ready' && after.revision==before.revision+1 && after.updatedAt==request.time;
+}
+match /users/{uid}/{kind}/{id} {
+allow read: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','rewards','settings','steps','dependencies','rewardEntries'];
+allow create: if owner(uid) && validRecord(kind,id) && (migrating(uid) || revisionWrite(uid));
+allow update: if owner(uid) && validRecord(kind,id) && revisionWrite(uid);
+allow delete: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','rewards','steps','dependencies','rewardEntries'] && revisionWrite(uid);
+}
+match /users/{uid}/sync/meta {
+function validMeta() {let v=request.resource.data; return fields(v,['schema','phase','revision','legacyRevision','updatedAt']) && v.schema==2 && v.phase in ['migrating','ready'] && v.revision is int && v.revision>=0 && v.legacyRevision is int && v.legacyRevision>=0 && v.updatedAt==request.time;}
+allow read: if owner(uid);
+allow create: if owner(uid) && validMeta() && request.resource.data.phase=='migrating' && request.resource.data.revision==0;
+allow update: if owner(uid) && validMeta() && request.resource.data.legacyRevision==resource.data.legacyRevision && request.resource.data.phase=='ready' && request.resource.data.revision==resource.data.revision+1;
+}
+match /users/{uid}/operations/{id} {
+allow read: if owner(uid);
+allow create: if owner(uid) && ident(id) && fields(request.resource.data,['at']) && request.resource.data.at==request.time && revisionWrite(uid);
+}
+match /users/{uid}/nekal/state {
+allow read: if owner(uid);
+// Read-only legacy backup. Old clients must reload to use schema 2.
+}
+ }
+}

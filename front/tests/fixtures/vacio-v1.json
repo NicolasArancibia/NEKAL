@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "items": [],
+  "groups": [],
+  "rewards": [],
+  "messages": [],
+  "workspaces": [
+    {
+      "id": "general",
+      "name": "General",
+      "color": "#7847EB"
+    }
+  ],
+  "profile": {
+    "name": "",
+    "roles": ""
+  },
+  "preferences": {
+    "softAlerts": true,
+    "quiet": true,
+    "quietStart": 21,
+    "quietEnd": 8,
+    "dayStart": 8,
+    "dayEnd": 21,
+    "notifications": false
+  }
+}

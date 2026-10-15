@@ -1,0 +1,18 @@
+{
+  "firestore": {"rules": "back/firestore.rules"},
+  "emulators": {"firestore": {"port": 8080}, "ui": {"enabled": false}, "singleProjectMode": true},
+  "hosting": {
+    "public": "front/dist",
+    "predeploy": ["npm --prefix front run build:web -- --clear"],
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
