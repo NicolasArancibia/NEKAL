@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "npm --prefix front start",
+    "web": "npm --prefix front run web",
+    "test": "npm --prefix front test",
+    "typecheck": "npm --prefix front run typecheck",
+    "deploy:web": "firebase deploy --only hosting --project nekal-973b2",
+    "deploy:rules": "firebase deploy --only firestore:rules --project nekal-973b2",
+    "deploy": "firebase deploy --only firestore:rules,hosting --project nekal-973b2",
+    "test:firestore": "firebase emulators:exec --only firestore --project demo-nekal-sync \"npm --prefix front run test:firestore\""
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "firebase-tools": "^15.31.0"
+  }
+}

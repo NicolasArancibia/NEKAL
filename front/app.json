@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Nekal",
+    "slug": "nekal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Img/Neka_Pose5.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F2F0FA",
+        "foregroundImage": "./assets/Img/Neka_Pose5.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.nekal"
+    },
+    "web": {
+      "favicon": "./assets/Img/Neka_Pose5.png",
+      "name": "Nekal",
+      "shortName": "Nekal"
+    }
+  }
+}

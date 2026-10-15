@@ -1,0 +1,1474 @@
+{
+  "date": "2026-10-15",
+  "root": "C:\\Users\\nicoa\\OneDrive\\Desktop\\NombreApp_V1_Codex",
+  "files": [
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/Ajustes.png",
+      "bytes": 119643,
+      "sha256": "9957D252C283A324C01E2C094BF8DB9138C46AF0D5E16CCD985C20075BFDC3E7"
+    },
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/CALENDARIO/LINEA DE TIEMPO.png",
+      "bytes": 144291,
+      "sha256": "4DA6CB5556F7287D4B4A2022F320A16FF58C1C0683636AACD082444010755BA5"
+    },
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/CHAT.png",
+      "bytes": 137096,
+      "sha256": "DE3CBCA98EEE89E886B596670DC35D737EF8535720C5658AF83FEC967769C4E7"
+    },
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/ESPACIO DE TRABAJO.png",
+      "bytes": 173042,
+      "sha256": "3FFE9A924CB2FAEE9E107E68F54BEF18055B92963603170D57D1DC77FCD868C5"
+    },
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/PERFIL.png",
+      "bytes": 144292,
+      "sha256": "DC1A9ED0BBA2C725CFA57CD65FA2650E440B3574E808AEE7922A32A0C6ED34EE"
+    },
+    {
+      "path": "documentacion/FOTOSPROTOTIPOPDF/RESUMEN.png",
+      "bytes": 129088,
+      "sha256": "00D2897ABEB7BF84005FE27BB2F0017717169C04FD15B24737F8AD07D489EF76"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose1.png",
+      "bytes": 34561,
+      "sha256": "776B98B37CB89C4AA55B222A40FD3A11E9BE92E4B98A291F00E4CEAA9BC1DC92"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose10.png",
+      "bytes": 31494,
+      "sha256": "F7F75E48FF112278445AF9F7A757275421DAF87D62B71255CFF03E91C94183F3"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose11.png",
+      "bytes": 34082,
+      "sha256": "8C106136DDFAD7A7EB74A2A83B68BD87DAC4B3AF83EACF1FF2884A4225562150"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose12.png",
+      "bytes": 32836,
+      "sha256": "D95DE38270988519FD215B127FA869203923E2EFC67750058CED3F41FC7CEA5D"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose13.png",
+      "bytes": 33540,
+      "sha256": "A14F2A948DA19896BB7D6C567F7BDB555026B7D39428EB56742D3886DC94B9FC"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose14.png",
+      "bytes": 40311,
+      "sha256": "8FB2FD226E61010AA077EC54C98D6A156D3805BC95C8131EBD5FCB59FD874DB6"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose15.png",
+      "bytes": 51537,
+      "sha256": "BBBEB8712D8168950814E1AA09DE6EDEF08A88DD755CDC94C264EAA1D27FC941"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose16.png",
+      "bytes": 34335,
+      "sha256": "CC2AC634849D80B5695EFA3F51DAA663588B1962B1DB1CB8D9BB7F73D58DB33E"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose17.png",
+      "bytes": 33588,
+      "sha256": "BEBE70027892644A3F0E84B9010570F81267CCA7C835032B2AB8DA941D7FF3E5"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose18.png",
+      "bytes": 34874,
+      "sha256": "9E6EF3DF57FC6A69E581612825FD31729BFDCE3622CA40C337407A254AECD6AB"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose2.png",
+      "bytes": 32099,
+      "sha256": "398AD06B1E987F609EC34C122A53284E0BCE93A9DB96402C29363D9375E5C027"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose3.png",
+      "bytes": 32668,
+      "sha256": "78DB704BF45C3581ECA2ED4AB2E3EF9F4C542C2D38C47A49BA9A85DCAEC63A3D"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose4.png",
+      "bytes": 31957,
+      "sha256": "11F4026DF258DF08657A952840BC58BED6B0F925BB8170A8FD6619FD9B805C8A"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose5.png",
+      "bytes": 34045,
+      "sha256": "7FD27D003B0A8EDE8F56BDD3E951335332F2A9DCAF9BD12982761E2DE70E707D"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose6.png",
+      "bytes": 34131,
+      "sha256": "56B4A2416B482B78BDB67FCE5C0D02F914ADFFACE78503BD3CCEDF6E42DA27C4"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose7.png",
+      "bytes": 32937,
+      "sha256": "668496DBF79F1760D3715177F1D270BE6625A3315D247345B8467DE5B882B708"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose8.png",
+      "bytes": 32590,
+      "sha256": "9B47646567E7A102F4F1D11996416BA8E2BBA034BC72D6167978B6422BDE5943"
+    },
+    {
+      "path": "documentacion/IMG_POSES/Neka_Pose9.png",
+      "bytes": 34422,
+      "sha256": "B967DA30A7D91AD7614033930AC60655D39E69A298BF90C1B58F90F0C7048D76"
+    },
+    {
+      "path": "documentacion/INFo_APP.pdf",
+      "bytes": 1556756,
+      "sha256": "ACDB7E1A236C30DF29BF21A599042718099C3D4A1EAD6E68B87A6F1F30D6A1BF"
+    },
+    {
+      "path": "documentacion/PLAN_V1.md",
+      "bytes": 1275,
+      "sha256": "8D7B965664D0C0F5BB0AF264FAB84331CF5A4A035799D8A810D7BF29EB188A63"
+    },
+    {
+      "path": "documentacion/SINCRONIZACION.md",
+      "bytes": 9626,
+      "sha256": "ED0639E0F13DAB93E535171D5461FAC1E1057B821CB2F9DBEB1D5A2381FD213F"
+    },
+    {
+      "path": "documentacion/V1.md",
+      "bytes": 14300,
+      "sha256": "802C2F8836F6510226214DD417F42B681DACFBF2863F10D61AEE100E5DCE51A9"
+    },
+    {
+      "path": "DOCUMENTACION2/01-islas-isometricas.png",
+      "bytes": 1770311,
+      "sha256": "27526F1AB623FC9AF1AA23EA16849DA2DCA3A0B73AC0C6FD3F7BA7C94ACC3026"
+    },
+    {
+      "path": "DOCUMENTACION2/02-red-de-circulos.png",
+      "bytes": 1580738,
+      "sha256": "B8F2547EBD0A2485D36C19BAF0C27EF4913A699FF7C537262458104D4493B401"
+    },
+    {
+      "path": "DOCUMENTACION2/03-territorios.png",
+      "bytes": 1426067,
+      "sha256": "750B0C68CD5E95981DF9801B1E10CDF271556E0A7DF99ED2762A9F8556A44569"
+    },
+    {
+      "path": "DOCUMENTACION2/04-universo-3d.png",
+      "bytes": 1732595,
+      "sha256": "46689EF2E13369D9A05C55BD67D6425CC74B9FD68E4CC31155182590FEA7B891"
+    },
+    {
+      "path": "DOCUMENTACION2/05-recorrido-movil.png",
+      "bytes": 1505858,
+      "sha256": "365E177F20F717C534323DE42A333AABECC2E7F4AE9731CCE293A0D2592C964E"
+    },
+    {
+      "path": "DOCUMENTACION2/INVESTIGACION.md",
+      "bytes": 20292,
+      "sha256": "000378851BBF28B6C3E05BEEE44E99C4C3592AC1E969568160CC34065CC4609B"
+    },
+    {
+      "path": "DOCUMENTACION2/PROMPTS.md",
+      "bytes": 24846,
+      "sha256": "CF9F83083DBFEFE8D70038BCFC931ECBC5647BBD60224ED4E50C99798ACEE1B8"
+    },
+    {
+      "path": "DOCUMENTACION2/PRUEBAS_Y_ESCENARIO.md",
+      "bytes": 7509,
+      "sha256": "DF55E504136CD1A17E79C1B90EF097D9AAC617E30AE1795D21AA4B8E04318A80"
+    },
+    {
+      "path": "DOCUMENTACION2/README.md",
+      "bytes": 4381,
+      "sha256": "B5CC5F5877BCC851F6A8736F47F9B7FC84F75A117FB9456D878490724D89331C"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-01-plataformas.png",
+      "bytes": 129643,
+      "sha256": "0759B353FCBC835C2C020F673CAADBA0D63E2B1505DB0D1D078834F2566D67F6"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-02-red-clara.png",
+      "bytes": 26831,
+      "sha256": "7902333C046ABB1092E0D9D7FF93CB1DF8B9DD1230A4AEEB7325F1FF6E7CE22F"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-03-nico-borja.png",
+      "bytes": 414053,
+      "sha256": "7A5E23532B7EFB40E1B3DA8C62AF2865EDEEAFA40A44BB671A9C6A29FE0072DA"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-04-grafo-analitico.png",
+      "bytes": 274467,
+      "sha256": "E2A9CC7A1BBB7C042EA5575EF4ADD03B31FE54C36101CAB21EC1A2E2684B7AF2"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-05-relaciones.png",
+      "bytes": 301213,
+      "sha256": "DA7CFF69ED09F88BDFA242A88D5C5A45D6D61E4964DD0B587BAAD829898FABC1"
+    },
+    {
+      "path": "DOCUMENTACION2/referencia-06-radial.png",
+      "bytes": 533586,
+      "sha256": "DCCFBEA6C732B413C08EB0988813F7D4941ECDF9EB88ABF5FB506CA39393E3FF"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/01-cuadrados-fieles.png",
+      "bytes": 1566346,
+      "sha256": "220787C87B05E91CE15B386CAD4094B9B76192E2A1A5AF37271848F8E619DDB0"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/02-cuadrados-interfaz.png",
+      "bytes": 1482877,
+      "sha256": "585CE8EA68CA08A5E776C2D21A0FD514E3A2514CECAE7CE7327ACD93B81F4377"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/03-cuadrados-lineales.png",
+      "bytes": 1161660,
+      "sha256": "F2BACF4DA632FD7100BDC8B459756E9C6AE38AE2AD49FA8AB3648E06F63E2057"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/04-red-oscura.png",
+      "bytes": 1672736,
+      "sha256": "B76255E8BC576EADEB81F22ED6F8AB2CD782B53F78086A76D8DCC5EDFCEC7D75"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/05-radial.png",
+      "bytes": 1544490,
+      "sha256": "376157CDE5B052554BF26F9DDE2E50BC183D991D0404AEB8E02A1E5F65986676"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/PROMPTS.md",
+      "bytes": 13512,
+      "sha256": "3AF48B525E2B2DF179F499AED05F4E26B11317EF67B7D8DB1B4F80FBF1A5D9CE"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/README.md",
+      "bytes": 3526,
+      "sha256": "740399FECF7240E10791466463415AC9E610E4DBD072D1E3521640719F291BCC"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/referencia-cuadrados.png",
+      "bytes": 129643,
+      "sha256": "0759B353FCBC835C2C020F673CAADBA0D63E2B1505DB0D1D078834F2566D67F6"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/referencia-radial.png",
+      "bytes": 306850,
+      "sha256": "562266E8B83A81D2A684088C5D7F4B04AF2438E605B2E65C0508F11932F177FC"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-02-minimalista/referencia-red.png",
+      "bytes": 183410,
+      "sha256": "9F030FCE3CF39B3B6AEA4F707E48453D2CE062FE405D346089CAA6F30D3FD45A"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (1).png",
+      "bytes": 1732595,
+      "sha256": "46689EF2E13369D9A05C55BD67D6425CC74B9FD68E4CC31155182590FEA7B891"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (2).png",
+      "bytes": 1566346,
+      "sha256": "220787C87B05E91CE15B386CAD4094B9B76192E2A1A5AF37271848F8E619DDB0"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (3).png",
+      "bytes": 1770311,
+      "sha256": "27526F1AB623FC9AF1AA23EA16849DA2DCA3A0B73AC0C6FD3F7BA7C94ACC3026"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (4).png",
+      "bytes": 1580738,
+      "sha256": "B8F2547EBD0A2485D36C19BAF0C27EF4913A699FF7C537262458104D4493B401"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (5).png",
+      "bytes": 1426067,
+      "sha256": "750B0C68CD5E95981DF9801B1E10CDF271556E0A7DF99ED2762A9F8556A44569"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/AVANCE (6).png",
+      "bytes": 1672736,
+      "sha256": "B76255E8BC576EADEB81F22ED6F8AB2CD782B53F78086A76D8DCC5EDFCEC7D75"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/01-volumenes-claros.png",
+      "bytes": 1498025,
+      "sha256": "28DECF9B88ED05E3B0EB1C48F019AC2F9DE53392C6D0F7486694BC3CD9959D0A"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/02-plataformas-por-niveles.png",
+      "bytes": 1688458,
+      "sha256": "5AC1686309E9E4F27AB73EB41DF7752B5D80CBCB70638989EF673538C70F859A"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/03-islas-modulares.png",
+      "bytes": 1548386,
+      "sha256": "B9E634D6DE65B9AFD12904219163DAABA69E9F2E0058B158D630CC1AE8116DC7"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/04-red-de-circulos.png",
+      "bytes": 1585381,
+      "sha256": "DC6F6E27F1F7DC6BAECAA2500FA540F6CAEA57FD270FAF604AF6E8192F933A41"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/05-territorios.png",
+      "bytes": 1543749,
+      "sha256": "A610E58254B05E5F293B17831DE60A17CA9DDBA880D680CB6C40E47063CB7BA2"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/06A-red-organica-plana.png",
+      "bytes": 1650891,
+      "sha256": "6AEDA6B231B506809C5FF872AA60A51590203E499764BDC335A9F141F3E6051B"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/06B-red-organica-profundidad.png",
+      "bytes": 1625258,
+      "sha256": "7BDDFEDAF62E96673E9DBDE9979D06DE621F2380D3EDEE96B6E24D909FD2D2D1"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/FUNCIONAMIENTO.md",
+      "bytes": 7635,
+      "sha256": "556D9E53C5B2DD71A0722791020B760B68FC06E99344C93D1A6C038FF2C41798"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/PROMPTS.md",
+      "bytes": 52516,
+      "sha256": "0DC32852D108C5A0AECE90A5C905940A9E2C2944D33068E19D64E9FAE7245A5D"
+    },
+    {
+      "path": "DOCUMENTACION2/ronda-03-NEKAL/finales/README.md",
+      "bytes": 4080,
+      "sha256": "45137742FB4B47F82BE6ABEDDDB161A1C75A0C794E2B17F13F621BA5685EEEB8"
+    }
+  ],
+  "protected": [
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/configuration-migration.md",
+      "bytes": 6714,
+      "sha256": "DE1E9AD2151AE54456566E2A44C9964A31B51FF5DC51ADB5754A6F1E20271FE7"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/destructuring-shim.md",
+      "bytes": 4588,
+      "sha256": "57C2D33882850A364848C6B35502EF0C1889EC5C4ACC8A1A8E954CE948890429"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/signature-mapping.md",
+      "bytes": 4434,
+      "sha256": "7860330BCFC578ED6FAD8237D93AD45B3D2A43A8EE14D67E660BD9DAC127D762"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/SKILL.md",
+      "bytes": 4660,
+      "sha256": "79FBB6197A78398E0C5930270EFFB123920997C0E6A891CA29383A09AA9B4849"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/flutter_setup.md",
+      "bytes": 3433,
+      "sha256": "7CE18E75F48E4E3B8B732B5FFC87DFDD6A17761C651944FF4786B7032E9AC999"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/ios_setup.md",
+      "bytes": 4974,
+      "sha256": "DC53EF4B61B7F23A577A5264FDEF5904E609AAD5091416426CE4C751E34F0494"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/usage_patterns_android.md",
+      "bytes": 4692,
+      "sha256": "F17ECB3050B7097F617974026EFE427E0E0A1C6370FC85A3B6ADFC3E8C988E45"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/usage_patterns_web.md",
+      "bytes": 5647,
+      "sha256": "4AC82DC440FB7CF6D5C121811ECA56014A02752502701FC604CCC14AF5A7A660"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/SKILL.md",
+      "bytes": 8609,
+      "sha256": "92D534C48871A27F82A2CD4CFEDA25F4AF2BC869D4E2B1A7D87E6196EEF62337"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/cli_commands.md",
+      "bytes": 3302,
+      "sha256": "8F1A4C798693FDBC1EFC5189CD99864F34A0485DCE83B2DC1076A3A20573D80A"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/configuration.md",
+      "bytes": 1801,
+      "sha256": "BB61CE29166BF0ABD0ED4AF463700CC6E2722DC0123C6983D54EC7C8A82BE0B5"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/emulation.md",
+      "bytes": 1552,
+      "sha256": "1C233B84FC0856B0B9DAA61FC42A4E6BEE0EC9864C419F3997B5FB56806D784C"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/SKILL.md",
+      "bytes": 2756,
+      "sha256": "1B3A264FC812C53666094D74E8792388278CBD22C1330CF38396761E4EF638E5"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/client_sdk_android.md",
+      "bytes": 4847,
+      "sha256": "AB70C4CD6894C8288BFAE3607F42F37D1383736F7DF9C36E3DB75DF9482C7202"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/client_sdk_web.md",
+      "bytes": 7938,
+      "sha256": "C822D89C0CEFF23BB89F4E69066D52928C0EF7E32781499D1EF0686DC2C870F6"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/flutter_setup.md",
+      "bytes": 5655,
+      "sha256": "4C5DA8C9B979C0CD531622E1328B649D79C779FCB7343BE8960E41799050A715"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/ios_setup.md",
+      "bytes": 2574,
+      "sha256": "5CF566FB1A6ED6E6B58FBEC56615BB8CBA65FB26C66DD320CC499FEC51D2D029"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/security_rules.md",
+      "bytes": 1495,
+      "sha256": "B01E4CBCED50CE18AA11A79ABBDBCCF1B41B218830B8C452282C77B3B77B1CC1"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/SKILL.md",
+      "bytes": 4459,
+      "sha256": "BF06DA11613A0F346432914C91F8A7076111C0CD1FF7C66BB2222ADB9E814158"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/android_setup.md",
+      "bytes": 1861,
+      "sha256": "5C1A6C389D83B810D480B497CC221A007E6DEF8FD2328DC82BEF26C06D936864"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/firebase-cli-guide.md",
+      "bytes": 482,
+      "sha256": "3380B3B39CD4AFBA95F0ED6A17260BBFE5BF552C9F2B6FFEE7AF789355FF68CE"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/firebase-service-init.md",
+      "bytes": 712,
+      "sha256": "647E7D11D9F16B22FA6CB048B30C14E68BDCDE8CEE9A482487805F47C456CEDE"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/flutter_setup.md",
+      "bytes": 4982,
+      "sha256": "4013D03978E6E25CB043141A7DAEA7756EA3BBCDBBF39488AD25ECE78CCB116D"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/ios_setup.md",
+      "bytes": 4168,
+      "sha256": "3BEF485C987FCD05A51407A7B11DB03C8F6AD1707E07817258634FB50F79B034"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/local-env-setup.md",
+      "bytes": 2821,
+      "sha256": "F02900524AA9A60C85644865070EC3275887F38EAFB676A8D15A4B490067C4CE"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/android_studio.md",
+      "bytes": 1352,
+      "sha256": "C3D2D74F6F03302115332FE2047B03D4338AE4C095CC45C601A1ED9370643158"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/antigravity.md",
+      "bytes": 2183,
+      "sha256": "D75891034A8D1C905B029B19807E1B2A24F5B552E693F0ECC1FC23EED11EAD68"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/claude.md",
+      "bytes": 392,
+      "sha256": "99525C5FFD6D08972F744401BDBA9570F3A9605DD860565A4A445E198809CE48"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/gemini-cli.md",
+      "bytes": 495,
+      "sha256": "099D91200351FE7BFF3FC806BBFDB6BB37B6AD836C1C2FE19C43E6103C8116DC"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/other-agents.md",
+      "bytes": 2369,
+      "sha256": "746C3CDF9667AD6156828B45748E6CADEDA558BE26B4490DA54112B4B3DABB43"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/android_studio.md",
+      "bytes": 681,
+      "sha256": "0BE81391A1DE2161DD8F5F4AB7CE67BB5E92B7A64A9D81A47DED7026E34F4583"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/antigravity.md",
+      "bytes": 3496,
+      "sha256": "225F0F0C28F37254FABB6964625EA9B5F8017B3E78F7C9091B032A60000FED73"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/claude_code.md",
+      "bytes": 1972,
+      "sha256": "104891C27B4435C046B248FADFEC7FE036EC8C55D1B1BCF0F77AABC7C04637DE"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/cursor.md",
+      "bytes": 3205,
+      "sha256": "3559D3C5806509C4222E92AA43710976BFD8C172B4EC74E7504CC1DF1C9DF667"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/gemini_cli.md",
+      "bytes": 2090,
+      "sha256": "20B9BAA511599AF02300364E0CA65C7EA8FD44BC4DC2413D0B34267CC71CD0F2"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/github_copilot.md",
+      "bytes": 3532,
+      "sha256": "0F7878522CC854F27231368B401E18F30DC20785A70F27F51CE5A5D92D86E546"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/other_agents.md",
+      "bytes": 3585,
+      "sha256": "4E2FB50D41E3617B50ECAB8F4DD9A3FB6317BD37F18E75EB8236F441252F8E13"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/web_setup.md",
+      "bytes": 1752,
+      "sha256": "4B7A4F9EAFF11B29D2DF95E4002C31CBC9AA8AAEDB30F19B8772CE3FDDB4BFF4"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/SKILL.md",
+      "bytes": 7397,
+      "sha256": "475EAC9C8C48AD907561406B221AD9F5E67666EBA4EDB0094D007275E6C52C1F"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/references/android_setup.md",
+      "bytes": 5478,
+      "sha256": "73E717B029E2562274ABE5F6244C3BBA6B2936F77BC1DE3B78F0D619B81E6E6D"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/references/ios_setup.md",
+      "bytes": 4700,
+      "sha256": "E44E8A73C62B8E06F5F647C015CC746AFC77E092A18EA157F59D5B63F64C5154"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/SKILL.md",
+      "bytes": 1777,
+      "sha256": "C34F838C9BD0BFB8BFF2AE3CABFE9D76CFC3D5E8CA5B8BD201040E004D7FABA7"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/examples.md",
+      "bytes": 15711,
+      "sha256": "961285D1B3B073C106A19B88D63C1911825D47CED0B8F3804B5275077554F742"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/cloud_functions.md",
+      "bytes": 6295,
+      "sha256": "40C0B64C636B0164CDB4798EC9B7C4AF7F8EFC56ABF342618821816502153A85"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/config.md",
+      "bytes": 7304,
+      "sha256": "5F5B405CC41BFA2185D51CFF25BD714F676FC0A33054F5BB2992C95AE5DC8912"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/data_seeding.md",
+      "bytes": 6110,
+      "sha256": "FBC88FCC18394C2A5AB946220A31A2FC48618234898AF03A9EC4D1024DDCA0D3"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/native_sql.md",
+      "bytes": 7236,
+      "sha256": "7148A1D2BD56368A95913F802F72322219028F31ECBB520064BFA9C2DE05B0CB"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/operations.md",
+      "bytes": 11611,
+      "sha256": "CCB2AADD91679F6FCC4958EF4B8742F75BDC23A8AA380270AA535DC7B2AE2725"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/realtime.md",
+      "bytes": 8051,
+      "sha256": "F0648B1EE06D69417589C45F9B7DB7D017D4E5C9951436C69BC462577A8EF577"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/schema.md",
+      "bytes": 7912,
+      "sha256": "9543116D50925AF5614489D07F35902A871E8C161773501343704A2887A4AA47"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_admin_node.md",
+      "bytes": 4343,
+      "sha256": "376BFA8B4871AB72378AE5B61214226114AB54CAB6A31042C2983E5194EED360"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_android.md",
+      "bytes": 3920,
+      "sha256": "FDD4E96D27F061A7600E6A2401D9E13469D19682893DC195F793201D57DBBC73"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_flutter.md",
+      "bytes": 3634,
+      "sha256": "2B132F6038D42AF210587BD3715D1913032486B5C61071B0D72682010EDCFFB5"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_ios.md",
+      "bytes": 4507,
+      "sha256": "AD16A3FD37BAA307C07EA36E1FB54E72A94019331004137274BA5BF4464530FE"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_web.md",
+      "bytes": 5048,
+      "sha256": "D1669C46B4841C93F5CEBC843ACB05752D3BCFCBB07021E04B09B47CC87CFA91"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/search.md",
+      "bytes": 9186,
+      "sha256": "DEF0A740A10067989DF0EE3480FFD873ED565F04409939C35A4DFA48F83BD01F"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/security.md",
+      "bytes": 9259,
+      "sha256": "5670DEE0967BAEA2A45682F38C9890D4F2FDA5710535396B3B912F4BE6008C1E"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/SKILL.md",
+      "bytes": 9698,
+      "sha256": "93DC727F31727ABD9513839F53B18905059CBABEBBDB7178A56DC183673E3753"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/templates.md",
+      "bytes": 7631,
+      "sha256": "0460F95115CE0545C0833C72FEF4775DA2009645B5A054859DE288EBA0076390"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/android_sdk_usage.md",
+      "bytes": 9083,
+      "sha256": "92EA7FF7853090E83580D504B36478F61C88B4C3393D67E73F24DE0E3C400347"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/data_model.md",
+      "bytes": 2973,
+      "sha256": "D53ED6234E134A94F150D7E49FC7C68DF641155D1897AA2C94433FD54D9B1968"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/flutter_setup.md",
+      "bytes": 4941,
+      "sha256": "8BDCA6EB18E0D2990584E4B49B8EF095D07C49E2FF279F1032FD46BE3B3AF195"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/indexes.md",
+      "bytes": 4103,
+      "sha256": "E9E772FC38057A6F4E663A18990515C693BD5D669E00DE48C79B271AB91633D8"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/ios_setup.md",
+      "bytes": 6159,
+      "sha256": "AD5A6DC65BFD1C89E3E0D91F96FC2D44A2334462CABC97D81168FA8906B3D37F"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/provisioning.md",
+      "bytes": 3373,
+      "sha256": "5AE828DCFDDC46340DF976C0EB047509187B2C754130B4D5EE4EC59C8584AD43"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/python_sdk_usage.md",
+      "bytes": 3203,
+      "sha256": "4D843ED51F6F752F52FF86FDAD45707DD7D0EEB683FB2B62F0F1FD260D081D55"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/web_sdk_usage.md",
+      "bytes": 4378,
+      "sha256": "6BE9D5D5E246391DC8284EE3AEE28942A61CDD6AF0B3DE23C16CC25E00FAF0A1"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/android_sdk_usage.md",
+      "bytes": 5350,
+      "sha256": "73A87234F8B8E909DA8908F9759C182F6287833FC09A95947C3E48D80CC5B73E"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/flutter_setup.md",
+      "bytes": 4784,
+      "sha256": "F68171A662629347AE7FECDBBA6024B9818503989DAE1116AD96EC25932DE651"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/indexes.md",
+      "bytes": 3548,
+      "sha256": "2C87ED06DE03215F30244650C22DDD70E63BC64258680E0650BCB081F523208D"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/ios_setup.md",
+      "bytes": 5550,
+      "sha256": "228452B1EC77CA2BE47CE42E36D3031A2AB9305C87140072B26FF447F25E7A41"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/provisioning.md",
+      "bytes": 3009,
+      "sha256": "94104D85235A36ED678DCD899D2E0532C1AE99A4B4D73B09542F61EE6197F701"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/web_sdk_usage.md",
+      "bytes": 4739,
+      "sha256": "25C2D48C7004F0744794847CD8ACB66D9318B4C56AE336D1B885B17029547996"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/SKILL.md",
+      "bytes": 4843,
+      "sha256": "EF7F436546F82FB454F4C4453CDADD4F5CFCA7C471BB6670FE1244048207ACA6"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/references/configuration.md",
+      "bytes": 1947,
+      "sha256": "679F89B3306DCA248EEF1B18D79009B9ACED94AC5B51DBE0BBF7925DB854B949"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/references/deploying.md",
+      "bytes": 1249,
+      "sha256": "7AAE31EFBB5EF029773EAFF33705D83F9800FFD9FD31D34707DF0D79EFCF6A86"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/SKILL.md",
+      "bytes": 2463,
+      "sha256": "2C501342012D9D5F244E43C3A73CFF3B1062C3AEF29CD851E68F82C5D5A1D778"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/references/android_setup.md",
+      "bytes": 3646,
+      "sha256": "63FA54736E979DAEF844AD499EA8854F8FFC50198672E25675D0DB45874DD7AE"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/references/ios_setup.md",
+      "bytes": 2758,
+      "sha256": "80ADE3BADA7CBB3793E5BED18FF2E9607FB698F168B1391551E3D59CA4D5E925"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/SKILL.md",
+      "bytes": 4995,
+      "sha256": "F15C78EF573C757E857CB843AB59BFC4CE693F7553D3F3B004939926D5B194D5"
+    },
+    {
+      "path": ".agents/skills/firebase-security-rules-auditor/SKILL.md",
+      "bytes": 3974,
+      "sha256": "0E4AE0FC7959D957831817D54417BBFEBE1091533D7174E61207564B4A9AB2EC"
+    },
+    {
+      "path": ".agents/skills/firestore-rules-creation/SKILL.md",
+      "bytes": 28627,
+      "sha256": "C5010C6672065676F24ECEFC1BEBA6E25ECCE0314D0E43D14341111B8B8E64DE"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/scripts/xcode_spm_setup/.gitignore",
+      "bytes": 162,
+      "sha256": "2A1ED19DDD059A9499C486302730908A9907800BDDB0E0FA39CA6A008300DC3D"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/scripts/xcode_spm_setup/Package.resolved",
+      "bytes": 1117,
+      "sha256": "D20982B64F4B5642822E9076335752712D4B1625E401A9CF8973855B61B01590"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/scripts/xcode_spm_setup/Package.swift",
+      "bytes": 445,
+      "sha256": "9018E1F5DB907FB855EE69837611CF0F40340226E95FDDAF085434FADCD3A592"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/scripts/xcode_spm_setup/Sources/main.swift",
+      "bytes": 9633,
+      "sha256": "A5104B6EEA715F41BCB6F7431CFB9FE2991FF4CE3D5CA34086EDEFAECE982269"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/SKILL.md",
+      "bytes": 6256,
+      "sha256": "BE7E5BC48383DC9CEDF09382A2D11757F8D3CA499E106DFE2360269AF62763FD"
+    },
+    {
+      "path": ".firebaserc",
+      "bytes": 53,
+      "sha256": "4ACF3CA01A198102373E3F179426C526EC1FCB8847B876B2F0768B70FDFD6B14"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 1215,
+      "sha256": "004891AFB12F79504939EC15B7864E520B3FB5A6837862356BF05A6237492EE1"
+    },
+    {
+      "path": "back/firebase.json",
+      "bytes": 50,
+      "sha256": "5E85C62AAC183AF54E81F625783D243D8E1F8BD6E2AAEC55855EDCA93C2B99D8"
+    },
+    {
+      "path": "back/firestore.rules",
+      "bytes": 6209,
+      "sha256": "A6D1841188500153CE5CCAB8CAA5111F7B38764E57D3476E102C52C317CE39FD"
+    },
+    {
+      "path": "back/README.md",
+      "bytes": 1461,
+      "sha256": "FCFF152C363B132F805C0B332A8C4B3AD1C1F4AD488896F40C54E89EBE1DA5CB"
+    },
+    {
+      "path": "firebase.json",
+      "bytes": 427,
+      "sha256": "DBDCC4D1D34B230B38AB63C0F9C8B8B93003E572EB6B5B306981C94E5A2A08AD"
+    },
+    {
+      "path": "firestore-debug.log",
+      "bytes": 45299,
+      "sha256": "298B6542D566ABE013EECEB74EE85F1BC8DE60EC0AF0D9B0204855407C67615F"
+    },
+    {
+      "path": "front/.claude/settings.json",
+      "bytes": 71,
+      "sha256": "1E7BE1A32A758BE623E4897BCD97715F42C1585F3D7389EAA996C230E8FE9834"
+    },
+    {
+      "path": "front/.env.example",
+      "bytes": 282,
+      "sha256": "BABF25536D0A0054C81414F7387A7252A796F010F8B232EF0CF6D274D1AF20F8"
+    },
+    {
+      "path": "front/.env.local",
+      "bytes": 249,
+      "sha256": "3F47ACD58C88FC5834EADA6DAE624AEF9357AB3FBEB564C7BF61B232D3945C1B"
+    },
+    {
+      "path": "front/.gitignore",
+      "bytes": 468,
+      "sha256": "B22C7A3A6C0D20F847B820D7F629A8119B105AE0A1DAA181A48EAA6DDDD8DB67"
+    },
+    {
+      "path": "front/.test-build/cloudRecords.js",
+      "bytes": 2502,
+      "sha256": "4D2BCE55FBAD75D75E327E5209C46976547EDD9BFB851AF825CC62A253085A6A"
+    },
+    {
+      "path": "front/.test-build/cloudSync.js",
+      "bytes": 6420,
+      "sha256": "146CC7F045653319FAFF8ABC672B0ABB42247D8E425379A9D1D1177F6906517C"
+    },
+    {
+      "path": "front/.test-build/model.js",
+      "bytes": 12417,
+      "sha256": "4DB658786E760A1CF6364B5643E32679C80548497805978DD6A2D7388D2CDD1E"
+    },
+    {
+      "path": "front/.test-build/planner.js",
+      "bytes": 5664,
+      "sha256": "899F594678AF575D50C0801E8427A40BAD13E412ADAF049770339FABDF7D98DB"
+    },
+    {
+      "path": "front/.test-build/storage.js",
+      "bytes": 5768,
+      "sha256": "A3F301D870EFDE7B8771D3ED41F0EA5DC78875C57793F8FDDFAAE6BA3A854320"
+    },
+    {
+      "path": "front/.test-build/SyncEngine.js",
+      "bytes": 8776,
+      "sha256": "9E697C44A70687F458665439F670519D153DF267F0A70E255B763E60FBAA18D6"
+    },
+    {
+      "path": "front/.test-build/syncModel.js",
+      "bytes": 10843,
+      "sha256": "52A1C1295B113480B534CA2874059333717442070DA154E97D855076F5EB7178"
+    },
+    {
+      "path": "front/.test-build/syncStorage.js",
+      "bytes": 4663,
+      "sha256": "C7E6E38C98C8356B61F31CEDA6C61200FA677C64BAA91F73E729FF16E9DE9749"
+    },
+    {
+      "path": "front/AGENTS.md",
+      "bytes": 118,
+      "sha256": "5986DF214FCB822F856B9A8AAC7C06503E02158AAD55C8D7EDF2966D7EE2DFFD"
+    },
+    {
+      "path": "front/android/.gitignore",
+      "bytes": 183,
+      "sha256": "ED2E83B6A71E3B048DC2681BE0BDF534A5EC81D4EDED17012E78A6B252422465"
+    },
+    {
+      "path": "front/android/app/build.gradle",
+      "bytes": 8200,
+      "sha256": "CF4581602E4BA38C113766FE6F63FF2A7E8E07B5D57FB1D3AAAED1CECE83CB49"
+    },
+    {
+      "path": "front/android/app/debug.keystore",
+      "bytes": 2257,
+      "sha256": "221E0A3106AA4C3CCC154E0A418B55020B3F9EA6E84F92E8749CD9E2F39F5E58"
+    },
+    {
+      "path": "front/android/app/proguard-rules.pro",
+      "bytes": 562,
+      "sha256": "8BD4D7B69A1D78E8322B459B5E8D48234ADCE7481DF04DA34C0140D52FFB367A"
+    },
+    {
+      "path": "front/android/app/src/debug/AndroidManifest.xml",
+      "bytes": 374,
+      "sha256": "FB1795032C764D975376E1612AB7022058ECA2268A45EFBE731A47A5D3AC0F60"
+    },
+    {
+      "path": "front/android/app/src/debugOptimized/AndroidManifest.xml",
+      "bytes": 374,
+      "sha256": "FB1795032C764D975376E1612AB7022058ECA2268A45EFBE731A47A5D3AC0F60"
+    },
+    {
+      "path": "front/android/app/src/main/AndroidManifest.xml",
+      "bytes": 2064,
+      "sha256": "16DC3B0F9096CA8E482E952ADA09A14277BF0603FAE089EBCDA450E37C5793AE"
+    },
+    {
+      "path": "front/android/app/src/main/java/com/anonymous/nekal/MainActivity.kt",
+      "bytes": 2189,
+      "sha256": "3FD7F52232B20D619D8127745269722DED21428C8C10D95378294B7B818FBF92"
+    },
+    {
+      "path": "front/android/app/src/main/java/com/anonymous/nekal/MainApplication.kt",
+      "bytes": 1491,
+      "sha256": "0D6A5B817BAAB3F5C1557E2F752C4124F5BA7BBBFE4518EAAF95EBFED072639F"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable-hdpi/splashscreen_logo.png",
+      "bytes": 20754,
+      "sha256": "721C895579CB08EC4C9A0FE7DADAFE9A97C33EF758D3578AD5E8B540DE59F974"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable-mdpi/splashscreen_logo.png",
+      "bytes": 12863,
+      "sha256": "F84B9B17A4A1C7D7DD840CD272C07A6C3FD66D5A9826B64BB53FACB6F176BC24"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable-xhdpi/splashscreen_logo.png",
+      "bytes": 29081,
+      "sha256": "E1C5250E339ADD5ED7849CB0859D052EDB9781ABB91DB049E68AE3A4059247D7"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable-xxhdpi/splashscreen_logo.png",
+      "bytes": 47123,
+      "sha256": "23D97CCB41A821EE345B2C5BB0C9BDAB730A751A9227925ACBF0AF021DC38A9B"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable-xxxhdpi/splashscreen_logo.png",
+      "bytes": 66529,
+      "sha256": "BE9FAC5C4CDA48C41DCE592288C486524BBA3E4CA7FA00C0A04A46928154B5BF"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable/ic_launcher_background.xml",
+      "bytes": 245,
+      "sha256": "51FCA95679D075DDBE2B9FE7AD2EFB5EF545C5770A9AD6CAFE8BF610C18C67BE"
+    },
+    {
+      "path": "front/android/app/src/main/res/drawable/rn_edit_text_material.xml",
+      "bytes": 1917,
+      "sha256": "738E3AAAD53180CABA1419A6D5DB8465A0742662FE59A4BBAF05F1061CBC3390"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "bytes": 257,
+      "sha256": "03D70962A0BEEA2BB6AB1A838B015D90DA6C33ADB045FF85F7B198ACA70DF08D"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "bytes": 257,
+      "sha256": "03D70962A0BEEA2BB6AB1A838B015D90DA6C33ADB045FF85F7B198ACA70DF08D"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp",
+      "bytes": 17709,
+      "sha256": "6B3A26363B7B744B8586E941154528D5ACDCF6CFBDA493DD9C99987D0C4BAEC3"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp",
+      "bytes": 5556,
+      "sha256": "64A19A64778CA94D6C8D4036DB2853EBB46501AFEE38D4EE42413BC54414D9D6"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-hdpi/ic_launcher.webp",
+      "bytes": 4856,
+      "sha256": "8982B5C627DC8CAAF3DC9C3C48CCD2F859BDB70E631B920C038DD2CD69B1E4A3"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.webp",
+      "bytes": 9221,
+      "sha256": "25FA050098886197697E25B396A563C27A6A53D76BDEEFFCAE7699C5118B9EE3"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp",
+      "bytes": 3116,
+      "sha256": "E35CDE10600F6327385CA72244D10F39CD9B9E8320A573EE781A0BF0F8BA42E8"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-mdpi/ic_launcher.webp",
+      "bytes": 2684,
+      "sha256": "542CE60CECBBED1C19BC8A057EB5D41B5917016030DC694E731D4DA635272230"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.webp",
+      "bytes": 28288,
+      "sha256": "DEDBA242B8B02CC670BE77E012950D85144397D8BD7AF442CA2E69C1B1C0197E"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp",
+      "bytes": 8729,
+      "sha256": "FE5C2B6D90AE77ACACDB299F5F95DDDE1F849A8BB7AB262EFE07F587DCF1DA06"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xhdpi/ic_launcher.webp",
+      "bytes": 7707,
+      "sha256": "DEE9E94C9FFB85C1B34E4FC0B77215B1CB3EA42C99E8FEDB92A0E433A9CCB049"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.webp",
+      "bytes": 54893,
+      "sha256": "A2D0F71BF57739426DD56C7F237B404612C8C05C660AB791DBD323DBAF6B1F76"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp",
+      "bytes": 16244,
+      "sha256": "2C067BEE10A0C2BEE93AB980AC5F5D726ACBFB1B5535F419C18B46DC37EF9D61"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp",
+      "bytes": 14663,
+      "sha256": "C7B0BA7C5F589EA21CE9C15D6676A2A95BB86A583C42671EA62629F92B3B5DE6"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp",
+      "bytes": 87033,
+      "sha256": "62BFC75C3A8C65795D4C5392CB1676022C8F2D15A3C0C311B1EB0CE4A2DA76B4"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp",
+      "bytes": 25447,
+      "sha256": "B0735DBDB65D96F814FC8F1CFBA376EFE32DBBCA06D095426E72BAAEA6BC8CCF"
+    },
+    {
+      "path": "front/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp",
+      "bytes": 23323,
+      "sha256": "3799BDD6A0DA1FF69B15FFC5AA8669A0E413B2031D1715C081D5FAE8B2EC9182"
+    },
+    {
+      "path": "front/android/app/src/main/res/values/colors.xml",
+      "bytes": 172,
+      "sha256": "B3F3F3115A6A5C49EA900C7440F320BE1304BCC988597C3C4A7B4C1395B060B2"
+    },
+    {
+      "path": "front/android/app/src/main/res/values/strings.xml",
+      "bytes": 65,
+      "sha256": "92A2D1E623A50C4012A07479A361A03F0B91ECB29D00A4643BC4AB2B370CD89B"
+    },
+    {
+      "path": "front/android/app/src/main/res/values/styles.xml",
+      "bytes": 592,
+      "sha256": "E40414258372E05336FDE31CD6A59BA286F0735DCC548FEC42180B59AF12B0F0"
+    },
+    {
+      "path": "front/android/build.gradle",
+      "bytes": 556,
+      "sha256": "BDB916D3FE7085C9E9F3BB45BD5EACB97F5D2C5A2B2AF965642F7D904739CA68"
+    },
+    {
+      "path": "front/android/gradle.properties",
+      "bytes": 2567,
+      "sha256": "D02B52DA10BF3ABB24279FD102DF47694B8130A6B7FE6110CC47A9476AC8673C"
+    },
+    {
+      "path": "front/android/gradle/wrapper/gradle-wrapper.jar",
+      "bytes": 46175,
+      "sha256": "B3A875DDC1F044746E1B1A55F645584505F4A10438C1AFEA9F15E92A7C42EC13"
+    },
+    {
+      "path": "front/android/gradle/wrapper/gradle-wrapper.properties",
+      "bytes": 252,
+      "sha256": "A180163249C7252412DDAEE1C7ADCF59F6494B1183136F690FBD9A3B8AAED00E"
+    },
+    {
+      "path": "front/android/gradlew",
+      "bytes": 8618,
+      "sha256": "FB68DEBC1B1ACF8EC55DC0D5E5495E1DEDD0BD6B61F304BEE61613EEB2BD9B92"
+    },
+    {
+      "path": "front/android/gradlew.bat",
+      "bytes": 3093,
+      "sha256": "982F1B2979DD2D13505C11E92192AB43EEF338242CA61587F86F8D7FBC86F67B"
+    },
+    {
+      "path": "front/android/settings.gradle",
+      "bytes": 1258,
+      "sha256": "B5F9D6A54EC7A1A75A36377DA3BA5D576CBFAF28EB36E71DF896A93EBE002DD7"
+    },
+    {
+      "path": "front/app.json",
+      "bytes": 597,
+      "sha256": "A0606A5434406E82D18E6D81BEC45DADE02D1C261B9B1C66A8A197D2A1F228E2"
+    },
+    {
+      "path": "front/App.tsx",
+      "bytes": 593,
+      "sha256": "657D8907ACF844F91BCFB2F8066CE2D2A25602DD38BEC019A617442744B5C0A1"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose1.png",
+      "bytes": 34561,
+      "sha256": "776B98B37CB89C4AA55B222A40FD3A11E9BE92E4B98A291F00E4CEAA9BC1DC92"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose10.png",
+      "bytes": 31494,
+      "sha256": "F7F75E48FF112278445AF9F7A757275421DAF87D62B71255CFF03E91C94183F3"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose11.png",
+      "bytes": 34082,
+      "sha256": "8C106136DDFAD7A7EB74A2A83B68BD87DAC4B3AF83EACF1FF2884A4225562150"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose12.png",
+      "bytes": 32836,
+      "sha256": "D95DE38270988519FD215B127FA869203923E2EFC67750058CED3F41FC7CEA5D"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose13.png",
+      "bytes": 33540,
+      "sha256": "A14F2A948DA19896BB7D6C567F7BDB555026B7D39428EB56742D3886DC94B9FC"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose14.png",
+      "bytes": 40311,
+      "sha256": "8FB2FD226E61010AA077EC54C98D6A156D3805BC95C8131EBD5FCB59FD874DB6"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose15.png",
+      "bytes": 51537,
+      "sha256": "BBBEB8712D8168950814E1AA09DE6EDEF08A88DD755CDC94C264EAA1D27FC941"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose16.png",
+      "bytes": 34335,
+      "sha256": "CC2AC634849D80B5695EFA3F51DAA663588B1962B1DB1CB8D9BB7F73D58DB33E"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose17.png",
+      "bytes": 33588,
+      "sha256": "BEBE70027892644A3F0E84B9010570F81267CCA7C835032B2AB8DA941D7FF3E5"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose18.png",
+      "bytes": 34874,
+      "sha256": "9E6EF3DF57FC6A69E581612825FD31729BFDCE3622CA40C337407A254AECD6AB"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose2.png",
+      "bytes": 32099,
+      "sha256": "398AD06B1E987F609EC34C122A53284E0BCE93A9DB96402C29363D9375E5C027"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose3.png",
+      "bytes": 32668,
+      "sha256": "78DB704BF45C3581ECA2ED4AB2E3EF9F4C542C2D38C47A49BA9A85DCAEC63A3D"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose4.png",
+      "bytes": 31957,
+      "sha256": "11F4026DF258DF08657A952840BC58BED6B0F925BB8170A8FD6619FD9B805C8A"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose5.png",
+      "bytes": 34045,
+      "sha256": "7FD27D003B0A8EDE8F56BDD3E951335332F2A9DCAF9BD12982761E2DE70E707D"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose6.png",
+      "bytes": 34131,
+      "sha256": "56B4A2416B482B78BDB67FCE5C0D02F914ADFFACE78503BD3CCEDF6E42DA27C4"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose7.png",
+      "bytes": 32937,
+      "sha256": "668496DBF79F1760D3715177F1D270BE6625A3315D247345B8467DE5B882B708"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose8.png",
+      "bytes": 32590,
+      "sha256": "9B47646567E7A102F4F1D11996416BA8E2BBA034BC72D6167978B6422BDE5943"
+    },
+    {
+      "path": "front/assets/Img/Neka_Pose9.png",
+      "bytes": 34422,
+      "sha256": "B967DA30A7D91AD7614033930AC60655D39E69A298BF90C1B58F90F0C7048D76"
+    },
+    {
+      "path": "front/CLAUDE.md",
+      "bytes": 11,
+      "sha256": "336CC4FBF19BEAADA7CCF9986414FA91851A8D7A07DFB3CCBE800A69EED0AB49"
+    },
+    {
+      "path": "front/index.ts",
+      "bytes": 307,
+      "sha256": "5C157F4D44972D9C84415E1E4BDA595B3ABCD8CF733F8A9CD20935BEC3ECCC42"
+    },
+    {
+      "path": "front/LICENSE",
+      "bytes": 1106,
+      "sha256": "FB3CA4A837F5779E83CEF89B78253A8949CFB9429C340309F62D0465EC6610B4"
+    },
+    {
+      "path": "front/package-lock.json",
+      "bytes": 304140,
+      "sha256": "64460A079794ACC543E8D772C94D8977619A8C3A87759130D09AA1D8DCA0C2F1"
+    },
+    {
+      "path": "front/package.json",
+      "bytes": 1444,
+      "sha256": "ED83D9B25F4FDB78916FF69C119C45748C8C315F6BF81A7C410EC98273B9A6CA"
+    },
+    {
+      "path": "front/src/components/layout/Navbar.tsx",
+      "bytes": 2630,
+      "sha256": "98F18675774B1A9E5122575D80A2823847323BD644DA92B2379FA7ED094FC1E9"
+    },
+    {
+      "path": "front/src/components/layout/ScreenLayout.tsx",
+      "bytes": 510,
+      "sha256": "B604659EB72A0597EE4AF3C8F2945BF724AB20377DCD583130CA9C1693F97C94"
+    },
+    {
+      "path": "front/src/components/layout/Topbar.tsx",
+      "bytes": 4230,
+      "sha256": "3C2D31BB96B3733D8DD0B4219FBB3A217783FD46552C7ADAA08FE6A86539596E"
+    },
+    {
+      "path": "front/src/components/ui/ChatUi/ChatHeader.tsx",
+      "bytes": 1360,
+      "sha256": "B20B12E5986BA9AB3E2338C4607A0AF5D133558BC87011E5916269DD9F047782"
+    },
+    {
+      "path": "front/src/components/ui/ChatUi/ChatInput.tsx",
+      "bytes": 1515,
+      "sha256": "6C8A9D4913B7E5D92B1617D1189A164763DF4329B1A621DE68755BC6489981E3"
+    },
+    {
+      "path": "front/src/components/ui/ChatUi/ChatMessage.tsx",
+      "bytes": 1595,
+      "sha256": "BC64E05BCF466D9834AC2DFB5DE4FB0320DCDC0B12770D638FEAB0A103891413"
+    },
+    {
+      "path": "front/src/components/ui/Common.tsx",
+      "bytes": 5608,
+      "sha256": "6F9D8539E4819588D795C7647386458B9A19CD66A51D4A8334A5860EF5AEAF87"
+    },
+    {
+      "path": "front/src/components/ui/EspacioTrabajoUi/AddFab.tsx",
+      "bytes": 656,
+      "sha256": "731F4FB0ABEAE5AB381EBE60DDCA41CB2BF4E8B2BA39F609539DDFC14621B70C"
+    },
+    {
+      "path": "front/src/components/ui/EspacioTrabajoUi/CanvasContent.tsx",
+      "bytes": 6363,
+      "sha256": "815424F4164ED79421997FFCC62D35A4F0526835499144FB89FFC4E06DF4D048"
+    },
+    {
+      "path": "front/src/components/ui/EspacioTrabajoUi/InfiniteCanvas.tsx",
+      "bytes": 1561,
+      "sha256": "D19E1C485973A539E493ABDFEA2AF06CB66B893A985F749A2784620B04ECE007"
+    },
+    {
+      "path": "front/src/components/ui/EspacioTrabajoUi/WorkspaceBar.tsx",
+      "bytes": 1788,
+      "sha256": "8AB0DA8E2611C2FE0073A4F08F8D94282E5631B09379DF75415FEE2C88F87BA4"
+    },
+    {
+      "path": "front/src/components/ui/EspacioTrabajoUi/ZoomControl.tsx",
+      "bytes": 1771,
+      "sha256": "6AB6F76BD1906D21A530ECEB325AD76BDFBDEF6E437D2F24C9DED35CE7126845"
+    },
+    {
+      "path": "front/src/components/ui/ItemCard.tsx",
+      "bytes": 3095,
+      "sha256": "68DA0067201D51809BC6D22EB4B897FACAAB29532F9ECB252A7A00C4A6046551"
+    },
+    {
+      "path": "front/src/components/ui/ItemEditor.tsx",
+      "bytes": 18886,
+      "sha256": "8D702B669CCC28E92BBE2C65D2F6722EE7BCC88DC73B6919AC0D4A73FF1D2A21"
+    },
+    {
+      "path": "front/src/navigation/AppNavigator.tsx",
+      "bytes": 1653,
+      "sha256": "F326C2313F2CCBCBCFA48393A86080B1FBA3DF2F65BACBD1BC78F94812603DEA"
+    },
+    {
+      "path": "front/src/navigation/TabNavigator.tsx",
+      "bytes": 1577,
+      "sha256": "8BB33E24474970648D13E7CE026C1DF2E61BB78167B91130184287D8BB86A50A"
+    },
+    {
+      "path": "front/src/pages/Ajustes.tsx",
+      "bytes": 17046,
+      "sha256": "43B42A2595E771AEB62D66FDB476F7683B6D6893B60729C220B35062C1295744"
+    },
+    {
+      "path": "front/src/pages/Bienvenida.tsx",
+      "bytes": 1773,
+      "sha256": "910D0ADB31332EC98FEE58C6416E9E88463BF2220F9D4AF6EF2E5E34EFD84FA2"
+    },
+    {
+      "path": "front/src/pages/Calendario.tsx",
+      "bytes": 8306,
+      "sha256": "092910768E9BBD8F7AC0BD2B8CB296BBE4B42F7B347A7FAAC64BDEC438E16BDE"
+    },
+    {
+      "path": "front/src/pages/Chat.tsx",
+      "bytes": 10824,
+      "sha256": "9EE5C41141EF437E4674C21DDF9C054D8556F152ABD0D10B776FE409EC9E4EFB"
+    },
+    {
+      "path": "front/src/pages/EspacioTrabajo.tsx",
+      "bytes": 11854,
+      "sha256": "206900C950726BC4539A21B870CF9214E7B98AD5E4A4575C658782E958A3AC1E"
+    },
+    {
+      "path": "front/src/pages/Login.tsx",
+      "bytes": 5201,
+      "sha256": "62663F244843C7D21E9AC1AF334EC53633A75A73AA893C2F3B851BB6B82E626E"
+    },
+    {
+      "path": "front/src/pages/Perfil.tsx",
+      "bytes": 8922,
+      "sha256": "A6C7B2A5F3558FE43F183FC5967209B7D9E779B2FDCD9503AA51CC504F63EF79"
+    },
+    {
+      "path": "front/src/pages/Resumen.tsx",
+      "bytes": 7948,
+      "sha256": "9108CD6273CE7D8680237B9E18501929F4CBEB428AA077E861E450FEC5480F0D"
+    },
+    {
+      "path": "front/src/styles/globalStyles.ts",
+      "bytes": 1783,
+      "sha256": "B1211D18EEAB3CC8F3201657D67B29B2E528580532BCB5EAD925D990AE5D5BB7"
+    },
+    {
+      "path": "front/src/utils/AppContext.tsx",
+      "bytes": 9018,
+      "sha256": "809FC1CCC54E755975AF539390EDDE0E152FBE91E4A5471B110BCC7F3466F83E"
+    },
+    {
+      "path": "front/src/utils/cloudRecords.ts",
+      "bytes": 2376,
+      "sha256": "346BA15DB7329BA2CB565AE21FA859DFAC57472AE764F740D5FDE6781DD61609"
+    },
+    {
+      "path": "front/src/utils/cloudSync.ts",
+      "bytes": 5939,
+      "sha256": "10BE521DB6F283FD4AF8D46750E037C0C6B3FA13C1B68C1D21AE2103845E3FBA"
+    },
+    {
+      "path": "front/src/utils/firebase.ts",
+      "bytes": 1347,
+      "sha256": "EA047C3895D2EA01A8CD6BEE6125B8FCCBEA4CD3E0EE956762DE640B84AFAF29"
+    },
+    {
+      "path": "front/src/utils/model.ts",
+      "bytes": 12669,
+      "sha256": "97F07708B795386127AC444FFA3DAF98FB076AD74278D243A9292105CB59C43A"
+    },
+    {
+      "path": "front/src/utils/notifications.ts",
+      "bytes": 2314,
+      "sha256": "6F1FABCE9456BDDC10C9A22E7630DBBB62F2293C567A3E2241B6962E346B789F"
+    },
+    {
+      "path": "front/src/utils/planner.ts",
+      "bytes": 5435,
+      "sha256": "1964DD128406B30C3CFC5FA91EEBBFB153E5BA9F483052BCA97C86F72D066AD9"
+    },
+    {
+      "path": "front/src/utils/storage.ts",
+      "bytes": 5246,
+      "sha256": "737524F003AC04237050B178D49499055B801BE7C2AB0587A9250D08C0CB6A9B"
+    },
+    {
+      "path": "front/src/utils/SyncEngine.ts",
+      "bytes": 8482,
+      "sha256": "12666F5F7F953936FACE7512A42325ED6F24314B35D6604725337B5BC06DEBF3"
+    },
+    {
+      "path": "front/src/utils/syncModel.ts",
+      "bytes": 11296,
+      "sha256": "3A39239C8CA8260610B534704CCB24696C7DC23288BD101D122147EE0908CA58"
+    },
+    {
+      "path": "front/src/utils/syncStorage.ts",
+      "bytes": 2860,
+      "sha256": "55FD5689AA4F21DA60EB0FA468FE8F4301FF18338EF9E85F902590228D4EE8D2"
+    },
+    {
+      "path": "front/tests/create-fixtures.cjs",
+      "bytes": 2579,
+      "sha256": "44F2CD63304D66F037541ADE602AC0D4AD9FF740707F6FE2514EE2E8ACC81968"
+    },
+    {
+      "path": "front/tests/firestore.cjs",
+      "bytes": 8179,
+      "sha256": "BEC9D3946F67CC17D5A060E78853354092E80BF0E52463D590FDDAE8DF9F1650"
+    },
+    {
+      "path": "front/tests/fixtures/respaldo-v1.json",
+      "bytes": 7671,
+      "sha256": "9C6794A2CA1D90474F2E724B2250F0BBACFB8304AE989B1524DF9887F720325E"
+    },
+    {
+      "path": "front/tests/fixtures/vacio-v1.json",
+      "bytes": 416,
+      "sha256": "00DF030194E763C60025EE49A3149742FBDB04A4A2D0B2542B832DAACC21C49B"
+    },
+    {
+      "path": "front/tests/outbox.cjs",
+      "bytes": 2524,
+      "sha256": "A4A2DC7E83576966BAB1A52AA8528F43FBFCA924988D556F969600C72BD0200E"
+    },
+    {
+      "path": "front/tests/rules.cjs",
+      "bytes": 8793,
+      "sha256": "17697F27E5C6CD2463098D907571B1495B788C5A28044B15AC3A266CF7029BD5"
+    },
+    {
+      "path": "front/tests/run.cjs",
+      "bytes": 750,
+      "sha256": "F177A52AC682CA30BF9B8613A71B49359D23E00D2A5F961847572A0C5670BD80"
+    },
+    {
+      "path": "front/tests/sync.cjs",
+      "bytes": 5085,
+      "sha256": "9C498CD0FBC6615F00288429163A542CD5AB41DFBCA4F6475FF2F594ADC9395D"
+    },
+    {
+      "path": "front/tsconfig.json",
+      "bytes": 220,
+      "sha256": "536ACD818A072C1DEE56B98A1139656A38CD1B64C715F6E8D6F1F26CE2D602E3"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 306918,
+      "sha256": "59D8095A6103A92CD79FA688BB0AE9F71D5766B75140D096CCB4382330E905F3"
+    },
+    {
+      "path": "package.json",
+      "bytes": 667,
+      "sha256": "398BE2ECAFFD302AA0A2202520EB45C9DDA332C431CCC7D2F0869F2047E9B78D"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3382,
+      "sha256": "5B3A9A9AE282A187505092F3A33F2A61335DCC47D0B4D3852EE1B759A73D7D34"
+    },
+    {
+      "path": "skills-lock.json",
+      "bytes": 3456,
+      "sha256": "243D9DD6D592209D6419F42AEB3DDC237B2C5E826F4F8CC21AD4FBCC52A673E2"
+    }
+  ],
+  "gitStatus": " M .gitignore\r\n M App.tsx\r\n M app.json\r\n D assets/android-icon-background.png\r\n D assets/android-icon-foreground.png\r\n D assets/android-icon-monochrome.png\r\n D assets/favicon.png\r\n D assets/icon.png\r\n D assets/splash-icon.png\r\n M package-lock.json\r\n M package.json\r\n M tsconfig.json\r\n?? .env.example\r\n?? assets/Img/\r\n?? src/\r\n?? tests/\r\n"
+}
