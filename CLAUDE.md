@@ -26,7 +26,7 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 - **Cada función de V2:** `superpowers:brainstorming` → `superpowers:writing-plans` → `superpowers:executing-plans`.
 - **Lógica (utils):** `superpowers:test-driven-development`. **Bugs:** `superpowers:systematic-debugging`.
 - **Antes de dar algo por terminado:** `superpowers:verification-before-completion` (test + typecheck + build:web) y `/code-review`.
-- **Diseño/UI:** `ui-ux-pro-max` (cubre React Native) + `mobile-design` (convenciones iOS). Revisar contra maquetas: `design:design-critique`; accesibilidad: `design:accessibility-review`.
+- **Diseño/UI:** `ui-ux-pro-max` (cubre React Native) + `mobile-design` (convenciones iOS) + `apple-design` (gestos, animaciones spring, hojas, tipografía y movimiento estilo Apple). Revisar contra maquetas: `design:design-critique`; accesibilidad: `design:accessibility-review`.
 - **Firebase:** skills en `.claude/skills` (`firebase-firestore`, `firebase-security-rules-auditor`, `firestore-rules-creation`, `firebase-auth-basics`…). Cambios en reglas: `/security-review`.
 - **Ver la app:** `/run` o el navegador integrado (`.claude/launch.json` → `nekal-web`).
 - **Solo si aplica:** `3d-web-experience` (Espacio en 3D), `claude-api` (Neka con IA real).
