@@ -437,7 +437,7 @@ export default function Ajustes({ onBack }: { onBack: () => void }) {
               puntos subes un nivel.
             </Text>
             <Text style={s.small}>
-              Consulta documentacion/V1.md para la fórmula completa, sus límites
+              Consulta DOCUMENTOS/V1/V1.md para la fórmula completa, sus límites
               y las decisiones de diseño.
             </Text>
           </>

@@ -4,7 +4,7 @@ Aplicación de organización personal para web y Expo Go. Conserva React Native,
 
 ## Iniciar desde esta carpeta (terminal de Codex o VS Code)
 
-Abre `NombreApp_V1_Codex` en VS Code y usa **Terminal > Nueva terminal**. Los mismos comandos funcionan en una terminal abierta desde Codex en esta carpeta.
+Abre `NEKAL-main` en VS Code y usa **Terminal > Nueva terminal**. Los mismos comandos funcionan en una terminal abierta desde Claude Code o Codex en esta carpeta.
 
 ```powershell
 npm run web
@@ -43,7 +43,7 @@ Las exportaciones quedan en `front/dist` y `front/dist-ios`. Exportar iOS compru
 
 El proyecto `nekal-973b2` usa Authentication con Email/Password y Cloud Firestore. La configuración está en `front/.env.local`. Para otro proyecto, copia `front/.env.example`, completa las cuatro variables públicas del cliente, publica las reglas de `back/firestore.rules` y reinicia Expo.
 
-Las cuentas cargan, guardan y reciben cambios automáticamente. Sin conexión conservan una cola local que se reenvía al reconectar; un conflicto incompatible requiere elegir una versión desde Perfil. Invitado conserva datos únicamente en ese dispositivo. No se necesitan claves privadas ni cuentas de servicio. Ver [sincronización, estructura y recuperación](documentacion/SINCRONIZACION.md) y [funciones y puntaje de V1](documentacion/V1.md).
+Las cuentas cargan, guardan y reciben cambios automáticamente. Sin conexión conservan una cola local que se reenvía al reconectar; un conflicto incompatible requiere elegir una versión desde Perfil. Invitado conserva datos únicamente en ese dispositivo. No se necesitan claves privadas ni cuentas de servicio. Ver [sincronización, estructura y recuperación](PROYECTO/CONEXIONES/SINCRONIZACION.md) y [funciones y puntaje de V1](DOCUMENTOS/V1/V1.md).
 
 ## Publicar actualizaciones en Firebase Hosting
 

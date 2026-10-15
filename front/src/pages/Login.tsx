@@ -67,7 +67,7 @@ export default function Login({ onGuest }: { onGuest?: () => void }) {
         <Text style={s.heading}>Firebase aún no está configurado</Text>
         <Text style={s.text}>
           Puedes usar todas las funciones locales. Para activar cuentas,
-          configura el proyecto Firebase siguiendo documentacion/V1.md.
+          configura el proyecto Firebase siguiendo DOCUMENTOS/V1/V1.md.
         </Text>
         <Text style={s.small}>
           Se necesita registrar una app web, habilitar Email/Password y
