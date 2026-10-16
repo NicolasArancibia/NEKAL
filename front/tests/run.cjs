@@ -11,6 +11,7 @@ const build = spawnSync(
     "src/utils/syncModel.ts",
     "src/utils/SyncEngine.ts",
     "src/utils/syncStorage.ts",
+    "src/utils/neka.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -47,3 +48,4 @@ require("./rules.cjs");
 require("./sync.cjs");
 require("./outbox.cjs");
 require("./theme.cjs");
+require("./neka.cjs");
