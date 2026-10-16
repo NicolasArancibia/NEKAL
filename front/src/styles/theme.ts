@@ -16,6 +16,9 @@ export const color = {
   warning: "#E8962E",
   onPrimary: "#FFFFFF",
   backdrop: "rgba(32, 20, 54, 0.35)",
+  // Decorativos del mapa del Espacio (no se usan como texto).
+  mapDot: "#DBCEF6",
+  mapEdge: "#CFBAF6",
 } as const;
 export const space = {
   xs: 4,

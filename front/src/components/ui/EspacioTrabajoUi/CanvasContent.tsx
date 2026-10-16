@@ -1,15 +1,9 @@
 import React, { useRef } from "react";
-import {
-  Animated,
-  Image,
-  PanResponder,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Image, PanResponder, Pressable, View } from "react-native";
 import Svg, { Circle, Defs, Line, Pattern, Rect } from "react-native-svg";
 import { Item, Group } from "../../../utils/model";
-import { colors } from "../../../styles/globalStyles";
+import { color, radius, shadow, space } from "../../../styles/theme";
+import { Txt } from "../base";
 function Node({
   item,
   x,
@@ -75,29 +69,28 @@ function Node({
             borderRadius: 18,
             backgroundColor:
               item.status === "completado"
-                ? colors.green
+                ? color.success
                 : item.priority === "urgente"
-                  ? colors.red
-                  : colors.primary,
+                  ? color.danger
+                  : color.primary,
             borderWidth: 5,
-            borderColor: "#EAE0FF",
-            boxShadow: "0 3px 12px #D1BDF4",
+            borderColor: color.primarySoft,
+            boxShadow: shadow.card,
           }}
         />
-        <Text
+        <Txt
+          variant="caption"
+          weight={600}
+          align="center"
           numberOfLines={2}
           style={{
-            fontSize: 11,
-            textAlign: "center",
-            color: colors.ink,
-            backgroundColor: "#FCFAFF",
-            borderRadius: 8,
-            padding: 3,
-            fontWeight: "600",
+            backgroundColor: color.background,
+            borderRadius: radius.sm,
+            paddingHorizontal: space.xs,
           }}
         >
           {item.title}
-        </Text>
+        </Txt>
       </Pressable>
     </Animated.View>
   );
@@ -150,7 +143,7 @@ export default function CanvasContent({
             height={24}
             patternUnits="userSpaceOnUse"
           >
-            <Circle cx={2} cy={2} r={1} fill="#DBCEF6" />
+            <Circle cx={2} cy={2} r={1} fill={color.mapDot} />
           </Pattern>
         </Defs>
         <Rect width={1000} height={1000} fill="url(#dots)" />
@@ -164,7 +157,7 @@ export default function CanvasContent({
               y1={hub?.y ?? 500}
               x2={p.x}
               y2={p.y}
-              stroke="#CFBAF6"
+              stroke={color.mapEdge}
               strokeWidth={2}
             />
           );
@@ -180,7 +173,7 @@ export default function CanvasContent({
                 y1={a.y}
                 x2={b.x}
                 y2={b.y}
-                stroke={colors.red}
+                stroke={color.danger}
                 strokeDasharray="5 5"
                 strokeWidth={2}
               />
@@ -196,18 +189,21 @@ export default function CanvasContent({
             left: g.x - 45,
             top: g.y - 16,
             width: 90,
-            padding: 6,
-            borderRadius: 12,
-            backgroundColor: "#EEE3FF",
+            padding: space.xs + 2,
+            borderRadius: radius.sm,
+            backgroundColor: color.primarySoft,
             borderWidth: 1,
-            borderColor: "#BC9EEB",
+            borderColor: color.mapEdge,
           }}
         >
-          <Text
-            style={{ fontSize: 10, color: colors.primary, textAlign: "center" }}
+          <Txt
+            variant="caption"
+            tone="primary"
+            align="center"
+            numberOfLines={1}
           >
             {g.name}
-          </Text>
+          </Txt>
         </View>
       ))}
       <View
@@ -224,11 +220,9 @@ export default function CanvasContent({
           style={{ width: 62, height: 62 }}
           resizeMode="contain"
         />
-        <Text
-          style={{ fontSize: 11, fontWeight: "800", color: colors.primary }}
-        >
+        <Txt variant="caption" weight={800} tone="primary">
           {name || "Tú"}
-        </Text>
+        </Txt>
       </View>
       {items.map((i) => {
         const p = positions.get(i.id)!;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, TextInput } from "react-native";
+import { View, ScrollView, TextInput } from "react-native";
 import WorkspaceBar from "../components/ui/EspacioTrabajoUi/WorkspaceBar";
 import ZoomControl from "../components/ui/EspacioTrabajoUi/ZoomControl";
 import AddFab from "../components/ui/EspacioTrabajoUi/AddFab";
@@ -7,8 +7,17 @@ import InfiniteCanvas from "../components/ui/EspacioTrabajoUi/InfiniteCanvas";
 import CanvasContent from "../components/ui/EspacioTrabajoUi/CanvasContent";
 import ItemEditor from "../components/ui/ItemEditor";
 import ItemCard from "../components/ui/ItemCard";
-import { Button, Chip, Empty, Field, Sheet } from "../components/ui/Common";
-import { ScreenHeader } from "../components/ui/base";
+import {
+  Button,
+  Card,
+  Chip,
+  EmptyState,
+  Field,
+  ScreenHeader,
+  Sheet,
+  Tag,
+  Txt,
+} from "../components/ui/base";
 import { useApp } from "../utils/AppContext";
 import {
   Item,
@@ -19,7 +28,14 @@ import {
   localDay,
   parseDateInput,
 } from "../utils/model";
-import { colors, s } from "../styles/globalStyles";
+import { color, font, radius, size, space, type } from "../styles/theme";
+
+const row = {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: space.sm,
+} as const;
+
 export default function EspacioTrabajo() {
   const { data, change } = useApp();
   const [workspace, setWorkspace] = useState("general"),
@@ -49,8 +65,8 @@ export default function EspacioTrabajo() {
     }
   };
   return (
-    <View style={s.page}>
-      <View style={{ padding: 16, gap: 10 }}>
+    <View style={{ flex: 1, backgroundColor: color.background }}>
+      <View style={{ padding: space.screen, gap: space.md }}>
         <ScreenHeader title="Espacio" />
         <WorkspaceBar
           name={selected.name}
@@ -65,21 +81,29 @@ export default function EspacioTrabajo() {
             setName("");
           }}
         />
-        <View style={s.row}>
+        <View style={row}>
           <TextInput
             accessibilityLabel="Buscar ítems"
             placeholder="Buscar en este espacio"
-            placeholderTextColor={colors.muted}
+            placeholderTextColor={color.inkSecondary}
             value={query}
             onChangeText={setQuery}
-            style={[
-              s.input,
-              { flex: 1, minHeight: 38, paddingVertical: 8, fontSize: 13 },
-            ]}
+            style={{
+              flex: 1,
+              minHeight: size.minTouch,
+              paddingHorizontal: space.lg,
+              borderRadius: radius.pill,
+              borderWidth: 1,
+              borderColor: color.line,
+              backgroundColor: color.surface,
+              color: color.ink,
+              fontFamily: font[500],
+              fontSize: type.callout.size,
+            }}
           />
           <Button
             title="Rutinas"
-            secondary
+            variant="secondary"
             small
             onPress={() => {
               setModal("groups");
@@ -88,15 +112,15 @@ export default function EspacioTrabajo() {
           />
         </View>
         {!list && (
-          <View style={s.between}>
+          <View style={[row, { justifyContent: "space-between" }]}>
             <Chip
-              title={moving ? "Mover nodos: activo" : "Mover nodos"}
+              title={moving ? "Moviendo nodos" : "Mover nodos"}
               selected={moving}
               onPress={() => setMoving(!moving)}
             />
             <Button
               title="Centrar"
-              secondary
+              variant="plain"
               small
               onPress={() => {
                 setReset((v) => v + 1);
@@ -108,18 +132,26 @@ export default function EspacioTrabajo() {
       </View>
       {list ? (
         <ScrollView
-          contentContainerStyle={[
-            s.content,
-            { paddingTop: 0, paddingBottom: 90 },
-          ]}
+          contentContainerStyle={{
+            paddingHorizontal: space.screen,
+            paddingBottom: 96,
+            gap: space.md,
+            width: "100%",
+            maxWidth: 960,
+            alignSelf: "center",
+          }}
         >
           {items.map((i) => (
             <ItemCard key={i.id} item={i} onPress={() => setEditor(i)} />
           ))}
           {!items.length && (
-            <Empty
-              title="Tu espacio empieza aquí"
-              detail="Crea una tarea, guarda una idea o planifica tu próximo objetivo."
+            <EmptyState
+              pose={3}
+              text={
+                query
+                  ? "No hay ítems con esa búsqueda."
+                  : "Pulsa + para crear tu primer ítem."
+              }
             />
           )}
         </ScrollView>
@@ -156,13 +188,12 @@ export default function EspacioTrabajo() {
                 position: "absolute",
                 top: "58%",
                 alignSelf: "center",
-                paddingHorizontal: 24,
+                paddingHorizontal: space.xxl,
               }}
             >
-              <Text style={[s.subtitle, { textAlign: "center" }]}>
-                Un espacio para tus ideas.{"\n"}Pulsa + para crear tu primer
-                ítem.
-              </Text>
+              <Txt tone="secondary" align="center">
+                Pulsa + para crear tu primer ítem.
+              </Txt>
             </View>
           )}
         </>
@@ -170,9 +201,9 @@ export default function EspacioTrabajo() {
       <View
         style={{
           position: "absolute",
-          bottom: 16,
-          left: 20,
-          right: 20,
+          bottom: space.lg,
+          left: space.screen,
+          right: space.screen,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -185,7 +216,9 @@ export default function EspacioTrabajo() {
             onZoomOut={() => setZoom((v) => Math.max(0.4, v - 0.1))}
           />
         ) : (
-          <Text style={s.small}>{items.length} ítems</Text>
+          <Txt variant="caption" tone="secondary">
+            {items.length} {items.length === 1 ? "ítem" : "ítems"}
+          </Txt>
         )}
         <AddFab onPress={() => setEditor(newItem(selected.id))} />
       </View>
@@ -198,7 +231,7 @@ export default function EspacioTrabajo() {
       )}
       <Sheet
         visible={!!modal}
-        title={modal === "spaces" ? "Tus espacios" : "Rutinas reutilizables"}
+        title={modal === "spaces" ? "Tus espacios" : "Rutinas"}
         onClose={() => {
           setModal(null);
           setError("");
@@ -207,20 +240,29 @@ export default function EspacioTrabajo() {
         {modal === "spaces" ? (
           <>
             {data.workspaces.map((w) => (
-              <View key={w.id} style={s.card}>
-                <Button
-                  title={`Abrir ${w.name}`}
-                  secondary
-                  onPress={() => {
-                    setWorkspace(w.id);
-                    setModal(null);
-                    setQuery("");
+              <Card
+                key={w.id}
+                accessibilityLabel={`Abrir ${w.name}`}
+                onPress={() => {
+                  setWorkspace(w.id);
+                  setModal(null);
+                  setQuery("");
+                }}
+                style={row}
+              >
+                <View
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: radius.pill,
+                    backgroundColor: w.color,
                   }}
                 />
-                {w.id === selected.id && (
-                  <Text style={s.small}>Espacio actual</Text>
-                )}
-              </View>
+                <Txt weight={600} numberOfLines={1} style={{ flex: 1 }}>
+                  {w.name}
+                </Txt>
+                {w.id === selected.id && <Tag text="Actual" tone="primary" />}
+              </Card>
             ))}
             <Field
               label="Nombre del espacio"
@@ -236,7 +278,7 @@ export default function EspacioTrabajo() {
                   const w = {
                     id: uid(),
                     name: name.trim(),
-                    color: colors.primary,
+                    color: color.primary,
                   };
                   change((d) => ({ ...d, workspaces: [...d.workspaces, w] }));
                   setWorkspace(w.id);
@@ -247,7 +289,7 @@ export default function EspacioTrabajo() {
             />
             <Button
               title={`Renombrar ${selected.name}`}
-              secondary
+              variant="secondary"
               onPress={() =>
                 act(() => {
                   if (!name.trim()) throw new Error("Escribe el nuevo nombre.");
@@ -264,7 +306,7 @@ export default function EspacioTrabajo() {
             {selected.id !== "general" && (
               <Button
                 title="Eliminar espacio vacío"
-                secondary
+                variant="plain"
                 onPress={() =>
                   act(() => {
                     if (
@@ -288,10 +330,10 @@ export default function EspacioTrabajo() {
           </>
         ) : (
           <>
-            <Text style={s.subtitle}>
-              Agrupa ítems desde su formulario. Reutilizar crea una copia
-              independiente con fechas desplazadas y progreso en cero.
-            </Text>
+            <Txt tone="secondary">
+              Agrupa ítems desde su formulario. Reutilizar crea una copia con
+              las fechas movidas y el progreso en cero.
+            </Txt>
             <Field
               label="Nombre de la rutina"
               value={name}
@@ -326,15 +368,15 @@ export default function EspacioTrabajo() {
             {data.groups
               .filter((g) => g.workspaceId === selected.id)
               .map((g) => (
-                <View key={g.id} style={s.card}>
-                  <Text style={s.heading}>{g.name}</Text>
-                  <Text style={s.small}>
+                <Card key={g.id}>
+                  <Txt variant="headline">{g.name}</Txt>
+                  <Txt variant="caption" tone="secondary">
                     {activeItems(data).filter((i) => i.groupId === g.id).length}{" "}
                     ítems
-                  </Text>
+                  </Txt>
                   <Button
                     title={`Reutilizar ${g.name}`}
-                    secondary
+                    variant="secondary"
                     onPress={() =>
                       act(() => {
                         parseDateInput(repeatDay);
@@ -346,7 +388,7 @@ export default function EspacioTrabajo() {
                   />
                   <Button
                     title={`Desagrupar ${g.name}`}
-                    secondary
+                    variant="plain"
                     small
                     onPress={() =>
                       act(() =>
@@ -360,11 +402,15 @@ export default function EspacioTrabajo() {
                       )
                     }
                   />
-                </View>
+                </Card>
               ))}
           </>
         )}
-        {!!error && <Text style={s.error}>{error}</Text>}
+        {!!error && (
+          <Txt tone="danger" accessibilityRole="alert">
+            {error}
+          </Txt>
+        )}
       </Sheet>
     </View>
   );

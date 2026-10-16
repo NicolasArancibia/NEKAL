@@ -1,23 +1,23 @@
-import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../../styles/globalStyles";
+import { color, radius, shadow } from "../../../styles/theme";
+import { PressableScale } from "../base";
+
 export default function AddFab({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable
-      accessibilityRole="button"
+    <PressableScale
       accessibilityLabel="Crear ítem"
       onPress={onPress}
       style={{
-        width: 54,
-        height: 54,
-        borderRadius: 27,
-        backgroundColor: colors.primary,
+        width: 56,
+        height: 56,
+        borderRadius: radius.pill,
+        backgroundColor: color.primary,
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 6px 16px #C7B5EA",
+        boxShadow: shadow.raised,
       }}
     >
-      <Ionicons name="add" size={28} color="white" />
-    </Pressable>
+      <Ionicons name="add-outline" size={28} color={color.onPrimary} />
+    </PressableScale>
   );
 }
