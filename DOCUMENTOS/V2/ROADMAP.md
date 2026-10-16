@@ -12,7 +12,7 @@ Cada subproyecto tiene su propio ciclo: brainstorming → spec → plan → impl
 
 | # | Subproyecto | Semanas | Estado |
 |---|---|---|---|
-| A | Sistema de diseño refinado | 1–2 (16–29 oct) | En brainstorming |
+| A | Sistema de diseño refinado | 1–2 (16–29 oct) | Spec escrita, en revisión: [A_SISTEMA_DE_DISENO.md](A_SISTEMA_DE_DISENO.md) |
 | B | Espacio: General como raíz + rediseño del mapa | 1–2 (16–29 oct) | Pendiente |
 | C | Importar Google Calendar | 3–4 (30 oct–12 nov) | Pendiente |
 | D | Neka con IA (un solo agente) | 3–4 (30 oct–12 nov) | Pendiente |
