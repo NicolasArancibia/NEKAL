@@ -35,7 +35,7 @@ export default function Toggle({
         accessibilityLabel={label}
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: color.primary, false: color.line }}
+        trackColor={{ true: color.primary, false: color.lineStrong }}
         thumbColor={color.surface}
         // react-native-web usa su propio verde si no se indica.
         {...({ activeThumbColor: color.surface } as object)}

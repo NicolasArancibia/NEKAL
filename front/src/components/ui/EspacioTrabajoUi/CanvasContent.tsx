@@ -217,6 +217,7 @@ export default function CanvasContent({
       >
         <Image
           source={require("../../../../assets/Img/Neka_Pose6.png")}
+          aria-hidden
           style={{ width: 62, height: 62 }}
           resizeMode="contain"
         />

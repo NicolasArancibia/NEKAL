@@ -31,7 +31,7 @@ export default function ChatInput({
         marginBottom: space.md,
         borderRadius: radius.pill,
         borderWidth: 1,
-        borderColor: color.line,
+        borderColor: color.lineStrong,
       }}
     >
       <TextInput

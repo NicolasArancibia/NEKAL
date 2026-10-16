@@ -22,8 +22,7 @@ export default function EmptyState({
         source={nekaImage(pose)}
         style={{ width: 82, height: 96 }}
         resizeMode="contain"
-        accessibilityElementsHidden
-        importantForAccessibility="no"
+        aria-hidden
       />
       <Txt tone="secondary" align="center">
         {text}

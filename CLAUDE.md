@@ -15,7 +15,8 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 ## Reglas
 
 - Antes de escribir código Expo, consultar la doc de **Expo v57** (MCP `context7`); ver `front/AGENTS.md`.
-- Lógica en `front/src/utils` (`model.ts`, `planner.ts`, sync). Pantallas en `front/src/pages`. Tema en `front/src/styles/globalStyles.ts`.
+- Lógica en `front/src/utils` (`model.ts`, `planner.ts`, sync, `neka.ts`). Pantallas en `front/src/pages`.
+- UI: usar `front/src/styles/theme.ts` y `front/src/components/ui/base/`; sin colores ni tamaños sueltos (lo verifica `tests/styles.cjs`). Texto siempre con `Txt`; íconos Ionicons de línea.
 - `DOCUMENTOS/V0`, `DOCUMENTOS/V1` e `IDEAS_ESPACIODETRABAJO` son históricos: no sobrescribir. Documentar la V2 en `DOCUMENTOS/V2/`.
 - Las maquetas de `IDEAS_ESPACIODETRABAJO` son propuestas, no funciones implementadas.
 - Git solo local (sin GitHub por ahora). `skills-lock.json` está excluido en `.git/info/exclude` (sus hashes disparan el escáner de secretos).

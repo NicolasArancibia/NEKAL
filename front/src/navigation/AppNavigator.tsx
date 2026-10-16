@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigator from "./TabNavigator";
 import Bienvenida from "../pages/Bienvenida";
 import { useApp } from "../utils/AppContext";
-import { Loading } from "../components/ui/Common";
 import { View, Modal, ActivityIndicator } from "react-native";
 import { Card, Txt } from "../components/ui/base";
 import { color, space } from "../styles/theme";
@@ -14,6 +13,23 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function Loading() {
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: color.background,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: space.lg,
+      }}
+    >
+      <ActivityIndicator color={color.primary} />
+      <Txt tone="secondary">Cargando…</Txt>
+    </View>
+  );
+}
 
 export default function AppNavigator() {
   const { ready, error, user, guest, cloudBusy } = useApp();

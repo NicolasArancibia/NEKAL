@@ -27,3 +27,7 @@ test("tema: contraste de texto ≥ 4.5", () => {
 test("tema: ningún estilo de texto bajo 11 px", () => {
   for (const v of Object.values(type)) assert.ok(v.size >= 11);
 });
+test("tema: bordes de controles ≥ 3:1 (WCAG 1.4.11)", () => {
+  for (const bg of [color.surface, color.background])
+    assert.ok(contrast(color.lineStrong, bg) >= 3, `lineStrong sobre ${bg}`);
+});

@@ -51,3 +51,4 @@ require("./outbox.cjs");
 require("./theme.cjs");
 require("./neka.cjs");
 require("./syncBanner.cjs");
+require("./styles.cjs");

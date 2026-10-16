@@ -27,8 +27,7 @@ export default function NekaCard({
       <Image
         source={nekaImage(state.pose)}
         resizeMode="contain"
-        accessibilityElementsHidden
-        importantForAccessibility="no"
+        aria-hidden
         style={{
           position: "absolute",
           right: 6,

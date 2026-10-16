@@ -94,7 +94,7 @@ export default function EspacioTrabajo() {
               paddingHorizontal: space.lg,
               borderRadius: radius.pill,
               borderWidth: 1,
-              borderColor: color.line,
+              borderColor: color.lineStrong,
               backgroundColor: color.surface,
               color: color.ink,
               fontFamily: font[500],

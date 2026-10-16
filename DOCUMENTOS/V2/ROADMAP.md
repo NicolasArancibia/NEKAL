@@ -12,7 +12,7 @@ Cada subproyecto tiene su propio ciclo: brainstorming → spec → plan → impl
 
 | # | Subproyecto | Semanas | Estado |
 |---|---|---|---|
-| A | Sistema de diseño refinado | 1–2 (16–29 oct) | Spec aprobada · plan en revisión: [A_PLAN_IMPLEMENTACION.md](A_PLAN_IMPLEMENTACION.md) |
+| A | Sistema de diseño refinado | 1–2 (16–29 oct) | Implementado (rama `v2/a-sistema-diseno`); falta prueba en iPhone. [Spec](A_SISTEMA_DE_DISENO.md) · [Plan](A_PLAN_IMPLEMENTACION.md) |
 | B | Espacio: General como raíz + rediseño del mapa | 1–2 (16–29 oct) | Pendiente |
 | C | Importar Google Calendar | 3–4 (30 oct–12 nov) | Pendiente |
 | D | Neka con IA (un solo agente) | 3–4 (30 oct–12 nov) | Pendiente |

@@ -48,7 +48,7 @@ export default function Field({
             ? color.danger
             : focused
               ? color.primary
-              : color.line,
+              : color.lineStrong,
           borderRadius: radius.sm,
           paddingHorizontal: space.md,
           paddingVertical: space.md,

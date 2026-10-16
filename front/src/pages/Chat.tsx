@@ -260,8 +260,7 @@ export default function Chat() {
               <Image
                 source={nekaImage(7)}
                 resizeMode="contain"
-                accessibilityElementsHidden
-                importantForAccessibility="no"
+                aria-hidden
                 style={{ width: 56, height: 64 }}
               />
               <Txt variant="headline" style={{ flex: 1 }}>

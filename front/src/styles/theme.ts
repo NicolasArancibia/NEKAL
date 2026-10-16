@@ -10,6 +10,8 @@ export const color = {
   inkSecondary: "#6F6683",
   inkDone: "#776E8A",
   line: "#EEE9F6",
+  // Bordes de campos e interruptores apagados (≥ 3:1, WCAG 1.4.11).
+  lineStrong: "#948BA6",
   danger: "#B42A55",
   dangerSoft: "#FCE8EF",
   success: "#2F9E77",

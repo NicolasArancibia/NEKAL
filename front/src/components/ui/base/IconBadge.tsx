@@ -10,8 +10,7 @@ export default function IconBadge({
 }) {
   return (
     <View
-      importantForAccessibility="no-hide-descendants"
-      accessibilityElementsHidden
+      aria-hidden
       style={{
         width: 42,
         height: 42,

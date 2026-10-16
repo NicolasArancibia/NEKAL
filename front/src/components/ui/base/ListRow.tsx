@@ -42,8 +42,14 @@ function Check({
       accessibilityRole="checkbox"
       accessibilityState={{ checked: done }}
       accessibilityLabel={`${done ? "Marcar pendiente" : "Completar"} ${title}`}
-      hitSlop={(size.minTouch - CHECK) / 2}
       onPress={onToggle}
+      style={{
+        width: size.minTouch,
+        height: size.minTouch,
+        marginHorizontal: -(size.minTouch - CHECK) / 2,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
       <Animated.View
         style={[
