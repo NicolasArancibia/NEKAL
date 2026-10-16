@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { signOut } from "firebase/auth";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import type { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
 import { auth } from "../utils/firebase";
 import { totalPoints } from "../utils/model";
 import { mergeValue, recordsOf } from "../utils/syncModel";
-import { Button, Field, Sheet } from "../components/ui/Common";
-import { colors, s } from "../styles/globalStyles";
+import { color, radius, size, space } from "../styles/theme";
+import {
+  Button,
+  Card,
+  Field,
+  PressableScale,
+  ScreenHeader,
+  Sheet,
+  Tag,
+  Txt,
+} from "../components/ui/base";
 import Login from "./Login";
 import Ajustes from "./Ajustes";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import type { TabParamList } from "../navigation/TabNavigator";
-import { ScreenHeader } from "../components/ui/base";
+
 export default function Perfil() {
   const {
     data,
@@ -44,40 +54,51 @@ export default function Perfil() {
       navigation.setParams({ settings: undefined } as never);
     }
   }, [route.params?.settings]);
-  if (settings) return <Ajustes onBack={() => setSettings(false)} />;
+  const points = totalPoints(data);
   return (
-    <ScrollView style={s.page} contentContainerStyle={s.content}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: color.background }}
+      contentContainerStyle={{
+        padding: space.screen,
+        paddingBottom: space.xxxl,
+        gap: space.lg,
+        width: "100%",
+        maxWidth: 960,
+        alignSelf: "center",
+      }}
+    >
       <ScreenHeader title="Perfil" />
-      <View style={[s.card, { alignItems: "center", paddingVertical: 26 }]}>
+      <Card style={{ alignItems: "center", paddingVertical: space.xxl }}>
         <View
           style={{
-            backgroundColor: colors.primary,
-            borderRadius: 38,
+            backgroundColor: color.primary,
+            borderRadius: radius.pill,
             width: 76,
             height: 76,
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "white", fontSize: 32, fontWeight: "700" }}>
+          <Txt variant="title" tone="onPrimary">
             {data.profile.name.slice(0, 1).toUpperCase() || "N"}
-          </Text>
+          </Txt>
         </View>
-        <Text style={s.heading}>{data.profile.name || "Tu nombre"}</Text>
-        <Text style={s.small}>
-          {data.profile.roles || "Un espacio para todas tus facetas"}
-        </Text>
-        <View style={s.wrap}>
-          <Text style={[s.pill, { color: colors.primary }]}>
-            Nivel {Math.floor(totalPoints(data) / 100) + 1}
-          </Text>
-          <Text style={[s.pill, { color: colors.primary }]}>
-            {totalPoints(data)} puntos
-          </Text>
+        <Txt variant="headline" numberOfLines={1}>
+          {data.profile.name || "Sin nombre"}
+        </Txt>
+        {!!data.profile.roles && (
+          <Txt variant="callout" tone="secondary" align="center">
+            {data.profile.roles}
+          </Txt>
+        )}
+        <View style={{ flexDirection: "row", gap: space.sm }}>
+          <Tag text={`Nivel ${Math.floor(points / 100) + 1}`} tone="primary" />
+          <Tag text={`${points} pts`} tone="primary" />
         </View>
-      </View>
+      </Card>
       <Button
         title="Editar perfil"
+        variant="secondary"
         onPress={() => {
           setName(data.profile.name);
           setProfileBase(data.profile);
@@ -85,85 +106,97 @@ export default function Perfil() {
           setEdit(true);
         }}
       />
-      <View style={s.card}>
-        <View style={s.row}>
-          <Image
-            source={require("../../assets/Img/Neka_Pose7.png")}
-            style={{ width: 60, height: 70 }}
-            resizeMode="contain"
+      <Card
+        onPress={() => setSettings(true)}
+        accessibilityLabel="Abrir ajustes"
+      >
+        <View
+          style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={size.icon}
+            color={color.primary}
           />
-          <View style={{ flex: 1 }}>
-            <Text style={s.heading}>A tu ritmo</Text>
-            <Text style={s.subtitle}>
-              Preferencias, avisos, respaldos y tus datos.
-            </Text>
-          </View>
+          <Txt weight={600} style={{ flex: 1 }}>
+            Ajustes
+          </Txt>
+          <Ionicons
+            name="chevron-forward-outline"
+            size={size.icon}
+            color={color.inkSecondary}
+          />
         </View>
-        <Button
-          title="Abrir ajustes"
-          secondary
-          onPress={() => setSettings(true)}
-        />
-      </View>
-      <View style={s.card}>
-        <Text style={s.heading}>
-          {user ? "Cuenta conectada" : "Modo local"}
-        </Text>
-        <Text style={s.text}>
-          {user?.email ?? "Tus datos se guardan en este navegador o teléfono."}
-        </Text>
-        <Text style={s.small}>{storageStatus}</Text>
-        {user ? (
-          <>
-            <Text style={s.small}>{cloudStatus}</Text>
-            <Text style={s.small}>
-              Tus cambios se guardan automáticamente. Sin conexión quedan
-              pendientes en este dispositivo y se enviarán cuando vuelvas a
-              conectarte.
-            </Text>
-            <Text style={s.small}>{pendingChanges} cambios pendientes</Text>
-            <Button
-              title="Reintentar conexión"
-              secondary
-              onPress={() => void cloud()}
-            />
-            {!!conflict && (
+      </Card>
+      <View style={{ gap: space.sm }}>
+        <Txt variant="headline">Cuenta</Txt>
+        <Card>
+          <Txt weight={600}>
+            {user ? (user.email ?? "Cuenta") : "Modo invitado"}
+          </Txt>
+          <Txt variant="callout" tone="secondary">
+            {user
+              ? `${cloudStatus} · ${pendingChanges} ${pendingChanges === 1 ? "cambio pendiente" : "cambios pendientes"}`
+              : "Tus datos quedan solo en este dispositivo."}
+          </Txt>
+          {!!storageStatus && (
+            <Txt variant="caption" tone="secondary">
+              {storageStatus}
+            </Txt>
+          )}
+          {user ? (
+            <>
               <Button
-                title="Revisar cambios simultáneos"
-                onPress={() => setReview(true)}
+                title="Reintentar conexión"
+                variant="secondary"
+                onPress={() => void cloud()}
               />
-            )}
-            <Button
-              title="Cerrar sesión"
-              secondary
-              disabled={cloudBusy}
-              onPress={() => {
-                if (auth)
-                  void signOut(auth).catch(() =>
-                    setError("No se pudo cerrar la sesión."),
-                  );
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Button
-              title="Conectar mi cuenta"
-              secondary
-              onPress={() => setAccount(true)}
-            />
-            <Button
-              title="Volver a la pantalla de acceso"
-              secondary
-              onPress={exitGuest}
-            />
-          </>
-        )}
+              {!!conflict && (
+                <Button
+                  title="Revisar cambios en conflicto"
+                  onPress={() => setReview(true)}
+                />
+              )}
+              <Button
+                title="Cerrar sesión"
+                variant="plain"
+                disabled={cloudBusy}
+                onPress={() => {
+                  if (auth)
+                    void signOut(auth).catch(() =>
+                      setError(
+                        "No se pudo cerrar la sesión. Revisa tu conexión y reintenta.",
+                      ),
+                    );
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                title="Conectar mi cuenta"
+                variant="secondary"
+                onPress={() => setAccount(true)}
+              />
+              <Button
+                title="Volver al inicio"
+                variant="plain"
+                onPress={exitGuest}
+              />
+            </>
+          )}
+        </Card>
       </View>
-      {!!error && <Text style={s.error}>{error}</Text>}
+      {!!error && (
+        <Txt tone="danger" accessibilityRole="alert">
+          {error}
+        </Txt>
+      )}
+      {settings && <Ajustes visible onClose={() => setSettings(false)} />}
       <Sheet
         visible={edit}
         title="Editar perfil"
+        size="auto"
         onClose={() => setEdit(false)}
       >
         <Field label="Tu nombre" value={name} onChange={setName} />
@@ -192,7 +225,7 @@ export default function Perfil() {
                 );
                 if (merged.conflict)
                   throw new Error(
-                    "Tu perfil cambió en otro dispositivo. Copia tus cambios y vuelve a abrir el perfil actualizado.",
+                    "Tu perfil cambió en otro dispositivo. Copia tus cambios y vuelve a abrir el perfil.",
                   );
                 return {
                   ...d,
@@ -206,7 +239,11 @@ export default function Perfil() {
             }
           }}
         />
-        {!!error && <Text style={s.error}>{error}</Text>}
+        {!!error && (
+          <Txt tone="danger" accessibilityRole="alert">
+            {error}
+          </Txt>
+        )}
       </Sheet>
       <Sheet
         visible={account}
@@ -217,34 +254,31 @@ export default function Perfil() {
       </Sheet>
       <Sheet
         visible={review}
-        title="Revisar cambios simultáneos"
+        title="Cambios en conflicto"
         onClose={() => setReview(false)}
       >
-        <Text style={s.text}>
-          {conflict?.reason ?? "No quedan conflictos pendientes."}
-        </Text>
-        <Text style={s.small}>
-          La versión de este dispositivo y la de Firebase están conservadas. La
-          elección se aplica a los cambios pendientes de este dispositivo. Antes
-          de resolver se guarda una copia local recuperable en Ajustes.
-        </Text>
-        <Text style={s.heading}>Datos que requieren revisión</Text>
-        <Text selectable style={s.small}>
-          {conflict?.paths.join("\n")}
-        </Text>
+        <Txt>{conflict?.reason ?? "No quedan conflictos pendientes."}</Txt>
+        <Txt variant="callout" tone="secondary">
+          Se guardan las dos versiones. Lo que elijas se aplica a los cambios
+          pendientes de este dispositivo, y antes queda una copia en Ajustes.
+        </Txt>
         {conflict?.paths.map((path) => (
-          <View key={path} style={s.card}>
-            <Text style={s.heading}>
+          <Card key={path}>
+            <Txt variant="headline">
               {recordsOf(data)[path]?.title ??
                 recordsOf(data)[path]?.name ??
                 path}
-            </Text>
-            <Text style={s.label}>Este dispositivo</Text>
-            <Text selectable style={s.small}>
+            </Txt>
+            <Txt variant="callout" weight={600}>
+              Este dispositivo
+            </Txt>
+            <Txt selectable variant="caption" tone="secondary">
               {JSON.stringify(recordsOf(data)[path] ?? "Eliminado", null, 2)}
-            </Text>
-            <Text style={s.label}>Firebase</Text>
-            <Text selectable style={s.small}>
+            </Txt>
+            <Txt variant="callout" weight={600}>
+              Firebase
+            </Txt>
+            <Txt selectable variant="caption" tone="secondary">
               {JSON.stringify(
                 remoteData
                   ? (recordsOf(remoteData)[path] ?? "Eliminado")
@@ -252,11 +286,11 @@ export default function Perfil() {
                 null,
                 2,
               )}
-            </Text>
-          </View>
+            </Txt>
+          </Card>
         ))}
         <Button
-          title="Conservar mis cambios pendientes"
+          title="Conservar mis cambios"
           disabled={!conflict}
           onPress={async () => {
             try {
@@ -270,7 +304,7 @@ export default function Perfil() {
         />
         <Button
           title="Usar la versión de Firebase"
-          secondary
+          variant="secondary"
           disabled={!conflict}
           onPress={async () => {
             try {
@@ -282,7 +316,11 @@ export default function Perfil() {
             }
           }}
         />
-        {!!error && <Text style={s.error}>{error}</Text>}
+        {!!error && (
+          <Txt tone="danger" accessibilityRole="alert">
+            {error}
+          </Txt>
+        )}
       </Sheet>
     </ScrollView>
   );

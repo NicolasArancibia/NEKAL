@@ -23,6 +23,7 @@ export default function Txt({
   numberOfLines,
   strike = false,
   tabular = false,
+  selectable,
   style,
   children,
   accessibilityRole,
@@ -35,6 +36,7 @@ export default function Txt({
   numberOfLines?: number;
   strike?: boolean;
   tabular?: boolean;
+  selectable?: boolean;
   style?: StyleProp<TextStyle>;
   children: ReactNode;
   accessibilityRole?: AccessibilityRole;
@@ -44,6 +46,7 @@ export default function Txt({
   return (
     <Text
       numberOfLines={numberOfLines}
+      selectable={selectable}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
       style={[

@@ -1,14 +1,46 @@
 import React, { useState } from "react";
-import { Platform, ScrollView, Share, Text, View } from "react-native";
+import { Platform, Share, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { useApp } from "../utils/AppContext";
 import { AppData, localDay, restoreItem } from "../utils/model";
 import { readBackup } from "../utils/storage";
 import { requestReminders } from "../utils/notifications";
-import { Button, Field, Sheet, Toggle } from "../components/ui/Common";
-import { colors, s } from "../styles/globalStyles";
-export default function Ajustes({ onBack }: { onBack: () => void }) {
+import { space } from "../styles/theme";
+import {
+  Button,
+  Card,
+  Disclosure,
+  Field,
+  Sheet,
+  Toggle,
+  Txt,
+} from "../components/ui/base";
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={{ gap: space.sm }}>
+      <Txt variant="headline">{title}</Txt>
+      <Card>{children}</Card>
+    </View>
+  );
+}
+
+// Ajustes en un panel; las ventanas internas de V1 pasaron a desplegables para
+// no anidar paneles.
+export default function Ajustes({
+  visible,
+  onClose,
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const {
     data,
     change,
@@ -23,15 +55,13 @@ export default function Ajustes({ onBack }: { onBack: () => void }) {
     [showJson, setShowJson] = useState(false),
     [confirmRecovery, setConfirmRecovery] = useState(false);
   const [message, setMessage] = useState(""),
-    [modal, setModal] = useState<"backup" | "trash" | "about" | "score" | null>(
-      null,
-    ),
     [imported, setImported] = useState<AppData | null>(null),
     [busy, setBusy] = useState(false);
   const [dayStart, setDayStart] = useState(String(data.preferences.dayStart)),
     [dayEnd, setDayEnd] = useState(String(data.preferences.dayEnd)),
     [quietStart, setQuietStart] = useState(String(data.preferences.quietStart)),
     [quietEnd, setQuietEnd] = useState(String(data.preferences.quietEnd));
+  const trashed = data.items.filter((i) => i.deletedAt);
   const pref = (patch: Partial<AppData["preferences"]>) =>
     change((d) => ({ ...d, preferences: { ...d.preferences, ...patch } }));
   const exportBackup = async () => {
@@ -52,9 +82,9 @@ export default function Ajustes({ onBack }: { onBack: () => void }) {
         await FileSystem.writeAsStringAsync(path, text);
         await Share.share({ url: path });
       }
-      setMessage("Respaldo preparado. Guárdalo en un lugar privado.");
+      setMessage("Respaldo listo. Guárdalo en un lugar privado.");
     } catch {
-      setMessage("No se pudo exportar el respaldo.");
+      setMessage("No se pudo exportar el respaldo. Inténtalo de nuevo.");
     }
   };
   const importBackup = async () => {
@@ -81,93 +111,38 @@ export default function Ajustes({ onBack }: { onBack: () => void }) {
     }
   };
   return (
-    <ScrollView style={s.page} contentContainerStyle={s.content}>
-      <View style={s.between}>
-        <Text style={s.title}>Ajustes</Text>
-        <Button title="Volver al perfil" secondary small onPress={onBack} />
-      </View>
-      <Text style={s.subtitle}>Una organización que se adapta a ti.</Text>
-      <View style={s.card}>
-        <Text style={s.heading}>Cómo te acompaña Neka</Text>
+    <Sheet
+      visible={visible}
+      title="Ajustes"
+      onClose={() => {
+        setImported(null);
+        setMessage("");
+        onClose();
+      }}
+    >
+      {!!message && (
+        <Txt tone="primary" weight={600} accessibilityRole="alert">
+          {message}
+        </Txt>
+      )}
+      {!!error && (
+        <Card>
+          <Txt tone="danger">{error}</Txt>
+          <Button
+            title="Reintentar guardado"
+            onPress={() => {
+              clearError();
+              retry();
+            }}
+          />
+        </Card>
+      )}
+      <Section title="Neka">
         <Toggle
           label="Avisos suaves"
           value={data.preferences.softAlerts}
           onChange={(softAlerts) => pref({ softAlerts })}
-          detail="Avisos de conflictos dentro de la app. Sin sonidos."
-        />
-        <View>
-          <Text style={s.text}>Preguntar siempre antes de cambiar</Text>
-          <Text style={s.small}>
-            Activado en esta V1: ninguna propuesta se aplica sin tu
-            confirmación.
-          </Text>
-        </View>
-        <Toggle
-          label="Horas de silencio"
-          value={data.preferences.quiet}
-          onChange={(quiet) => pref({ quiet })}
-        />
-        <View style={s.row}>
-          <View style={{ flex: 1 }}>
-            <Field
-              label="Silencio desde (0–23)"
-              value={quietStart}
-              onChange={setQuietStart}
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Field
-              label="Silencio hasta (0–23)"
-              value={quietEnd}
-              onChange={setQuietEnd}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-        <Text style={s.heading}>Tu jornada para propuestas</Text>
-        <View style={s.row}>
-          <View style={{ flex: 1 }}>
-            <Field
-              label="Inicio (0–23)"
-              value={dayStart}
-              onChange={setDayStart}
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Field
-              label="Fin (0–23)"
-              value={dayEnd}
-              onChange={setDayEnd}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-        <Button
-          title="Guardar horarios"
-          secondary
-          onPress={() => {
-            const values = [dayStart, dayEnd, quietStart, quietEnd].map(Number);
-            if (
-              [dayStart, dayEnd, quietStart, quietEnd].some((v) => !v.trim()) ||
-              values.some((v) => !Number.isInteger(v) || v < 0 || v > 23) ||
-              values[0] >= values[1] ||
-              values[2] === values[3]
-            ) {
-              setMessage(
-                "Usa horas enteras de 0 a 23, inicio anterior al fin y horas de silencio distintas.",
-              );
-              return;
-            }
-            pref({
-              dayStart: values[0],
-              dayEnd: values[1],
-              quietStart: values[2],
-              quietEnd: values[3],
-            });
-            setMessage("Horarios guardados.");
-          }}
+          detail="Avisos de choques dentro de la app, sin sonido."
         />
         <Toggle
           label="Recordatorios del teléfono"
@@ -188,287 +163,276 @@ export default function Ajustes({ onBack }: { onBack: () => void }) {
           detail={
             Platform.OS === "web"
               ? "Actívalos desde Expo Go en tu iPhone."
-              : "Diez minutos antes, respetando las horas de silencio."
+              : "10 minutos antes, respetando las horas de silencio."
           }
         />
-      </View>
-      <View style={s.card}>
-        <Text style={s.heading}>Tus datos</Text>
+        <Txt variant="caption" tone="secondary">
+          Neka siempre te pregunta antes de mover algo.
+        </Txt>
+      </Section>
+      <Section title="Jornada">
+        <Toggle
+          label="Horas de silencio"
+          value={data.preferences.quiet}
+          onChange={(quiet) => pref({ quiet })}
+        />
+        <View style={{ flexDirection: "row", gap: space.md }}>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Silencio desde"
+              value={quietStart}
+              onChange={setQuietStart}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Silencio hasta"
+              value={quietEnd}
+              onChange={setQuietEnd}
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+        <View style={{ flexDirection: "row", gap: space.md }}>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Jornada desde"
+              value={dayStart}
+              onChange={setDayStart}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Jornada hasta"
+              value={dayEnd}
+              onChange={setDayEnd}
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+        <Txt variant="caption" tone="secondary">
+          Horas de 0 a 23. Neka solo propone horarios dentro de tu jornada.
+        </Txt>
         <Button
-          title="Respaldar o importar"
-          secondary
+          title="Guardar horarios"
+          variant="secondary"
           onPress={() => {
-            setModal("backup");
-            setMessage("");
+            const values = [dayStart, dayEnd, quietStart, quietEnd].map(Number);
+            if (
+              [dayStart, dayEnd, quietStart, quietEnd].some((v) => !v.trim()) ||
+              values.some((v) => !Number.isInteger(v) || v < 0 || v > 23) ||
+              values[0] >= values[1] ||
+              values[2] === values[3]
+            ) {
+              setMessage(
+                "Usa horas enteras de 0 a 23, con el inicio antes del fin y horas de silencio distintas.",
+              );
+              return;
+            }
+            pref({
+              dayStart: values[0],
+              dayEnd: values[1],
+              quietStart: values[2],
+              quietEnd: values[3],
+            });
+            setMessage("Horarios guardados.");
           }}
         />
-        <Button
-          title={`Papelera (${data.items.filter((i) => i.deletedAt).length})`}
-          secondary
-          onPress={() => setModal("trash")}
-        />
-        <Text style={s.small}>
-          Los cambios se guardan en este dispositivo. Si borras los datos del
-          navegador o desinstalas la app, necesitarás tu respaldo o copia de
-          Firebase.
-        </Text>
-      </View>
-      <View style={s.card}>
-        <Text style={s.heading}>Sobre Nekal</Text>
-        <Button
-          title="Cómo se calculan mis puntos"
-          secondary
-          onPress={() => setModal("score")}
-        />
-        <Button
-          title="Información de uso y privacidad"
-          secondary
-          onPress={() => setModal("about")}
-        />
-        <Text style={s.small}>
-          NEKAL · V1.0 · hecho para avanzar a tu ritmo
-        </Text>
-      </View>
-      {!!message && (
-        <Text
-          accessibilityRole="alert"
-          style={[s.text, { color: colors.primary }]}
-        >
-          {message}
-        </Text>
-      )}
-      {!!error && (
-        <View style={s.card}>
-          <Text style={s.error}>{error}</Text>
+      </Section>
+      <Section title="Tus datos">
+        <Disclosure title="Respaldar o importar">
+          <Txt tone="secondary">
+            El respaldo incluye ítems, adjuntos, perfil, preferencias, chat y
+            puntos. Importar reemplaza tus datos actuales, pero antes guardamos
+            una copia que puedes recuperar.
+          </Txt>
           <Button
-            title="Reintentar guardado"
+            title="Exportar respaldo JSON"
+            onPress={() => void exportBackup()}
+          />
+          <Button
+            title="Ver JSON para copiar o pegar"
+            variant="secondary"
             onPress={() => {
-              clearError();
-              retry();
+              setJson(JSON.stringify(data, null, 2));
+              setShowJson(!showJson);
             }}
           />
-        </View>
-      )}
-      <Sheet
-        visible={!!modal}
-        title={
-          modal === "backup"
-            ? "Respaldos"
-            : modal === "trash"
-              ? "Papelera"
-              : modal === "score"
-                ? "Tu puntaje"
-                : "Uso y privacidad"
-        }
-        onClose={() => {
-          setModal(null);
-          setImported(null);
-        }}
-      >
-        {modal === "backup" && (
-          <>
-            <Text style={s.text}>
-              El respaldo incluye ítems, adjuntos, perfil, preferencias, chat y
-              puntos. La importación reemplaza los datos del modo o cuenta
-              actual. Antes de reemplazarlos guardamos una copia recuperable en
-              este dispositivo.
-            </Text>
-            <Button
-              title="Exportar respaldo JSON"
-              onPress={() => void exportBackup()}
-            />
-            <Button
-              title="Ver JSON para copiar o pegar"
-              secondary
-              onPress={() => {
-                setJson(JSON.stringify(data, null, 2));
-                setShowJson(!showJson);
-              }}
-            />
-            {showJson && (
-              <>
-                <Field
-                  label="Respaldo JSON"
-                  value={json}
-                  onChange={setJson}
-                  multiline
-                />
-                <Button
-                  title="Validar JSON pegado"
-                  secondary
-                  onPress={() => {
-                    try {
-                      setImported(readBackup(json));
-                      setMessage("Respaldo válido, listo para revisar.");
-                    } catch (e) {
-                      setMessage((e as Error).message);
-                    }
-                  }}
-                />
-              </>
-            )}
-            {hasRecovery && (
-              <>
-                <Button
-                  title="Recuperar datos anteriores"
-                  secondary
-                  disabled={busy}
-                  onPress={() => setConfirmRecovery(true)}
-                />
-                {confirmRecovery && (
-                  <>
-                    <Text style={s.text}>
-                      Recupera la copia anterior a la última importación o
-                      descarga. El estado actual quedará guardado como nueva
-                      copia recuperable.
-                    </Text>
-                    <Button
-                      title="Confirmar recuperación"
-                      disabled={busy}
-                      onPress={async () => {
-                        try {
-                          setBusy(true);
-                          await restorePrevious();
-                          setConfirmRecovery(false);
-                          setImported(null);
-                          setMessage("Datos anteriores recuperados.");
-                        } catch (e) {
-                          setMessage((e as Error).message);
-                        } finally {
-                          setBusy(false);
-                        }
-                      }}
-                    />
-                  </>
-                )}
-              </>
-            )}
-            <Button
-              title={busy ? "Leyendo…" : "Elegir respaldo para importar"}
-              secondary
-              disabled={busy}
-              onPress={() => void importBackup()}
-            />
-            {imported && (
-              <View style={s.card}>
-                <Text style={s.heading}>Respaldo válido</Text>
-                <Text style={s.text}>
-                  {imported.items.length} ítems · {imported.workspaces.length}{" "}
-                  espacios · {imported.profile.name || "Sin nombre"}
-                </Text>
-                <Text style={s.small}>
-                  Se guardará una copia de los datos actuales. Podrás deshacer
-                  esta importación con «Recuperar datos anteriores».
-                </Text>
-                <Button
-                  title="Importar con copia de recuperación"
-                  danger
-                  disabled={busy}
-                  onPress={async () => {
-                    try {
-                      setBusy(true);
-                      await replaceData({
-                        ...imported,
-                        preferences: {
-                          ...imported.preferences,
-                          notifications: false,
-                        },
-                      });
-                      setImported(null);
-                      setModal(null);
-                      setMessage(
-                        "Respaldo importado. Los recordatorios requieren activarse en este dispositivo.",
-                      );
-                    } catch (e) {
-                      setMessage((e as Error).message);
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
-                />
-              </View>
-            )}
-            {!!message && <Text style={s.text}>{message}</Text>}
-          </>
-        )}
-        {modal === "trash" && (
-          <>
-            {!data.items.some((i) => i.deletedAt) && (
-              <Text style={s.subtitle}>La papelera está vacía.</Text>
-            )}
-            {data.items
-              .filter((i) => i.deletedAt)
-              .map((i) => (
-                <View key={i.id} style={s.card}>
-                  <Text style={s.heading}>{i.title}</Text>
+          {showJson && (
+            <>
+              <Field
+                label="Respaldo JSON"
+                value={json}
+                onChange={setJson}
+                multiline
+              />
+              <Button
+                title="Validar JSON pegado"
+                variant="secondary"
+                onPress={() => {
+                  try {
+                    setImported(readBackup(json));
+                    setMessage("Respaldo válido. Revísalo abajo.");
+                  } catch (e) {
+                    setMessage((e as Error).message);
+                  }
+                }}
+              />
+            </>
+          )}
+          {hasRecovery && (
+            <>
+              <Button
+                title="Recuperar datos anteriores"
+                variant="secondary"
+                disabled={busy}
+                onPress={() => setConfirmRecovery(true)}
+              />
+              {confirmRecovery && (
+                <>
+                  <Txt>
+                    Vuelves a la copia anterior a la última importación. Lo que
+                    tienes ahora queda guardado como nueva copia.
+                  </Txt>
                   <Button
-                    title={`Restaurar ${i.title}`}
-                    secondary
-                    onPress={() => {
+                    title="Confirmar recuperación"
+                    disabled={busy}
+                    onPress={async () => {
                       try {
-                        change((d) => restoreItem(d, i.id));
-                        setMessage("Ítem restaurado.");
+                        setBusy(true);
+                        await restorePrevious();
+                        setConfirmRecovery(false);
+                        setImported(null);
+                        setMessage("Datos anteriores recuperados.");
                       } catch (e) {
                         setMessage((e as Error).message);
+                      } finally {
+                        setBusy(false);
                       }
                     }}
                   />
-                </View>
-              ))}
-            {!!message && <Text style={s.text}>{message}</Text>}
-          </>
-        )}
-        {modal === "score" && (
-          <>
-            <Text style={s.heading}>Cada avance cuenta</Text>
-            <Text style={s.text}>
-              Base = 10 × dificultad × prioridad. Dificultad: 1, 2 o 3.
-              Prioridad: baja ×1, media ×1,5, urgente ×2.
-            </Text>
-            <Text style={s.text}>
-              Desbloquear dependencias suma 5 puntos por ítem, con un máximo de
-              15 adicionales. Notas e ideas no puntúan. Eventos, visitas y
-              reuniones solo puntúan si lo activas.
-            </Text>
-            <Text style={s.text}>
-              Los goals entregan hasta el 80% por sus hitos y el resto al
-              completarlos. El presupuesto queda fijo al ganar la primera
-              recompensa; reabrir o marcar otra vez no duplica puntos. Cada 100
-              puntos subes un nivel.
-            </Text>
-            <Text style={s.small}>
-              Consulta DOCUMENTOS/V1/V1.md para la fórmula completa, sus límites
-              y las decisiones de diseño.
-            </Text>
-          </>
-        )}
-        {modal === "about" && (
-          <>
-            <Text style={s.heading}>Tu planificación sigue siendo tuya</Text>
-            <Text style={s.text}>
-              Nekal es una herramienta personal de organización. Tú revisas y
-              aceptas los cambios sugeridos. Neka funciona con reglas locales;
-              no envía conversaciones a servicios de inteligencia artificial.
-            </Text>
-            <Text style={s.text}>
-              En modo local, los datos permanecen en este navegador o teléfono.
-              Al conectar Firebase, el correo y la autenticación se procesan
-              allí; tus datos de planificación se envían cuando eliges subirlos.
-              Cada usuario accede a su propia copia si se despliegan las reglas
-              incluidas.
-            </Text>
-            <Text style={s.text}>
-              Los avisos dependen de permisos y configuración del dispositivo.
-              Mantén respaldos de información importante.
-            </Text>
-            <Text style={s.small}>
-              Versión personal de prueba. Antes de una publicación pública, el
-              responsable deberá definir sus datos de contacto y las condiciones
-              de servicio y privacidad correspondientes.
-            </Text>
-          </>
-        )}
-      </Sheet>
-    </ScrollView>
+                </>
+              )}
+            </>
+          )}
+          <Button
+            title={busy ? "Leyendo…" : "Elegir respaldo para importar"}
+            variant="secondary"
+            disabled={busy}
+            onPress={() => void importBackup()}
+          />
+          {imported && (
+            <Card variant="featured">
+              <Txt variant="headline">Respaldo válido</Txt>
+              <Txt>
+                {imported.items.length} ítems · {imported.workspaces.length}{" "}
+                espacios · {imported.profile.name || "Sin nombre"}
+              </Txt>
+              <Txt variant="caption" tone="secondary">
+                Podrás deshacerlo con «Recuperar datos anteriores».
+              </Txt>
+              <Button
+                title="Importar con copia de recuperación"
+                variant="danger"
+                disabled={busy}
+                onPress={async () => {
+                  try {
+                    setBusy(true);
+                    await replaceData({
+                      ...imported,
+                      preferences: {
+                        ...imported.preferences,
+                        notifications: false,
+                      },
+                    });
+                    setImported(null);
+                    setMessage(
+                      "Respaldo importado. Vuelve a activar los recordatorios en este dispositivo.",
+                    );
+                  } catch (e) {
+                    setMessage((e as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              />
+            </Card>
+          )}
+        </Disclosure>
+        <Disclosure title={`Papelera (${trashed.length})`}>
+          {!trashed.length && (
+            <Txt tone="secondary">La papelera está vacía.</Txt>
+          )}
+          {trashed.map((i) => (
+            <View
+              key={i.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: space.md,
+              }}
+            >
+              <Txt numberOfLines={1} style={{ flex: 1 }}>
+                {i.title}
+              </Txt>
+              <Button
+                title="Restaurar"
+                variant="secondary"
+                small
+                onPress={() => {
+                  try {
+                    change((d) => restoreItem(d, i.id));
+                    setMessage(`«${i.title}» restaurado.`);
+                  } catch (e) {
+                    setMessage((e as Error).message);
+                  }
+                }}
+              />
+            </View>
+          ))}
+        </Disclosure>
+        <Txt variant="caption" tone="secondary">
+          Si borras los datos del navegador o desinstalas la app, solo te quedan
+          tu respaldo o tu cuenta.
+        </Txt>
+      </Section>
+      <Section title="Sobre Nekal">
+        <Disclosure title="¿Cómo se calculan los puntos?">
+          <Txt>
+            Base = 10 × dificultad × prioridad. Dificultad: 1, 2 o 3. Prioridad:
+            baja ×1, media ×1,5, urgente ×2.
+          </Txt>
+          <Txt>
+            Desbloquear dependencias suma 5 puntos por ítem, hasta 15 extra.
+            Notas e ideas no suman. Eventos, visitas y reuniones solo suman si
+            lo activas.
+          </Txt>
+          <Txt>
+            Los goals entregan hasta el 80% con sus hitos y el resto al
+            completarlos. Reabrir o marcar otra vez no duplica puntos. Cada 100
+            puntos subes un nivel.
+          </Txt>
+        </Disclosure>
+        <Disclosure title="Privacidad">
+          <Txt>
+            Tú revisas y aceptas cada cambio sugerido. Neka funciona con reglas
+            en tu dispositivo y no envía conversaciones a servicios de IA.
+          </Txt>
+          <Txt>
+            Como invitado, tus datos quedan en este navegador o teléfono. Con
+            una cuenta, se sincronizan con Firebase y solo tú puedes leerlos.
+          </Txt>
+          <Txt variant="caption" tone="secondary">
+            Versión de prueba. Antes de publicarla hay que definir contacto y
+            condiciones de privacidad.
+          </Txt>
+        </Disclosure>
+        <Txt variant="caption" tone="secondary">
+          Nekal · V2
+        </Txt>
+      </Section>
+    </Sheet>
   );
 }

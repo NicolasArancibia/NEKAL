@@ -36,6 +36,9 @@ export default function Toggle({
         value={value}
         onValueChange={onChange}
         trackColor={{ true: color.primary, false: color.line }}
+        thumbColor={color.surface}
+        // react-native-web usa su propio verde si no se indica.
+        {...({ activeThumbColor: color.surface } as object)}
       />
     </View>
   );
