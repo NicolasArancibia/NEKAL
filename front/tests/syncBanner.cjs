@@ -56,3 +56,19 @@ test("aviso: cambios sin guardar", () =>
     text: "Cambios sin guardar. Exporta un respaldo.",
     action: { label: "Ajustes", target: "ajustes" },
   }));
+test("aviso: sin conexión gana al error que la acompaña (salida real de SyncEngine)", () => {
+  const off =
+    "Sin conexión o sincronización pendiente · cambios conservados en este dispositivo";
+  const e = "Failed to get document because the client is offline.";
+  assert.deepEqual(
+    f({ ...ok, error: e, cloudStatus: off, pendingChanges: 2 }),
+    {
+      tone: "neutral",
+      text: "Sin conexión · 2 cambios guardados en este dispositivo",
+    },
+  );
+  assert.equal(
+    f({ ...ok, error: e, cloudStatus: "Cambios sin guardar" }).text,
+    "Cambios sin guardar. Exporta un respaldo.",
+  );
+});

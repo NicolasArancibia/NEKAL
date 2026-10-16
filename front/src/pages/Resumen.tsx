@@ -17,6 +17,7 @@ import {
   visibleToday,
 } from "../utils/neka";
 import { useToggleDone } from "../utils/useToggleDone";
+import { useNow } from "../utils/useNow";
 import { color, size, space } from "../styles/theme";
 import {
   Button,
@@ -58,7 +59,7 @@ export default function Resumen() {
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [editor, setEditor] = useState<Item | null>(null);
   const { toggle, error } = useToggleDone();
-  const now = Date.now();
+  const now = useNow();
   const points = totalPoints(data),
     level = Math.floor(points / 100) + 1;
   const neka = nekaState(data, now),

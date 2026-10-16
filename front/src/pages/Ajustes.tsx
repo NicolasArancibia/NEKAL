@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, Share, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
@@ -16,6 +16,8 @@ import {
   Toggle,
   Txt,
 } from "../components/ui/base";
+
+type Where = "neka" | "jornada" | "backup" | "json" | "trash";
 
 function Section({
   title,
@@ -54,7 +56,9 @@ export default function Ajustes({
   const [json, setJson] = useState(""),
     [showJson, setShowJson] = useState(false),
     [confirmRecovery, setConfirmRecovery] = useState(false);
-  const [message, setMessage] = useState(""),
+  const [notice, setNotice] = useState<{ at: Where; text: string } | null>(
+      null,
+    ),
     [imported, setImported] = useState<AppData | null>(null),
     [busy, setBusy] = useState(false);
   const [dayStart, setDayStart] = useState(String(data.preferences.dayStart)),
@@ -62,6 +66,22 @@ export default function Ajustes({
     [quietStart, setQuietStart] = useState(String(data.preferences.quietStart)),
     [quietEnd, setQuietEnd] = useState(String(data.preferences.quietEnd));
   const trashed = data.items.filter((i) => i.deletedAt);
+  const say = (at: Where, text: string) => setNotice({ at, text });
+  // El mensaje aparece junto a la acción que lo produjo.
+  const note = (at: Where) =>
+    notice?.at === at ? (
+      <Txt tone="primary" weight={600} accessibilityRole="alert">
+        {notice.text}
+      </Txt>
+    ) : null;
+  // Tras importar o recuperar, los campos muestran los horarios nuevos.
+  const p = data.preferences;
+  useEffect(() => {
+    setDayStart(String(p.dayStart));
+    setDayEnd(String(p.dayEnd));
+    setQuietStart(String(p.quietStart));
+    setQuietEnd(String(p.quietEnd));
+  }, [p.dayStart, p.dayEnd, p.quietStart, p.quietEnd]);
   const pref = (patch: Partial<AppData["preferences"]>) =>
     change((d) => ({ ...d, preferences: { ...d.preferences, ...patch } }));
   const exportBackup = async () => {
@@ -82,9 +102,9 @@ export default function Ajustes({
         await FileSystem.writeAsStringAsync(path, text);
         await Share.share({ url: path });
       }
-      setMessage("Respaldo listo. Guárdalo en un lugar privado.");
+      say("backup", "Respaldo listo. Guárdalo en un lugar privado.");
     } catch {
-      setMessage("No se pudo exportar el respaldo. Inténtalo de nuevo.");
+      say("backup", "No se pudo exportar el respaldo. Inténtalo de nuevo.");
     }
   };
   const importBackup = async () => {
@@ -103,9 +123,9 @@ export default function Ajustes({
           ? await (await fetch(a.uri)).text()
           : await FileSystem.readAsStringAsync(a.uri);
       setImported(readBackup(text));
-      setMessage("Revisa el respaldo antes de reemplazar tus datos.");
+      say("backup", "Revisa el respaldo antes de reemplazar tus datos.");
     } catch (e) {
-      setMessage((e as Error).message);
+      say("backup", (e as Error).message);
     } finally {
       setBusy(false);
     }
@@ -116,15 +136,10 @@ export default function Ajustes({
       title="Ajustes"
       onClose={() => {
         setImported(null);
-        setMessage("");
+        setNotice(null);
         onClose();
       }}
     >
-      {!!message && (
-        <Txt tone="primary" weight={600} accessibilityRole="alert">
-          {message}
-        </Txt>
-      )}
       {!!error && (
         <Card>
           <Txt tone="danger">{error}</Txt>
@@ -151,13 +166,14 @@ export default function Ajustes({
             try {
               if (enabled) await requestReminders();
               pref({ notifications: enabled });
-              setMessage(
+              say(
+                "neka",
                 enabled
                   ? "Recordatorios activados, 10 minutos antes."
                   : "Recordatorios desactivados.",
               );
             } catch (e) {
-              setMessage((e as Error).message);
+              say("neka", (e as Error).message);
             }
           }}
           detail={
@@ -169,6 +185,7 @@ export default function Ajustes({
         <Txt variant="caption" tone="secondary">
           Neka siempre te pregunta antes de mover algo.
         </Txt>
+        {note("neka")}
       </Section>
       <Section title="Jornada">
         <Toggle
@@ -226,7 +243,8 @@ export default function Ajustes({
               values[0] >= values[1] ||
               values[2] === values[3]
             ) {
-              setMessage(
+              say(
+                "jornada",
                 "Usa horas enteras de 0 a 23, con el inicio antes del fin y horas de silencio distintas.",
               );
               return;
@@ -237,9 +255,10 @@ export default function Ajustes({
               quietStart: values[2],
               quietEnd: values[3],
             });
-            setMessage("Horarios guardados.");
+            say("jornada", "Horarios guardados.");
           }}
         />
+        {note("jornada")}
       </Section>
       <Section title="Tus datos">
         <Disclosure title="Respaldar o importar">
@@ -274,12 +293,13 @@ export default function Ajustes({
                 onPress={() => {
                   try {
                     setImported(readBackup(json));
-                    setMessage("Respaldo válido. Revísalo abajo.");
+                    say("json", "Respaldo válido. Revísalo abajo.");
                   } catch (e) {
-                    setMessage((e as Error).message);
+                    say("json", (e as Error).message);
                   }
                 }}
               />
+              {note("json")}
             </>
           )}
           {hasRecovery && (
@@ -305,9 +325,9 @@ export default function Ajustes({
                         await restorePrevious();
                         setConfirmRecovery(false);
                         setImported(null);
-                        setMessage("Datos anteriores recuperados.");
+                        say("backup", "Datos anteriores recuperados.");
                       } catch (e) {
-                        setMessage((e as Error).message);
+                        say("backup", (e as Error).message);
                       } finally {
                         setBusy(false);
                       }
@@ -348,11 +368,12 @@ export default function Ajustes({
                       },
                     });
                     setImported(null);
-                    setMessage(
+                    say(
+                      "backup",
                       "Respaldo importado. Vuelve a activar los recordatorios en este dispositivo.",
                     );
                   } catch (e) {
-                    setMessage((e as Error).message);
+                    say("backup", (e as Error).message);
                   } finally {
                     setBusy(false);
                   }
@@ -360,6 +381,7 @@ export default function Ajustes({
               />
             </Card>
           )}
+          {note("backup")}
         </Disclosure>
         <Disclosure title={`Papelera (${trashed.length})`}>
           {!trashed.length && (
@@ -384,14 +406,15 @@ export default function Ajustes({
                 onPress={() => {
                   try {
                     change((d) => restoreItem(d, i.id));
-                    setMessage(`«${i.title}» restaurado.`);
+                    say("trash", `«${i.title}» restaurado.`);
                   } catch (e) {
-                    setMessage((e as Error).message);
+                    say("trash", (e as Error).message);
                   }
                 }}
               />
             </View>
           ))}
+          {note("trash")}
         </Disclosure>
         <Txt variant="caption" tone="secondary">
           Si borras los datos del navegador o desinstalas la app, solo te quedan

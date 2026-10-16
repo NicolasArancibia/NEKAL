@@ -17,18 +17,8 @@ export function syncBannerFor({
   cloudStatus,
   pendingChanges,
 }: SyncInput): SyncBannerState | null {
-  if (error)
-    return {
-      tone: "danger",
-      text: "No se pudo guardar.",
-      action: { label: "Reintentar", target: "retry" },
-    };
-  if (hasConflict)
-    return {
-      tone: "danger",
-      text: "Hay cambios en conflicto.",
-      action: { label: "Revisar", target: "perfil" },
-    };
+  // SyncEngine fija error y estado a la vez al perder conexión: el estado
+  // describe mejor la situación, así que va primero.
   if (cloudStatus.startsWith("Sin conexión"))
     return {
       tone: "neutral",
@@ -41,6 +31,18 @@ export function syncBannerFor({
       tone: "danger",
       text: "Cambios sin guardar. Exporta un respaldo.",
       action: { label: "Ajustes", target: "ajustes" },
+    };
+  if (error)
+    return {
+      tone: "danger",
+      text: "No se pudo guardar.",
+      action: { label: "Reintentar", target: "retry" },
+    };
+  if (hasConflict)
+    return {
+      tone: "danger",
+      text: "Hay cambios en conflicto.",
+      action: { label: "Revisar", target: "perfil" },
     };
   return null;
 }

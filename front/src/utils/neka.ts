@@ -33,12 +33,15 @@ export function timeUntil(fromMs: number, toMs: number): string {
   return m ? `en ${h} h ${m} min` : `en ${h} h`;
 }
 
-export function todayTime(item: Item, now = Date.now()): string {
-  const today = localDay(new Date(now));
+// La hora (scheduledAt o dueAt) que cae en el día local pedido, o "".
+export function timeOn(item: Item, day: string): string {
   for (const iso of [item.scheduledAt, item.dueAt])
-    if (iso && localDay(new Date(iso)) === today) return iso;
+    if (iso && localDay(new Date(iso)) === day) return iso;
   return "";
 }
+
+export const todayTime = (item: Item, now = Date.now()) =>
+  timeOn(item, localDay(new Date(now)));
 
 export const todayItems = (data: AppData, now = Date.now()): Item[] =>
   activeItems(data)
@@ -85,7 +88,11 @@ export function nekaState(data: AppData, now = Date.now()): NekaState {
       c.kind === "overlap" &&
       c.itemIds.some((id) => {
         const i = byId(id);
-        return !!i && !!todayTime(i, now);
+        // Un choque es de horarios: solo cuenta si uno está agendado hoy.
+        return (
+          !!i?.scheduledAt &&
+          localDay(new Date(i.scheduledAt)) === localDay(new Date(now))
+        );
       }),
   );
   if (clash) {

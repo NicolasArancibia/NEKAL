@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useAnimatedStyle,
@@ -91,10 +91,13 @@ export default function ListRow({
   onPress: () => void;
   onToggle?: () => void;
 }) {
+  // La zona que abre el ítem y el círculo son hermanos (no anidados) para que
+  // VoiceOver y la web los expongan como dos controles distintos.
+  const label = [time, title, done ? "completado" : "", tag?.text]
+    .filter(Boolean)
+    .join(", ");
   return (
-    <PressableScale
-      onPress={onPress}
-      accessibilityLabel={`Abrir ${title}`}
+    <View
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -102,9 +105,18 @@ export default function ListRow({
         minHeight: size.minTouch,
       }}
     >
-      <Txt variant="callout" tone="secondary" tabular style={{ width: 42 }}>
-        {time ?? ""}
-      </Txt>
+      <PressableScale
+        onPress={onPress}
+        accessibilityLabel={label}
+        style={StyleSheet.absoluteFill}
+      >
+        <View />
+      </PressableScale>
+      <View aria-hidden style={{ width: 42, pointerEvents: "none" }}>
+        <Txt variant="callout" tone="secondary" tabular>
+          {time ?? ""}
+        </Txt>
+      </View>
       {onToggle ? (
         <Check
           done={done}
@@ -114,27 +126,36 @@ export default function ListRow({
         />
       ) : (
         <View
+          aria-hidden
           style={{
             width: 8,
             height: 8,
             borderRadius: radius.pill,
             backgroundColor: dotColor,
+            pointerEvents: "none",
           }}
         />
       )}
-      <Txt
-        numberOfLines={1}
-        strike={done}
-        tone={done ? "done" : "ink"}
-        style={{ flex: 1 }}
+      <View
+        aria-hidden
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space.md,
+          pointerEvents: "none",
+        }}
       >
-        {title}
-      </Txt>
-      {tag && (
-        <View style={{ alignSelf: "center" }}>
-          <Tag text={tag.text} tone={tag.tone} />
-        </View>
-      )}
-    </PressableScale>
+        <Txt
+          numberOfLines={1}
+          strike={done}
+          tone={done ? "done" : "ink"}
+          style={{ flex: 1 }}
+        >
+          {title}
+        </Txt>
+        {tag && <Tag text={tag.text} tone={tag.tone} />}
+      </View>
+    </View>
   );
 }
