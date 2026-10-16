@@ -47,6 +47,20 @@ export const todayItems = (data: AppData, now = Date.now()): Item[] =>
       (a, b) => Date.parse(todayTime(a, now)) - Date.parse(todayTime(b, now)),
     );
 
+// Si hay más ítems que el límite, prioriza los que aún no pasan y completa con
+// los anteriores más recientes; siempre en orden de hora.
+export function visibleToday(
+  today: Item[],
+  now: number,
+  limit: number,
+): Item[] {
+  if (today.length <= limit) return today;
+  const upcoming = today.filter((i) => Date.parse(todayTime(i, now)) >= now),
+    past = today.filter((i) => Date.parse(todayTime(i, now)) < now),
+    shown = upcoming.slice(0, limit);
+  return [...past.slice(past.length - (limit - shown.length)), ...shown];
+}
+
 export const nextItem = (data: AppData, now = Date.now()) =>
   todayItems(data, now).find(
     (i) => i.status !== "completado" && Date.parse(todayTime(i, now)) >= now,

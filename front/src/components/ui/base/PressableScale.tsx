@@ -58,6 +58,15 @@ export default function PressableScale({
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled, ...accessibilityState }}
+      // aria-* además de accessibilityState: react-native-web solo expone estas.
+      aria-checked={
+        typeof accessibilityState?.checked === "boolean"
+          ? accessibilityState.checked
+          : undefined
+      }
+      aria-selected={accessibilityState?.selected}
+      aria-expanded={accessibilityState?.expanded}
+      aria-disabled={disabled || undefined}
       disabled={disabled}
       hitSlop={hitSlop}
       onPress={onPress}

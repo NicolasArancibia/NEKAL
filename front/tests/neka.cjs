@@ -204,3 +204,17 @@ test("timeUntil y hhmm", () => {
   );
   assert.equal(n.hhmm(at("01", "07:05")), "07:05");
 });
+test("visibleToday: con más del límite prioriza lo que viene", () => {
+  const items = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00"].map(
+    (h) => task({ id: h, scheduledAt: at("01", h) }),
+  );
+  const ids = (list) => list.map((i) => i.id);
+  // now = 13:00 → 3 que vienen + las 3 anteriores más recientes, en orden de hora
+  assert.deepEqual(ids(n.visibleToday(n.todayItems(data(items), now), now, 6)), [
+    "10:00", "11:00", "12:00", "14:00", "15:00", "16:00",
+  ]);
+  // bajo el límite se muestran todos
+  assert.deepEqual(ids(n.visibleToday(n.todayItems(data(items.slice(0, 3)), now), now, 6)), [
+    "08:00", "09:00", "10:00",
+  ]);
+});

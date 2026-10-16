@@ -1,48 +1,76 @@
 import React, { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
-import {
-  Item,
-  activeItems,
-  localDay,
-  newItem,
-  passive,
-  totalPoints,
-} from "../utils/model";
+import { Item, newItem, saveItem, totalPoints } from "../utils/model";
 import { findConflicts } from "../utils/planner";
-import { colors, s } from "../styles/globalStyles";
-import { Button, Empty } from "../components/ui/Common";
-import ItemCard from "../components/ui/ItemCard";
+import {
+  NekaAction,
+  hhmm,
+  nekaState,
+  nextItem,
+  timeUntil,
+  todayItems,
+  todayTime,
+  visibleToday,
+} from "../utils/neka";
+import { haptic } from "../utils/haptics";
+import { color, size, space } from "../styles/theme";
+import {
+  Button,
+  Card,
+  IconBadge,
+  LevelRing,
+  ListRow,
+  NekaCard,
+  ProgressBar,
+  ScreenHeader,
+  Txt,
+} from "../components/ui/base";
+import { typeIcons } from "../components/ui/ItemCard";
 import ItemEditor from "../components/ui/ItemEditor";
-import { ScreenHeader } from "../components/ui/base";
+
+function SectionTitle({ title, detail }: { title: string; detail?: string }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        gap: space.md,
+        marginTop: space.sm,
+      }}
+    >
+      <Txt variant="headline">{title}</Txt>
+      {!!detail && (
+        <Txt variant="callout" tone="secondary">
+          {detail}
+        </Txt>
+      )}
+    </View>
+  );
+}
+
 export default function Resumen() {
-  const { data } = useApp();
+  const { data, change } = useApp();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [editor, setEditor] = useState<Item | null>(null);
-  const items = activeItems(data),
-    actionable = items.filter((i) => !passive(i)),
-    conflicts = findConflicts(data),
-    points = totalPoints(data),
+  const [error, setError] = useState("");
+  const now = Date.now();
+  const points = totalPoints(data),
     level = Math.floor(points / 100) + 1;
-  const today = localDay(),
-    hour = new Date().getHours(),
-    greeting =
-      hour < 12 ? "Buenos días" : hour < 20 ? "Buenas tardes" : "Buenas noches";
-  const priorities = actionable
-    .filter((i) => i.status !== "completado")
-    .sort((a, b) => {
-      const rank = { urgente: 0, media: 1, baja: 2 };
-      return (
-        rank[a.priority] - rank[b.priority] ||
-        (a.scheduledAt || a.dueAt || "z").localeCompare(
-          b.scheduledAt || b.dueAt || "z",
-        )
-      );
-    })
-    .slice(0, 4);
+  const neka = nekaState(data, now),
+    next = nextItem(data, now),
+    today = todayItems(data, now),
+    done = today.filter((i) => i.status === "completado").length;
+  const clashing = new Set(
+    findConflicts(data, now)
+      .filter((c) => c.kind === "overlap")
+      .flatMap((c) => c.itemIds),
+  );
+  const space_ = (id: string) => data.workspaces.find((w) => w.id === id);
   const weekStart = new Date();
   weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
@@ -52,170 +80,152 @@ export default function Resumen() {
         !r.key.endsWith(":budget") && Date.parse(r.at) >= weekStart.getTime(),
     )
     .reduce((n, r) => n + r.points, 0);
+  const name = data.profile.name.trim().split(" ")[0];
+
+  const onNeka = (a: NekaAction) => {
+    if (a.target === "chat") navigation.navigate("Chat");
+    else if (a.target === "crear") setEditor(newItem());
+    else {
+      const item = data.items.find((i) => i.id === a.itemId);
+      if (item) setEditor(item);
+    }
+  };
+
+  const toggle = (item: Item) => {
+    const completing = item.status !== "completado";
+    try {
+      change((d) => {
+        const current = d.items.find((i) => i.id === item.id) ?? item;
+        return saveItem(d, {
+          ...current,
+          status: completing ? "completado" : "pendiente",
+        });
+      });
+      if (completing) haptic.success();
+      setError("");
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  const nextLine = (item: Item) => {
+    const start = todayTime(item, now);
+    const range =
+      start === item.scheduledAt && item.duration > 0
+        ? ` – ${hhmm(new Date(Date.parse(start) + item.duration * 60000).toISOString())}`
+        : "";
+    return `${hhmm(start)}${range} · ${space_(item.workspaceId)?.name ?? ""}`;
+  };
+
   return (
-    <ScrollView style={s.page} contentContainerStyle={s.content}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: color.background }}
+      contentContainerStyle={{
+        padding: space.screen,
+        paddingBottom: space.xxxl,
+        gap: space.md,
+        width: "100%",
+        maxWidth: 960,
+        alignSelf: "center",
+      }}
+    >
       <ScreenHeader
         showDate
-        title={
-          data.profile.name.trim()
-            ? `Hola, ${data.profile.name.trim().split(" ")[0]}`
-            : "Hola"
-        }
+        title={name ? `Hola, ${name}` : "Hola"}
+        right={<LevelRing level={level} progress={(points % 100) / 100} />}
       />
-      <View
-        style={[s.card, { backgroundColor: "#F0E8FF", borderColor: "#E4D6FF" }]}
-      >
-        <View style={s.between}>
-          <View>
-            <Text
-              style={[s.small, { color: colors.primary, fontWeight: "700" }]}
-            >
-              TU CAMINO CON NEKA
-            </Text>
-            <Text style={[s.title, { color: colors.primary, marginTop: 6 }]}>
-              {points} puntos
-            </Text>
-          </View>
-          <View
-            style={{ backgroundColor: "white", padding: 14, borderRadius: 18 }}
+      <NekaCard state={neka} onAction={onNeka} />
+
+      {next && (
+        <>
+          <SectionTitle
+            title="Lo siguiente"
+            detail={timeUntil(now, Date.parse(todayTime(next, now)))}
+          />
+          <Card
+            onPress={() => setEditor(next)}
+            accessibilityLabel={`Abrir ${next.title}`}
+            style={{ flexDirection: "row", alignItems: "center" }}
           >
-            <Text style={[s.heading, { color: colors.primary }]}>
-              Nivel {level}
-            </Text>
+            <IconBadge name={typeIcons[next.type]} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Txt variant="headline" numberOfLines={1}>
+                {next.title}
+              </Txt>
+              <Txt variant="callout" tone="secondary" numberOfLines={1}>
+                {nextLine(next)}
+              </Txt>
+            </View>
+          </Card>
+        </>
+      )}
+
+      {today.length > 0 && (
+        <>
+          <SectionTitle
+            title="Hoy"
+            detail={`${done} de ${today.length} listo`}
+          />
+          {!!error && (
+            <Txt variant="caption" tone="danger" accessibilityRole="alert">
+              {error}
+            </Txt>
+          )}
+          <View>
+            {visibleToday(today, now, size.todayLimit).map((item) => (
+              <ListRow
+                key={item.id}
+                title={item.title}
+                time={hhmm(todayTime(item, now))}
+                dotColor={space_(item.workspaceId)?.color ?? color.primary}
+                done={item.status === "completado"}
+                tag={
+                  clashing.has(item.id)
+                    ? { text: "Choca", tone: "danger" }
+                    : undefined
+                }
+                onPress={() => setEditor(item)}
+                onToggle={() => toggle(item)}
+              />
+            ))}
           </View>
-        </View>
+          {today.length > size.todayLimit && (
+            <View style={{ alignSelf: "flex-start" }}>
+              <Button
+                title={`Ver ${today.length - size.todayLimit} más`}
+                variant="plain"
+                small
+                onPress={() => navigation.navigate("Calendario")}
+              />
+            </View>
+          )}
+        </>
+      )}
+
+      <SectionTitle title="Progreso" />
+      <Card>
         <View
           style={{
-            height: 7,
-            borderRadius: 8,
-            backgroundColor: "#DDD0F7",
-            overflow: "hidden",
+            flexDirection: "row",
+            alignItems: "baseline",
+            justifyContent: "space-between",
           }}
         >
-          <View
-            style={{
-              width: `${points % 100}%`,
-              height: 7,
-              backgroundColor: colors.primary,
-              borderRadius: 8,
-            }}
-          />
+          <Txt variant="headline">Nivel {level}</Txt>
+          <Txt variant="callout" tone="secondary">
+            {points} pts
+          </Txt>
         </View>
-        <Text style={s.small}>
-          {100 - (points % 100)} puntos para el siguiente nivel · {weekPoints}{" "}
+        <ProgressBar
+          value={(points % 100) / 100}
+          accessibilityLabel={`Avance al nivel ${level + 1}`}
+        />
+        <Txt variant="caption" tone="secondary">
+          {100 - (points % 100)} pts para el nivel {level + 1} · {weekPoints}{" "}
           esta semana
-        </Text>
-      </View>
-      <View style={s.between}>
-        <Text style={s.heading}>Progreso por espacio</Text>
-        <Text style={s.small}>
-          {actionable.filter((i) => i.status === "completado").length}/
-          {actionable.length} completados
-        </Text>
-      </View>
-      <View style={s.card}>
-        {data.workspaces.map((w) => {
-          const group = actionable.filter((i) => i.workspaceId === w.id),
-            done = group.reduce(
-              (n, i) =>
-                n +
-                (i.status === "completado"
-                  ? 1
-                  : i.type === "Goal" && i.steps.length
-                    ? i.steps.filter((st) => st.done).length / i.steps.length
-                    : 0),
-              0,
-            ),
-            pct = group.length ? Math.round((done / group.length) * 100) : 0;
-          return (
-            <View key={w.id} style={{ gap: 8 }}>
-              <View style={s.between}>
-                <Text style={s.text}>{w.name}</Text>
-                <Text style={[s.small, { color: colors.primary }]}>{pct}%</Text>
-              </View>
-              <View
-                style={{
-                  height: 6,
-                  backgroundColor: colors.lavender,
-                  borderRadius: 5,
-                }}
-              >
-                <View
-                  style={{
-                    width: `${pct}%`,
-                    height: 6,
-                    backgroundColor: w.color,
-                    borderRadius: 5,
-                  }}
-                />
-              </View>
-            </View>
-          );
-        })}
-      </View>
-      <View style={s.between}>
-        <Text style={s.heading}>Prioridades</Text>
-        <Button
-          title="Ver calendario"
-          secondary
-          small
-          onPress={() => navigation.navigate("Calendario")}
-        />
-      </View>
-      {priorities.map((i) => (
-        <ItemCard key={i.id} item={i} onPress={() => setEditor(i)} />
-      ))}
-      {!priorities.length && (
-        <Empty
-          title={items.length ? "Todo al día" : "Comienza con algo pequeño"}
-          detail={
-            items.length
-              ? "No tienes compromisos pendientes. Puedes guardar una nueva idea."
-              : "Crea tu primer ítem y Neka te ayudará a darle espacio."
-          }
-        />
-      )}
-      <Button
-        title="Crear mi próximo ítem"
-        onPress={() => setEditor(newItem())}
-      />
-      <View style={s.between}>
-        <Text style={s.heading}>Tu planificación</Text>
-        <Text style={s.small}>
-          {
-            actionable.filter(
-              (i) =>
-                i.scheduledAt && localDay(new Date(i.scheduledAt)) === today,
-            ).length
-          }{" "}
-          para hoy
-        </Text>
-      </View>
-      {conflicts.length ? (
-        <View style={[s.card, { borderColor: "#F6CBDA" }]}>
-          <Text style={[s.heading, { color: colors.red }]}>
-            Hay algo que podemos reorganizar
-          </Text>
-          {conflicts.slice(0, 2).map((c) => (
-            <Text key={c.id} style={s.text}>
-              {c.description}
-            </Text>
-          ))}
-          <Button
-            title="Resolver con Neka"
-            secondary
-            onPress={() => navigation.navigate("Chat")}
-          />
-        </View>
-      ) : (
-        <View style={s.card}>
-          <Text style={s.text}>Sin conflictos detectados</Text>
-          <Text style={s.small}>
-            Revisamos superposiciones, plazos y dependencias cada vez que
-            cambias tus ítems.
-          </Text>
-        </View>
-      )}
+        </Txt>
+      </Card>
+
       {editor && (
         <ItemEditor
           key={editor.id}
