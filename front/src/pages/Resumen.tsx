@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
-import { Item, newItem, saveItem, totalPoints } from "../utils/model";
+import { Item, newItem, totalPoints } from "../utils/model";
 import { findConflicts } from "../utils/planner";
 import {
   NekaAction,
@@ -16,7 +16,7 @@ import {
   todayTime,
   visibleToday,
 } from "../utils/neka";
-import { haptic } from "../utils/haptics";
+import { useToggleDone } from "../utils/useToggleDone";
 import { color, size, space } from "../styles/theme";
 import {
   Button,
@@ -54,10 +54,10 @@ function SectionTitle({ title, detail }: { title: string; detail?: string }) {
 }
 
 export default function Resumen() {
-  const { data, change } = useApp();
+  const { data } = useApp();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [editor, setEditor] = useState<Item | null>(null);
-  const [error, setError] = useState("");
+  const { toggle, error } = useToggleDone();
   const now = Date.now();
   const points = totalPoints(data),
     level = Math.floor(points / 100) + 1;
@@ -88,23 +88,6 @@ export default function Resumen() {
     else {
       const item = data.items.find((i) => i.id === a.itemId);
       if (item) setEditor(item);
-    }
-  };
-
-  const toggle = (item: Item) => {
-    const completing = item.status !== "completado";
-    try {
-      change((d) => {
-        const current = d.items.find((i) => i.id === item.id) ?? item;
-        return saveItem(d, {
-          ...current,
-          status: completing ? "completado" : "pendiente",
-        });
-      });
-      if (completing) haptic.success();
-      setError("");
-    } catch (e) {
-      setError((e as Error).message);
     }
   };
 
