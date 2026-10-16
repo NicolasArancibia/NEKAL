@@ -1,54 +1,87 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, firebaseConfigured } from "../utils/firebase";
-import { Button, Field } from "../components/ui/Common";
-import { s } from "../styles/globalStyles";
-function errorText(error: unknown) {
-  const code = (error as { code?: string }).code;
+import { space } from "../styles/theme";
+import { Button, Card, Field, Txt } from "../components/ui/base";
+
+type Target = "email" | "password" | "confirmation" | "general";
+type Notice = { text: string; target: Target; info?: boolean } | null;
+
+function errorNotice(error: unknown): Notice {
+  const code = (error as { code?: string }).code ?? "";
+  const known: Record<string, Notice> = {
+    "auth/invalid-credential": {
+      text: "Correo o contraseña incorrectos.",
+      target: "general",
+    },
+    "auth/invalid-email": {
+      text: "Escribe un correo válido.",
+      target: "email",
+    },
+    "auth/email-already-in-use": {
+      text: "Ese correo ya tiene una cuenta. Inicia sesión.",
+      target: "email",
+    },
+    "auth/weak-password": {
+      text: "Usa al menos 6 caracteres.",
+      target: "password",
+    },
+    "auth/network-request-failed": {
+      text: "Sin conexión. Revisa tu internet y reintenta.",
+      target: "general",
+    },
+    "auth/operation-not-allowed": {
+      text: "Activa Email/Password en Firebase Authentication.",
+      target: "general",
+    },
+    "auth/too-many-requests": {
+      text: "Demasiados intentos. Espera un momento y reintenta.",
+      target: "general",
+    },
+  };
   return (
-    (
-      {
-        "auth/invalid-credential": "Correo o contraseña incorrectos.",
-        "auth/invalid-email": "El correo no es válido.",
-        "auth/email-already-in-use": "Ese correo ya tiene una cuenta.",
-        "auth/weak-password": "Usa una contraseña de al menos 6 caracteres.",
-        "auth/network-request-failed":
-          "No hay conexión con Firebase. Inténtalo de nuevo.",
-        "auth/operation-not-allowed":
-          "Activa Email/Password en Firebase Authentication.",
-        "auth/too-many-requests":
-          "Demasiados intentos. Espera antes de volver a intentarlo.",
-      } as Record<string, string>
-    )[code ?? ""] ??
-    "No se pudo completar la operación. Revisa la configuración de Firebase y tu conexión."
+    known[code] ?? {
+      text: "No se pudo completar. Revisa tu conexión y reintenta.",
+      target: "general",
+    }
   );
 }
+
 export default function Login({ onGuest }: { onGuest?: () => void }) {
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
     [confirmation, setConfirmation] = useState(""),
     [register, setRegister] = useState(false),
     [busy, setBusy] = useState(false),
-    [message, setMessage] = useState("");
+    [notice, setNotice] = useState<Notice>(null);
+  const errorFor = (target: Target) =>
+    notice && !notice.info && notice.target === target
+      ? notice.text
+      : undefined;
   const run = async (reset = false) => {
     if (!auth) return;
     setBusy(true);
-    setMessage("");
+    setNotice(null);
     try {
       if (!email.trim()) throw { code: "auth/invalid-email" };
       if (reset) {
         await sendPasswordResetEmail(auth, email.trim());
-        setMessage(
-          "Si existe una cuenta, recibirás las instrucciones para recuperar el acceso.",
-        );
+        setNotice({
+          text: "Si existe una cuenta con ese correo, te enviamos las instrucciones.",
+          target: "general",
+          info: true,
+        });
       } else if (register) {
         if (password !== confirmation) {
-          setMessage("Las contraseñas no coinciden.");
+          setNotice({
+            text: "Las contraseñas no coinciden.",
+            target: "confirmation",
+          });
           return;
         }
         await createUserWithEmailAndPassword(auth, email.trim(), password);
@@ -56,50 +89,43 @@ export default function Login({ onGuest }: { onGuest?: () => void }) {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       }
     } catch (e) {
-      setMessage(errorText(e));
+      setNotice(errorNotice(e));
     } finally {
       setBusy(false);
     }
   };
   if (!firebaseConfigured)
     return (
-      <View style={s.card}>
-        <Text style={s.heading}>Firebase aún no está configurado</Text>
-        <Text style={s.text}>
-          Puedes usar todas las funciones locales. Para activar cuentas,
-          configura el proyecto Firebase siguiendo DOCUMENTOS/V1/V1.md.
-        </Text>
-        <Text style={s.small}>
-          Se necesita registrar una app web, habilitar Email/Password y
-          Firestore, y completar front/.env.local. No ingreses claves de
-          administrador.
-        </Text>
+      <Card>
+        <Txt variant="headline">Las cuentas no están configuradas</Txt>
+        <Txt tone="secondary">
+          Puedes usar Nekal como invitado. Para activar cuentas, completa
+          front/.env.local siguiendo DOCUMENTOS/V1/V1.md.
+        </Txt>
         {!!onGuest && (
           <Button title="Continuar como invitado" onPress={onGuest} />
         )}
-      </View>
+      </Card>
     );
   return (
-    <View style={{ gap: 16 }}>
-      <View style={s.card}>
-        <Text style={s.heading}>
+    <View style={{ gap: space.lg }}>
+      <Card>
+        <Txt variant="title">
           {register ? "Crear cuenta" : "Iniciar sesión"}
-        </Text>
-        <Text style={s.small}>
-          Cada cuenta tiene su propio espacio. Los datos del modo local se
-          conservan separados; puedes transferirlos mediante un respaldo.
-        </Text>
+        </Txt>
         <Field
           label="Correo electrónico"
           value={email}
           onChange={setEmail}
           keyboardType="email-address"
+          error={errorFor("email")}
         />
         <Field
           label="Contraseña"
           value={password}
           onChange={setPassword}
           secure
+          error={errorFor("password")}
         />
         {register && (
           <Field
@@ -107,6 +133,7 @@ export default function Login({ onGuest }: { onGuest?: () => void }) {
             value={confirmation}
             onChange={setConfirmation}
             secure
+            error={errorFor("confirmation")}
           />
         )}
         <Button
@@ -114,42 +141,46 @@ export default function Login({ onGuest }: { onGuest?: () => void }) {
           disabled={busy}
           onPress={() => void run()}
         />
+        {notice?.target === "general" && (
+          <Txt
+            variant="callout"
+            tone={notice.info ? "primary" : "danger"}
+            accessibilityRole="alert"
+          >
+            {notice.text}
+          </Txt>
+        )}
         <Button
           title={register ? "Ya tengo una cuenta" : "Crear una cuenta"}
-          secondary
+          variant="secondary"
           disabled={busy}
           onPress={() => {
             setRegister(!register);
-            setMessage("");
+            setNotice(null);
             setPassword("");
             setConfirmation("");
           }}
         />
-        <Button
-          title="Recuperar contraseña"
-          secondary
-          disabled={busy}
-          onPress={() => void run(true)}
-        />
-        {!!message && (
-          <Text accessibilityRole="alert" style={s.error}>
-            {message}
-          </Text>
+        {!register && (
+          <Button
+            title="Recuperar contraseña"
+            variant="plain"
+            disabled={busy}
+            onPress={() => void run(true)}
+          />
         )}
-      </View>
+      </Card>
       {!!onGuest && (
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: space.sm }}>
           <Button
             title="Continuar como invitado"
-            secondary
+            variant="secondary"
             disabled={busy}
             onPress={onGuest}
           />
-          <Text style={[s.small, { textAlign: "center" }]}>
-            Como invitado, tus datos se guardan solo en este dispositivo. No se
-            sincronizan con una cuenta y se pierden si borras el almacenamiento
-            de la app.
-          </Text>
+          <Txt variant="caption" tone="secondary" align="center">
+            Como invitado, tus datos quedan solo en este dispositivo.
+          </Txt>
         </View>
       )}
     </View>
