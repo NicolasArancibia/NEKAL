@@ -1,18 +1,19 @@
+// Adaptador temporal hacia components/ui/base (plan A, Task 3). Se elimina al
+// terminar la migración de pantallas (Task 12).
 import React from "react";
 import {
   ActivityIndicator,
   Modal,
-  Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
   KeyboardAvoidingView,
   Platform,
-  Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, s } from "../../styles/globalStyles";
+import { color, space } from "../../styles/theme";
+import * as base from "./base";
 export function Button({
   title,
   onPress,
@@ -29,135 +30,18 @@ export function Button({
   small?: boolean;
 }) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={title}
+    <base.Button
+      title={title}
+      onPress={onPress}
+      variant={danger ? "danger" : secondary ? "secondary" : "primary"}
       disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        paddingHorizontal: small ? 12 : 18,
-        paddingVertical: small ? 9 : 13,
-        borderRadius: 14,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: secondary
-          ? colors.lavender
-          : danger
-            ? colors.red
-            : colors.primary,
-        opacity: disabled ? 0.4 : pressed ? 0.75 : 1,
-        minHeight: small ? 36 : 46,
-      })}
-    >
-      <Text
-        style={{
-          color: secondary ? colors.primary : "#FFF",
-          fontSize: small ? 12 : 14,
-          fontWeight: "700",
-        }}
-      >
-        {title}
-      </Text>
-    </Pressable>
+      small={small}
+    />
   );
 }
-export function Chip({
-  title,
-  selected,
-  onPress,
-}: {
-  title: string;
-  selected?: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[
-        s.pill,
-        { backgroundColor: selected ? colors.primary : colors.lavender },
-      ]}
-    >
-      <Text
-        style={{
-          fontSize: 12,
-          fontWeight: "600",
-          color: selected ? "#FFF" : colors.primary,
-        }}
-      >
-        {title}
-      </Text>
-    </Pressable>
-  );
-}
-export function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  multiline = false,
-  secure = false,
-  keyboardType = "default",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  multiline?: boolean;
-  secure?: boolean;
-  keyboardType?: "default" | "email-address" | "numeric";
-}) {
-  return (
-    <View>
-      <Text style={s.label}>{label}</Text>
-      <TextInput
-        accessibilityLabel={label}
-        value={value}
-        onChangeText={onChange}
-        placeholder={placeholder}
-        placeholderTextColor="#9A90A8"
-        multiline={multiline}
-        secureTextEntry={secure}
-        autoCapitalize={
-          secure || keyboardType === "email-address" ? "none" : "sentences"
-        }
-        keyboardType={keyboardType}
-        style={[
-          s.input,
-          multiline && { minHeight: 96, textAlignVertical: "top" },
-        ]}
-      />
-    </View>
-  );
-}
-export function Toggle({
-  label,
-  value,
-  onChange,
-  detail,
-}: {
-  label: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-  detail?: string;
-}) {
-  return (
-    <View style={s.between}>
-      <View style={{ flex: 1 }}>
-        <Text style={s.text}>{label}</Text>
-        {detail && <Text style={s.small}>{detail}</Text>}
-      </View>
-      <Switch
-        accessibilityLabel={label}
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ true: colors.primary, false: "#DDD4EE" }}
-      />
-    </View>
-  );
-}
+export const Chip = base.Chip;
+export const Field = base.Field;
+export const Toggle = base.Toggle;
 export function Sheet({
   visible,
   title,
@@ -173,7 +57,7 @@ export function Sheet({
     <Modal
       visible={visible}
       transparent
-      animationType={Platform.OS==='web'?'none':'slide'}
+      animationType={Platform.OS === "web" ? "none" : "slide"}
       onRequestClose={onClose}
     >
       <View
@@ -225,22 +109,25 @@ export function Sheet({
 }
 export function Empty({ title, detail }: { title: string; detail: string }) {
   return (
-    <View style={[s.card, { paddingVertical: 30 }]}>
-      <Text style={s.heading}>{title}</Text>
-      <Text style={s.subtitle}>{detail}</Text>
-    </View>
+    <base.Card>
+      <base.Txt variant="headline">{title}</base.Txt>
+      <base.Txt tone="secondary">{detail}</base.Txt>
+    </base.Card>
   );
 }
 export function Loading() {
   return (
     <View
-      style={[
-        s.page,
-        { justifyContent: "center", alignItems: "center", gap: 16 },
-      ]}
+      style={{
+        flex: 1,
+        backgroundColor: color.background,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: space.lg,
+      }}
     >
-      <ActivityIndicator color={colors.primary} />
-      <Text style={s.subtitle}>Preparando tu espacio…</Text>
+      <ActivityIndicator color={color.primary} />
+      <base.Txt tone="secondary">Cargando…</base.Txt>
     </View>
   );
 }
