@@ -7,7 +7,7 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 ## Comandos (desde la raíz)
 
 - `npm run web` — app web local (puerto 8081)
-- `npm test` — 28 pruebas de dominio y sync (runner propio en Node, no jest)
+- `npm test` — pruebas de dominio, sync, Neka, tema y estilos (runner propio en Node, no jest)
 - `npm run typecheck` · `npm --prefix front run build:web`
 - `npm run test:firestore` — reglas en emulador; requiere Java 21 (no instalado)
 - `npm run deploy` — publica reglas + web. **Solo si se pide explícitamente.**
