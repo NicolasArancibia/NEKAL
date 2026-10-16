@@ -21,6 +21,9 @@
       "favicon": "./assets/Img/Neka_Pose5.png",
       "name": "Nekal",
       "shortName": "Nekal"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

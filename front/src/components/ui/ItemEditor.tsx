@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Image, Platform, Share, Text, View } from "react-native";
+import { Image, Platform, ScrollView, Share, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { useApp } from "../../utils/AppContext";
@@ -17,8 +18,34 @@ import {
   saveItem,
   uid,
 } from "../../utils/model";
-import { colors, s } from "../../styles/globalStyles";
-import { Button, Chip, Field, Sheet, Toggle } from "./Common";
+import { color, size, space } from "../../styles/theme";
+import {
+  Button,
+  Card,
+  Chip,
+  Disclosure,
+  Field,
+  PressableScale,
+  Sheet,
+  Tag,
+  Toggle,
+  Txt,
+} from "./base";
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={{ gap: space.md }}>
+      <Txt variant="headline">{title}</Txt>
+      {children}
+    </View>
+  );
+}
 
 export default function ItemEditor({
   item,
@@ -127,15 +154,23 @@ export default function ItemEditor({
       setBusy(false);
     }
   };
+  const spaceName =
+    data.workspaces.find((w) => w.id === draft.workspaceId)?.name ?? "";
+  const linkable = activeItems(data).filter(
+    (i) => i.id !== draft.id && !passive(i),
+  );
   return (
     <Sheet
       visible
       title={exists ? "Editar ítem" : "Crear ítem"}
       onClose={onClose}
     >
-      <Text style={s.small}>Tus ideas y compromisos, en un mismo lugar.</Text>
       {!exists ? (
-        <View style={s.wrap}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: space.sm, paddingVertical: space.xs }}
+        >
           {TYPES.map((type) => (
             <Chip
               key={type}
@@ -149,32 +184,295 @@ export default function ItemEditor({
               }
             />
           ))}
-        </View>
+        </ScrollView>
       ) : (
-        <Text style={[s.heading, { color: colors.primary }]}>{draft.type}</Text>
+        <Tag text={draft.type} tone="primary" />
       )}
-      <Field
-        label="Título"
-        value={draft.title}
-        onChange={(title) => patch({ title })}
-        placeholder="¿Qué quieres organizar?"
-      />
-      <Field
-        label="Descripción"
-        value={draft.description}
-        onChange={(description) => patch({ description })}
-        multiline
-        placeholder="Agrega contexto, a tu ritmo"
-      />
-      <Field
-        label="Fecha de inicio"
-        value={draft.startDate}
-        onChange={(startDate) => patch({ startDate })}
-        placeholder="AAAA-MM-DD"
-      />
-      <View>
-        <Text style={s.label}>Espacio</Text>
-        <View style={s.wrap}>
+
+      <Section title="Qué">
+        <Field
+          label="Título"
+          value={draft.title}
+          onChange={(title) => patch({ title })}
+          placeholder="¿Qué quieres organizar?"
+        />
+        <Field
+          label="Descripción"
+          value={draft.description}
+          onChange={(description) => patch({ description })}
+          multiline
+          placeholder="Contexto, enlaces, lo que necesites recordar"
+        />
+        {draft.type === "Nota" && (
+          <Field
+            label="Contenido de la nota"
+            value={draft.content}
+            onChange={(content) => patch({ content })}
+            multiline
+          />
+        )}
+        {draft.type === "Idea" && (
+          <>
+            <Field
+              label="Categoría de la idea"
+              value={draft.category}
+              onChange={(category) => patch({ category })}
+            />
+            {exists && (
+              <Button
+                title="Convertir en tarea"
+                variant="secondary"
+                onPress={() =>
+                  patch({
+                    type: "Tarea",
+                    flexible: true,
+                    description: [
+                      draft.description,
+                      draft.category
+                        ? `Categoría original: ${draft.category}`
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join("\n"),
+                  })
+                }
+              />
+            )}
+          </>
+        )}
+        {isPassive && (
+          <Txt variant="caption" tone="secondary">
+            Las notas e ideas no tienen estado ni suman puntos.
+          </Txt>
+        )}
+      </Section>
+
+      <Section title="Cuándo">
+        <Field
+          label="Fecha de inicio"
+          value={draft.startDate}
+          onChange={(startDate) => patch({ startDate })}
+          placeholder="AAAA-MM-DD"
+        />
+        {!isPassive && (
+          <>
+            <Field
+              label={appointment ? "Fecha y hora" : "Horario (opcional)"}
+              value={scheduled}
+              onChange={setScheduled}
+              placeholder="AAAA-MM-DD HH:mm"
+            />
+            {!appointment && (
+              <Field
+                label={
+                  draft.type === "Deadline"
+                    ? "Fecha límite"
+                    : "Fecha límite (opcional)"
+                }
+                value={due}
+                onChange={setDue}
+                placeholder="AAAA-MM-DD HH:mm"
+              />
+            )}
+            <Field
+              label="Duración (minutos)"
+              value={String(draft.duration)}
+              onChange={(v) => patch({ duration: v ? Number(v) : 0 })}
+              keyboardType="numeric"
+            />
+            <Txt variant="caption" tone="secondary">
+              El horario ocupa tiempo en tu día; la fecha límite es cuándo debe
+              estar listo.
+            </Txt>
+            <Toggle
+              label="Neka puede proponer moverlo"
+              value={draft.flexible}
+              onChange={(flexible) => patch({ flexible })}
+              detail="Siempre verás la propuesta antes de que cambie."
+            />
+          </>
+        )}
+      </Section>
+
+      {!isPassive && draft.type !== "Goal" && draft.type !== "Deadline" && (
+        <Section title="Detalles">
+          <Field
+            label={draft.type === "Visita" ? "Ubicación" : "Ubicación o enlace"}
+            value={draft.location}
+            onChange={(location) => patch({ location })}
+          />
+          {draft.type === "Visita" && (
+            <Field
+              label="Persona o motivo de la visita"
+              value={draft.visitReason}
+              onChange={(visitReason) => patch({ visitReason })}
+            />
+          )}
+          {draft.type === "Meeting" && (
+            <>
+              <Field
+                label="Participantes"
+                value={draft.participants}
+                onChange={(participants) => patch({ participants })}
+                placeholder="Nombres separados por comas"
+              />
+              <Field
+                label="Agenda"
+                value={draft.agenda}
+                onChange={(agenda) => patch({ agenda })}
+                multiline
+              />
+            </>
+          )}
+          {appointment && (
+            <>
+              <Toggle
+                label="Cuenta para mi puntaje"
+                value={draft.countsForScore}
+                onChange={(countsForScore) => patch({ countsForScore })}
+              />
+              {draft.countsForScore && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: space.sm,
+                  }}
+                >
+                  {([1, 2, 3] as const).map((difficulty) => (
+                    <Chip
+                      key={difficulty}
+                      title={["Baja", "Media", "Alta"][difficulty - 1]}
+                      selected={draft.difficulty === difficulty}
+                      onPress={() => patch({ difficulty })}
+                    />
+                  ))}
+                </View>
+              )}
+            </>
+          )}
+        </Section>
+      )}
+
+      {!isPassive && !appointment && (
+        <Section title={draft.type === "Goal" ? "Hitos" : "Subtareas"}>
+          {draft.steps.map((st) => (
+            <View
+              key={st.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: space.sm,
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Toggle
+                  label={st.title}
+                  value={st.done}
+                  onChange={(done) =>
+                    patch({
+                      steps: draft.steps.map((x) =>
+                        x.id === st.id ? { ...x, done } : x,
+                      ),
+                    })
+                  }
+                />
+              </View>
+              <PressableScale
+                accessibilityLabel={`Quitar ${st.title}`}
+                onPress={() =>
+                  patch({ steps: draft.steps.filter((x) => x.id !== st.id) })
+                }
+                style={{
+                  width: size.minTouch,
+                  height: size.minTouch,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Ionicons
+                  name="close-outline"
+                  size={size.icon}
+                  color={color.inkSecondary}
+                />
+              </PressableScale>
+            </View>
+          ))}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "flex-end",
+              gap: space.sm,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Field
+                label={draft.type === "Goal" ? "Nuevo hito" : "Nueva subtarea"}
+                value={step}
+                onChange={setStep}
+              />
+            </View>
+            <Button
+              title="Añadir"
+              variant="secondary"
+              onPress={() => {
+                if (step.trim()) {
+                  patch({
+                    steps: [
+                      ...draft.steps,
+                      { id: uid(), title: step.trim(), done: false },
+                    ],
+                  });
+                  setStep("");
+                }
+              }}
+            />
+          </View>
+        </Section>
+      )}
+
+      {!isPassive && (
+        <Section title="Estado y prioridad">
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
+          >
+            {(["pendiente", "en curso", "completado"] as const).map(
+              (status) => (
+                <Chip
+                  key={status}
+                  title={status}
+                  selected={draft.status === status}
+                  onPress={() => patch({ status })}
+                />
+              ),
+            )}
+          </View>
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
+          >
+            {(["baja", "media", "urgente"] as const).map((priority) => (
+              <Chip
+                key={priority}
+                title={priority}
+                selected={draft.priority === priority}
+                onPress={() => patch({ priority })}
+              />
+            ))}
+          </View>
+          <Txt variant="caption" tone="secondary">
+            {frozenPoints ?? pointsFor(estimatedItem, data.items)} pts{" "}
+            {frozenPoints === undefined ? "estimados" : "asignados"} ·
+            dificultad{" "}
+            {["baja", "media", "alta"][difficultyOf(estimatedItem) - 1]}
+          </Txt>
+        </Section>
+      )}
+
+      <Disclosure title={`Espacio y relaciones · ${spaceName}`}>
+        <Txt variant="callout" weight={600}>
+          Espacio
+        </Txt>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
           {data.workspaces.map((w) => (
             <Chip
               key={w.id}
@@ -184,10 +482,10 @@ export default function ItemEditor({
             />
           ))}
         </View>
-      </View>
-      <View>
-        <Text style={s.label}>Rutina / grupo</Text>
-        <View style={s.wrap}>
+        <Txt variant="callout" weight={600}>
+          Rutina o grupo
+        </Txt>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
           <Chip
             title="Sin grupo"
             selected={!draft.groupId}
@@ -204,27 +502,51 @@ export default function ItemEditor({
               />
             ))}
         </View>
-      </View>
+        {!isPassive && (
+          <>
+            <Txt variant="callout" weight={600}>
+              Depende de
+            </Txt>
+            <Txt variant="caption" tone="secondary">
+              Lo marcado debe completarse antes de terminar este ítem.
+            </Txt>
+            {linkable.map((i) => (
+              <Toggle
+                key={i.id}
+                label={i.title}
+                value={draft.dependencies.includes(i.id)}
+                onChange={(checked) =>
+                  patch({
+                    dependencies: checked
+                      ? [...draft.dependencies, i.id]
+                      : draft.dependencies.filter((id) => id !== i.id),
+                  })
+                }
+              />
+            ))}
+            {!linkable.length && (
+              <Txt variant="caption" tone="secondary">
+                Crea otro ítem accionable para vincularlo.
+              </Txt>
+            )}
+          </>
+        )}
+      </Disclosure>
+
       {draft.type === "Nota" && (
-        <>
-          <Field
-            label="Contenido de la nota"
-            value={draft.content}
-            onChange={(content) => patch({ content })}
-            multiline
-          />
+        <Disclosure title={`Adjuntos (${draft.attachments.length}/3)`}>
           <Button
             title={busy ? "Leyendo archivo…" : "Adjuntar imagen o archivo"}
             disabled={busy}
-            secondary
+            variant="secondary"
             onPress={() => void addAttachment()}
           />
-          <Text style={s.small}>
+          <Txt variant="caption" tone="secondary">
             Hasta 3 adjuntos de 350 KB. Se guardan dentro del respaldo.
-          </Text>
+          </Txt>
           {draft.attachments.map((a) => (
-            <View key={a.id} style={s.card}>
-              <Text style={s.text}>{a.name}</Text>
+            <Card key={a.id}>
+              <Txt numberOfLines={1}>{a.name}</Txt>
               {a.mime.startsWith("image/") && (
                 <Image
                   source={{ uri: a.data }}
@@ -232,325 +554,76 @@ export default function ItemEditor({
                   resizeMode="contain"
                 />
               )}
-              <Button
-                title={`Abrir ${a.name}`}
-                secondary
-                small
-                onPress={async () => {
-                  try {
-                    if (Platform.OS === "web") {
-                      const link = document.createElement("a");
-                      link.href = a.data;
-                      link.download = a.name;
-                      link.click();
-                    } else {
-                      const path =
-                        FileSystem.cacheDirectory +
-                        a.id +
-                        "-" +
-                        a.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-                      await FileSystem.writeAsStringAsync(
-                        path,
-                        a.data.split(",")[1],
-                        { encoding: FileSystem.EncodingType.Base64 },
-                      );
-                      await Share.share({ url: path });
-                    }
-                  } catch {
-                    setError("No se pudo abrir el adjunto.");
-                  }
-                }}
-              />
-              <Button
-                title={`Quitar ${a.name}`}
-                small
-                secondary
-                onPress={() =>
-                  patch({
-                    attachments: draft.attachments.filter((x) => x.id !== a.id),
-                  })
-                }
-              />
-            </View>
-          ))}
-        </>
-      )}
-      {draft.type === "Idea" && (
-        <>
-          <Field
-            label="Categoría de la idea"
-            value={draft.category}
-            onChange={(category) => patch({ category })}
-          />
-          {exists && (
-            <Button
-              title="Convertir en tarea"
-              secondary
-              onPress={() =>
-                patch({
-                  type: "Tarea",
-                  flexible: true,
-                  description: [
-                    draft.description,
-                    draft.category
-                      ? `Categoría original: ${draft.category}`
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join("\n"),
-                })
-              }
-            />
-          )}
-          <Text style={s.small}>
-            Las notas e ideas no tienen estado ni suman puntos.
-          </Text>
-        </>
-      )}
-      {!isPassive && (
-        <>
-          <View>
-            <Text style={s.label}>Estado</Text>
-            <View style={s.wrap}>
-              {(["pendiente", "en curso", "completado"] as const).map(
-                (status) => (
-                  <Chip
-                    key={status}
-                    title={status}
-                    selected={draft.status === status}
-                    onPress={() => patch({ status })}
-                  />
-                ),
-              )}
-            </View>
-          </View>
-          <View>
-            <Text style={s.label}>Prioridad</Text>
-            <View style={s.wrap}>
-              {(["baja", "media", "urgente"] as const).map((priority) => (
-                <Chip
-                  key={priority}
-                  title={priority}
-                  selected={draft.priority === priority}
-                  onPress={() => patch({ priority })}
-                />
-              ))}
-            </View>
-          </View>
-          <Field
-            label={
-              appointment
-                ? "Fecha y hora del compromiso"
-                : "Horario planificado (opcional)"
-            }
-            value={scheduled}
-            onChange={setScheduled}
-            placeholder="AAAA-MM-DD HH:mm"
-          />
-          {!appointment && (
-            <Field
-              label={
-                draft.type === "Deadline"
-                  ? "Fecha límite (obligatoria)"
-                  : "Fecha límite (opcional)"
-              }
-              value={due}
-              onChange={setDue}
-              placeholder="AAAA-MM-DD HH:mm"
-            />
-          )}
-          <Text style={s.small}>
-            Fechas en la zona horaria de este dispositivo. El horario
-            planificado ocupa tiempo; la fecha límite indica cuándo debe estar
-            terminado.
-          </Text>
-          <Field
-            label="Duración estimada (minutos)"
-            value={String(draft.duration)}
-            onChange={(v) => patch({ duration: v ? Number(v) : 0 })}
-            keyboardType="numeric"
-          />
-          <Toggle
-            label="Neka puede proponer moverlo"
-            value={draft.flexible}
-            onChange={(flexible) => patch({ flexible })}
-            detail="Siempre verás la propuesta antes de aplicar un cambio."
-          />
-          {draft.type !== "Goal" && draft.type !== "Deadline" && (
-            <Field
-              label={
-                draft.type === "Visita"
-                  ? "Ubicación (obligatoria)"
-                  : "Ubicación o enlace"
-              }
-              value={draft.location}
-              onChange={(location) => patch({ location })}
-            />
-          )}
-          {draft.type === "Visita" && (
-            <Field
-              label="Persona / motivo de la visita"
-              value={draft.visitReason}
-              onChange={(visitReason) => patch({ visitReason })}
-            />
-          )}
-          {draft.type === "Meeting" && (
-            <>
-              <Field
-                label="Participantes"
-                value={draft.participants}
-                onChange={(participants) => patch({ participants })}
-                placeholder="Nombres separados por comas"
-              />
-              <Field
-                label="Agenda de la reunión"
-                value={draft.agenda}
-                onChange={(agenda) => patch({ agenda })}
-                multiline
-              />
-            </>
-          )}
-          {appointment && (
-            <>
-              <Toggle
-                label="Cuenta para mi puntaje"
-                value={draft.countsForScore}
-                onChange={(countsForScore) => patch({ countsForScore })}
-              />
-              {draft.countsForScore && (
-                <View style={s.wrap}>
-                  {([1, 2, 3] as const).map((difficulty) => (
-                    <Chip
-                      key={difficulty}
-                      title={["Baja", "Media", "Alta"][difficulty - 1]}
-                      selected={draft.difficulty === difficulty}
-                      onPress={() => patch({ difficulty })}
-                    />
-                  ))}
-                </View>
-              )}
-            </>
-          )}
-          {!appointment && (
-            <View style={s.card}>
-              <Text style={s.heading}>
-                {draft.type === "Goal" ? "Hitos" : "Checklist de subtareas"}
-              </Text>
-              {draft.steps.map((st) => (
-                <View key={st.id} style={s.row}>
-                  <View style={{ flex: 1 }}>
-                    <Toggle
-                      label={st.title}
-                      value={st.done}
-                      onChange={(done) =>
-                        patch({
-                          steps: draft.steps.map((x) =>
-                            x.id === st.id ? { ...x, done } : x,
-                          ),
-                        })
+              <View style={{ flexDirection: "row", gap: space.sm }}>
+                <Button
+                  title="Abrir"
+                  variant="secondary"
+                  small
+                  onPress={async () => {
+                    try {
+                      if (Platform.OS === "web") {
+                        const link = document.createElement("a");
+                        link.href = a.data;
+                        link.download = a.name;
+                        link.click();
+                      } else {
+                        const path =
+                          FileSystem.cacheDirectory +
+                          a.id +
+                          "-" +
+                          a.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+                        await FileSystem.writeAsStringAsync(
+                          path,
+                          a.data.split(",")[1],
+                          { encoding: FileSystem.EncodingType.Base64 },
+                        );
+                        await Share.share({ url: path });
                       }
-                    />
-                  </View>
-                  <Button
-                    title={`Quitar ${st.title}`}
-                    secondary
-                    small
-                    onPress={() =>
-                      patch({
-                        steps: draft.steps.filter((x) => x.id !== st.id),
-                      })
+                    } catch {
+                      setError("No se pudo abrir el adjunto.");
                     }
-                  />
-                </View>
-              ))}
-              <Field
-                label={draft.type === "Goal" ? "Nuevo hito" : "Nueva subtarea"}
-                value={step}
-                onChange={setStep}
-              />
-              <Button
-                title="Añadir a la lista"
-                secondary
-                small
-                onPress={() => {
-                  if (step.trim()) {
+                  }}
+                />
+                <Button
+                  title="Quitar"
+                  variant="plain"
+                  small
+                  onPress={() =>
                     patch({
-                      steps: [
-                        ...draft.steps,
-                        { id: uid(), title: step.trim(), done: false },
-                      ],
-                    });
-                    setStep("");
-                  }
-                }}
-              />
-            </View>
-          )}
-          <View style={s.card}>
-            <Text style={s.heading}>Depende de</Text>
-            <Text style={s.small}>
-              Debe completarse antes de finalizar este ítem.
-            </Text>
-            {activeItems(data)
-              .filter((i) => i.id !== draft.id && !passive(i))
-              .map((i) => (
-                <Toggle
-                  key={i.id}
-                  label={i.title}
-                  value={draft.dependencies.includes(i.id)}
-                  onChange={(checked) =>
-                    patch({
-                      dependencies: checked
-                        ? [...draft.dependencies, i.id]
-                        : draft.dependencies.filter((id) => id !== i.id),
+                      attachments: draft.attachments.filter(
+                        (x) => x.id !== a.id,
+                      ),
                     })
                   }
                 />
-              ))}
-            {!activeItems(data).some(
-              (i) => i.id !== draft.id && !passive(i),
-            ) && (
-              <Text style={s.small}>
-                Crea otro ítem accionable para vincularlo.
-              </Text>
-            )}
-          </View>
-          <View style={s.card}>
-            <Text style={s.heading}>
-              {frozenPoints ?? pointsFor(estimatedItem, data.items)} puntos{" "}
-              {frozenPoints === undefined ? "estimados" : "asignados"}
-            </Text>
-            <Text style={s.small}>
-              Dificultad{" "}
-              {["baja", "media", "alta"][difficultyOf(estimatedItem) - 1]}. El
-              puntaje se fija al obtener la primera recompensa; reabrir un ítem
-              no vuelve a premiarlo.
-            </Text>
-          </View>
-        </>
+              </View>
+            </Card>
+          ))}
+        </Disclosure>
       )}
+
       {!!error && (
-        <Text accessibilityRole="alert" style={s.error}>
+        <Txt tone="danger" accessibilityRole="alert">
           {error}
-        </Text>
+        </Txt>
       )}
-      <Button title="Guardar ítem" onPress={save} disabled={busy} />
+      <Button title="Guardar" onPress={save} disabled={busy} />
       {exists &&
         (!confirmDelete ? (
           <Button
-            title="Mover a la papelera"
-            secondary
+            title="Enviar a la papelera"
+            variant="plain"
             onPress={() => setConfirmDelete(true)}
           />
         ) : (
-          <View style={s.card}>
-            <Text style={s.text}>
-              Podrás restaurarlo desde Ajustes. Los puntos ya obtenidos se
+          <Card variant="featured">
+            <Txt>
+              Podrás restaurarlo desde Ajustes. Los puntos que ganaste se
               conservan.
-            </Text>
+            </Txt>
             <Button
-              title="Confirmar eliminación"
-              danger
+              title="Enviar a la papelera"
+              variant="danger"
               onPress={() => {
                 try {
                   change((d) => deleteItem(d, item.id));
@@ -561,11 +634,11 @@ export default function ItemEditor({
               }}
             />
             <Button
-              title="Cancelar eliminación"
-              secondary
+              title="Cancelar"
+              variant="secondary"
               onPress={() => setConfirmDelete(false)}
             />
-          </View>
+          </Card>
         ))}
     </Sheet>
   );

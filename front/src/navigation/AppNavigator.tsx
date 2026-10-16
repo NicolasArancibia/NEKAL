@@ -2,9 +2,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigator from "./TabNavigator";
 import Bienvenida from "../pages/Bienvenida";
 import { useApp } from "../utils/AppContext";
-import { Loading } from "../components/ui/Common";
-import { Text, View, Modal, ActivityIndicator } from "react-native";
-import { s } from "../styles/globalStyles";
+import { View, Modal, ActivityIndicator } from "react-native";
+import { Card, Txt } from "../components/ui/base";
+import { color, space } from "../styles/theme";
 import type { NavigatorScreenParams } from "@react-navigation/native";
 import type { TabParamList } from "./TabNavigator";
 
@@ -14,12 +14,38 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+function Loading() {
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: color.background,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: space.lg,
+      }}
+    >
+      <ActivityIndicator color={color.primary} />
+      <Txt tone="secondary">Cargando…</Txt>
+    </View>
+  );
+}
+
 export default function AppNavigator() {
   const { ready, error, user, guest, cloudBusy } = useApp();
   if (!ready)
     return error ? (
-      <View style={[s.content, { marginTop: 60 }]}>
-        <Text style={s.error}>{error}</Text>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: color.background,
+          padding: space.screen,
+          paddingTop: 60,
+        }}
+      >
+        <Txt tone="danger" accessibilityRole="alert">
+          {error}
+        </Txt>
       </View>
     ) : (
       <Loading />
@@ -37,15 +63,15 @@ export default function AppNavigator() {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(30,20,50,.4)",
+            backgroundColor: color.backdrop,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <View style={s.card}>
-            <ActivityIndicator />
-            <Text style={s.text}>Sincronizando con Firebase…</Text>
-          </View>
+          <Card style={{ alignItems: "center" }}>
+            <ActivityIndicator color={color.primary} />
+            <Txt>Sincronizando tu cuenta…</Txt>
+          </Card>
         </View>
       </Modal>
     </>

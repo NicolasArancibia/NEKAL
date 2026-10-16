@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Animated, PanResponder, View } from "react-native";
+import { color } from "../../../styles/theme";
 export default function InfiniteCanvas({
   zoomLevel,
   children,
@@ -33,7 +34,7 @@ export default function InfiniteCanvas({
   ).current;
   return (
     <View
-      style={{ flex: 1, overflow: "hidden", backgroundColor: "#FCFAFF" }}
+      style={{ flex: 1, overflow: "hidden", backgroundColor: color.background }}
       {...responder.panHandlers}
     >
       <Animated.View

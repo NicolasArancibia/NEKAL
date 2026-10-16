@@ -3,18 +3,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Login from "./Login";
 import { useApp } from "../utils/AppContext";
-import { colors, s } from "../styles/globalStyles";
+import { color, space } from "../styles/theme";
+import { Txt, nekaImage } from "../components/ui/base";
 
 export default function Bienvenida() {
   const { enterGuest } = useApp();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: color.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -24,7 +24,7 @@ export default function Bienvenida() {
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: "center",
-            padding: 24,
+            padding: space.xxl,
           }}
         >
           <View
@@ -32,24 +32,26 @@ export default function Bienvenida() {
               width: "100%",
               maxWidth: 460,
               alignSelf: "center",
-              gap: 20,
+              gap: space.xl,
             }}
           >
-            <View style={{ alignItems: "center", gap: 8 }}>
+            <View style={{ alignItems: "center", gap: space.sm }}>
               <Image
-                source={require("../../assets/Img/Neka_Pose5.png")}
-                style={{ width: 94, height: 94 }}
+                source={nekaImage(3)}
+                style={{ width: 104, height: 120 }}
                 resizeMode="contain"
-                accessibilityLabel="Neka te da la bienvenida"
+                accessibilityLabel="Neka te saluda"
               />
-              <Text style={[s.title, { color: colors.primary }]}>
-                Bienvenido a Nekal
-              </Text>
-              <Text
-                style={[s.subtitle, { textAlign: "center", marginBottom: 0 }]}
+              <Txt
+                variant="largeTitle"
+                tone="primary"
+                accessibilityRole="header"
               >
-                Un espacio para lo importante, a tu ritmo.
-              </Text>
+                Nekal
+              </Txt>
+              <Txt tone="secondary" align="center">
+                Organiza tu día. Neka te avisa si algo choca.
+              </Txt>
             </View>
             <Login onGuest={enterGuest} />
           </View>
