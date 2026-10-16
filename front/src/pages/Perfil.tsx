@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 import { signOut } from "firebase/auth";
 import { useApp } from "../utils/AppContext";
@@ -9,6 +9,9 @@ import { Button, Field, Sheet } from "../components/ui/Common";
 import { colors, s } from "../styles/globalStyles";
 import Login from "./Login";
 import Ajustes from "./Ajustes";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import type { TabParamList } from "../navigation/TabNavigator";
+import { ScreenHeader } from "../components/ui/base";
 export default function Perfil() {
   const {
     data,
@@ -32,10 +35,19 @@ export default function Perfil() {
     [error, setError] = useState(""),
     [review, setReview] = useState(false);
   const [profileBase, setProfileBase] = useState(data.profile);
+  const route = useRoute<RouteProp<TabParamList, "Perfil">>();
+  const navigation = useNavigation();
+  // El aviso "Cambios sin guardar" abre Ajustes mediante este parámetro.
+  useEffect(() => {
+    if (route.params?.settings) {
+      setSettings(true);
+      navigation.setParams({ settings: undefined } as never);
+    }
+  }, [route.params?.settings]);
   if (settings) return <Ajustes onBack={() => setSettings(false)} />;
   return (
     <ScrollView style={s.page} contentContainerStyle={s.content}>
-      <Text style={s.title}>Tu perfil</Text>
+      <ScreenHeader title="Perfil" />
       <View style={[s.card, { alignItems: "center", paddingVertical: 26 }]}>
         <View
           style={{

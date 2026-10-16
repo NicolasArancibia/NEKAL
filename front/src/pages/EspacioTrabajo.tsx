@@ -8,6 +8,7 @@ import CanvasContent from "../components/ui/EspacioTrabajoUi/CanvasContent";
 import ItemEditor from "../components/ui/ItemEditor";
 import ItemCard from "../components/ui/ItemCard";
 import { Button, Chip, Empty, Field, Sheet } from "../components/ui/Common";
+import { ScreenHeader } from "../components/ui/base";
 import { useApp } from "../utils/AppContext";
 import {
   Item,
@@ -50,6 +51,7 @@ export default function EspacioTrabajo() {
   return (
     <View style={s.page}>
       <View style={{ padding: 16, gap: 10 }}>
+        <ScreenHeader title="Espacio" />
         <WorkspaceBar
           name={selected.name}
           list={list}

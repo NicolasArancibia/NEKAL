@@ -11,6 +11,7 @@ import {
 } from "../utils/model";
 import { colors, s } from "../styles/globalStyles";
 import { Button, Chip, Empty, Toggle } from "../components/ui/Common";
+import { ScreenHeader } from "../components/ui/base";
 import ItemCard from "../components/ui/ItemCard";
 import ItemEditor from "../components/ui/ItemEditor";
 export default function Calendario() {
@@ -50,21 +51,22 @@ export default function Calendario() {
     setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1));
   return (
     <ScrollView style={s.page} contentContainerStyle={s.content}>
-      <View style={s.between}>
-        <Text style={s.title}>Tu calendario</Text>
-        <Button
-          title="Hoy"
-          small
-          secondary
-          onPress={() => {
-            setMonth(
-              new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            );
-            setSelected(localDay());
-          }}
-        />
-      </View>
-      <Text style={s.subtitle}>Una mirada tranquila a lo que viene.</Text>
+      <ScreenHeader
+        title="Calendario"
+        right={
+          <Button
+            title="Hoy"
+            small
+            secondary
+            onPress={() => {
+              setMonth(
+                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+              );
+              setSelected(localDay());
+            }}
+          />
+        }
+      />
       <View style={[s.card, { padding: 14 }]}>
         <View style={s.between}>
           <Button title="‹" small secondary onPress={() => move(-1)} />

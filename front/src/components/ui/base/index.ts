@@ -13,3 +13,7 @@ export { default as Toggle } from "./Toggle";
 export { default as Disclosure } from "./Disclosure";
 export { default as EmptyState } from "./EmptyState";
 export { nekaImage } from "./nekaImages";
+export { default as Sheet } from "./Sheet";
+export { default as TabBar } from "./TabBar";
+export { default as ScreenHeader } from "./ScreenHeader";
+export { default as SyncBanner } from "./SyncBanner";

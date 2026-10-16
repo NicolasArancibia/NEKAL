@@ -17,6 +17,7 @@ import { colors, s } from "../styles/globalStyles";
 import { Button, Empty } from "../components/ui/Common";
 import ItemCard from "../components/ui/ItemCard";
 import ItemEditor from "../components/ui/ItemEditor";
+import { ScreenHeader } from "../components/ui/base";
 export default function Resumen() {
   const { data } = useApp();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
@@ -53,31 +54,14 @@ export default function Resumen() {
     .reduce((n, r) => n + r.points, 0);
   return (
     <ScrollView style={s.page} contentContainerStyle={s.content}>
-      <View style={s.between}>
-        <View style={{ flex: 1, gap: 6 }}>
-          <Text style={s.small}>
-            {new Date().toLocaleDateString("es-CL", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-            })}
-          </Text>
-          <Text style={s.title}>
-            {greeting}
-            {data.profile.name ? `, ${data.profile.name.split(" ")[0]}` : ""}
-          </Text>
-          <Text style={s.subtitle}>
-            {conflicts.length
-              ? `${conflicts.length} conflictos necesitan tu atención.`
-              : "Un paso a la vez. Haz espacio para lo importante."}
-          </Text>
-        </View>
-        <Image
-          source={require("../../assets/Img/Neka_Pose2.png")}
-          style={{ width: 80, height: 95 }}
-          resizeMode="contain"
-        />
-      </View>
+      <ScreenHeader
+        showDate
+        title={
+          data.profile.name.trim()
+            ? `Hola, ${data.profile.name.trim().split(" ")[0]}`
+            : "Hola"
+        }
+      />
       <View
         style={[s.card, { backgroundColor: "#F0E8FF", borderColor: "#E4D6FF" }]}
       >

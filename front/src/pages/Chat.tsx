@@ -6,7 +6,8 @@ import {
   Text,
   View,
 } from "react-native";
-import ChatHeader from "../components/ui/ChatUi/ChatHeader";
+import { ScreenHeader } from "../components/ui/base";
+import { space } from "../styles/theme";
 import ChatMessage from "../components/ui/ChatUi/ChatMessage";
 import ChatInput from "../components/ui/ChatUi/ChatInput";
 import ItemEditor from "../components/ui/ItemEditor";
@@ -122,7 +123,9 @@ export default function Chat() {
       style={s.page}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ChatHeader />
+      <View style={{ paddingHorizontal: space.screen }}>
+        <ScreenHeader title="Neka" />
+      </View>
       <ScrollView
         ref={scroll}
         contentContainerStyle={{ paddingBottom: 20 }}
