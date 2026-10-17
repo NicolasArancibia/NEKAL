@@ -40,3 +40,19 @@ test("ordenarPorProfundidad: de lejos a cerca", () =>
       .map((p) => p.id),
     ["a", "b", "c"],
   ));
+
+const co = require("../.test-build/colores.js");
+test("colores: tonos de un violeta", () => {
+  const t = co.tonos("#7546EC");
+  assert.equal(t.base, "#7546ec");
+  // 88 % de blanco: 0x75 + (255 − 0x75) · 0.88 = 238.4 → ee
+  assert.equal(t.suave, "#eee9fd");
+  assert.equal(t.bordeOscuro, "#5835b1");
+  assert.equal(t.bordeClaro, "#9874f1");
+  assert.match(t.zona, /^#[0-9a-f]{6}$/);
+  assert.match(t.zonaInterna, /^#[0-9a-f]{6}$/);
+});
+test("colores: acepta #abc y rechaza basura", () => {
+  assert.equal(co.tonos("#fff").base, "#ffffff");
+  assert.throws(() => co.tonos("violeta"));
+});

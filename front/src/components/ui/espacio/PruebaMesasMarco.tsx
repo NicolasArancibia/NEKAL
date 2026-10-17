@@ -44,8 +44,7 @@ export default function PruebaMesasMarco({
             />
           </View>
           <Txt variant="caption" tone="secondary">
-            Un dedo mueve. Dos dedos giran, pellizcan o inclinan (arriba y
-            abajo).
+            Un dedo mueve; dos dedos giran o acercan. Toca Trabajo o acércate para entrar.
           </Txt>
         </View>
         <View style={{ flex: 1 }}>{children}</View>

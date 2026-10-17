@@ -14,6 +14,7 @@ const build = spawnSync(
     "src/utils/neka.ts",
     "src/utils/syncBanner.ts",
     "src/utils/acomodo/proyeccion.ts",
+    "src/utils/colores.ts",
     "--outDir",
     ".test-build",
     "--module",
