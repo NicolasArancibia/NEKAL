@@ -6,15 +6,17 @@ export default function Chip({
   title,
   selected = false,
   onPress,
+  accessibilityLabel = title,
 }: {
   title: string;
   selected?: boolean;
   onPress: () => void;
+  accessibilityLabel?: string;
 }) {
   return (
     <PressableScale
       onPress={onPress}
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected }}
       hitSlop={6}
       style={{

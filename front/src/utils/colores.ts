@@ -42,3 +42,6 @@ export function tonos(color: string): Tonos {
     bordeOscuro: mezcla(c, 0, 0.25),
   };
 }
+
+// Colores para elegir al crear una mesa (B_SISTEMA_VISUAL §2, provisorios).
+export const COLORES_MESA = ["#7546EC", "#2E9E6B", "#D9693C", "#948BA6"];
