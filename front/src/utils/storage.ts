@@ -1,10 +1,72 @@
-import { AppData, TYPES, validateItem, passive } from "./model";
+import {
+  AppData,
+  Group,
+  REPEATS,
+  TYPES,
+  validateGroup,
+  validateItem,
+  passive,
+} from "./model";
+
+// Grupos guardados antes de la V2/B (3 campos) reciben los campos nuevos vacíos.
+export function normalizeGroup(g: any): Group {
+  return {
+    id: g.id,
+    name: g.name,
+    workspaceId: g.workspaceId,
+    parentId: g.parentId ?? "",
+    repeat: g.repeat ?? "",
+    repeatDays: g.repeatDays ?? [],
+    repeatStart: g.repeatStart ?? "",
+  };
+}
+
+// x/y del mapa de la V1 pasan a ser el orden dentro de cada contenedor
+// (mesa + grupo): de arriba hacia abajo y de izquierda a derecha. Un contenedor
+// con alguna cosa en y ≠ 0 aún tiene coordenadas viejas; los que ya ordenó la
+// V2 tienen y = 0 en todas (las funciones de estructura renumeran completo).
+// Es idempotente, así que sirve igual para datos locales, respaldos y la nube.
+export function ordenarLegado<T extends { id: string; workspaceId: string; groupId: string; x: number; y: number }>(
+  items: T[],
+): T[] {
+  const porContenedor = new Map<string, T[]>();
+  for (const i of items) {
+    const k = `${i.workspaceId}|${i.groupId}`;
+    porContenedor.set(k, [...(porContenedor.get(k) ?? []), i]);
+  }
+  const orden = new Map<string, number>();
+  for (const lista of porContenedor.values())
+    if (lista.some((i) => i.y !== 0))
+      [...lista]
+        .sort((a, b) => a.y - b.y || a.x - b.x)
+        .forEach((i, n) => orden.set(i.id, n));
+  return orden.size
+    ? items.map((i) => (orden.has(i.id) ? { ...i, x: orden.get(i.id)!, y: 0 } : i))
+    : items;
+}
+
+export function migrateV1(d: any): any {
+  return {
+    ...d,
+    version: 2,
+    items: ordenarLegado(d.items),
+    groups: d.groups.map(normalizeGroup),
+  };
+}
+
 export function readBackup(text: string): AppData {
-  const d = JSON.parse(text);
+  const raw = JSON.parse(text);
   if (text.length > 10000000) throw new Error("El respaldo supera 10 MB.");
   if (
+    !raw ||
+    (raw.version !== 1 && raw.version !== 2) ||
+    !Array.isArray(raw.items) ||
+    !Array.isArray(raw.groups)
+  )
+    throw new Error("El archivo no es un respaldo Nekal válido.");
+  const d = migrateV1(raw);
+  if (
     !d ||
-    d.version !== 1 ||
     !Array.isArray(d.items) ||
     !Array.isArray(d.workspaces) ||
     !d.workspaces.length ||
@@ -15,7 +77,7 @@ export function readBackup(text: string): AppData {
     typeof d.profile?.roles !== "string" ||
     !d.preferences
   )
-    throw new Error("El archivo no es un respaldo Nekal V1 válido.");
+    throw new Error("El archivo no es un respaldo Nekal válido.");
   for (const list of [d.items, d.workspaces, d.groups, d.messages])
     if (new Set(list.map((x: any) => x.id)).size !== list.length)
       throw new Error("El respaldo contiene identificadores duplicados.");
@@ -122,13 +184,23 @@ export function readBackup(text: string): AppData {
       typeof w.color !== "string"
     )
       throw new Error("Espacio inválido.");
-  for (const g of d.groups)
+  for (const g of d.groups) {
     if (
       typeof g.id !== "string" ||
       typeof g.name !== "string" ||
-      !d.workspaces.some((w: any) => w.id === g.workspaceId)
+      !d.workspaces.some((w: any) => w.id === g.workspaceId) ||
+      typeof g.parentId !== "string" ||
+      !REPEATS.includes(g.repeat) ||
+      !Array.isArray(g.repeatDays) ||
+      g.repeatDays.some((n: unknown) => !Number.isInteger(n) || (n as number) < 0 || (n as number) > 6) ||
+      new Set(g.repeatDays).size !== g.repeatDays.length ||
+      typeof g.repeatStart !== "string" ||
+      (g.repeatStart && !/^\d{4}-\d{2}-\d{2}$/.test(g.repeatStart))
     )
-      throw new Error("Rutina inválida.");
+      throw new Error("Grupo inválido.");
+    const error = validateGroup(g, d);
+    if (error) throw new Error(`Grupo inválido: ${error}`);
+  }
   for (const r of d.rewards)
     if (
       typeof r.key !== "string" ||

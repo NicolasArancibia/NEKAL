@@ -30,6 +30,41 @@ const edit = (d, fields) => ({
   items: d.items.map((i) => ({ ...i, ...fields })),
 });
 assert.deepEqual(dataOf(recordsOf(a)), a);
+// V2/B: posiciones viejas de la nube se leen como orden (y = 0).
+{
+  const viejo = recordsOf({
+    ...a,
+    items: [
+      { ...a.items[0], id: "p", x: 300, y: 200 },
+      { ...a.items[0], id: "q", x: 100, y: 200 },
+    ],
+  });
+  assert.deepEqual(
+    dataOf(viejo).items.map((i) => [i.id, i.x, i.y]),
+    [
+      ["p", 1, 0],
+      ["q", 0, 0],
+    ],
+  );
+}
+// V2/B: un registro de grupo viejo (3 campos) se lee con los campos nuevos.
+assert.deepEqual(
+  dataOf({
+    "workspaces/general": { id: "general", name: "General", color: "#7847EB" },
+    "groups/g": { id: "g", name: "G", workspaceId: "general" },
+  }).groups,
+  [
+    {
+      id: "g",
+      name: "G",
+      workspaceId: "general",
+      parentId: "",
+      repeat: "",
+      repeatDays: [],
+      repeatStart: "",
+    },
+  ],
+);
 const local = edit(a, { title: "Local" }),
   remote = edit(a, { description: "Remote" });
 const merged = mergeOperation(recordsOf(remote), operation(a, local));

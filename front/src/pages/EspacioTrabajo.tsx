@@ -28,6 +28,7 @@ import {
   duplicateGroup,
   localDay,
   parseDateInput,
+  newGroup,
 } from "../utils/model";
 import { color, font, radius, size, space, type } from "../styles/theme";
 
@@ -361,11 +362,7 @@ export default function EspacioTrabajo() {
                     ...d,
                     groups: [
                       ...d.groups,
-                      {
-                        id: uid(),
-                        name: name.trim(),
-                        workspaceId: selected.id,
-                      },
+                      newGroup(name.trim(), selected.id),
                     ],
                   }));
                   setName("");

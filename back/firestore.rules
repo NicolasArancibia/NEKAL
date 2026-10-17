@@ -19,7 +19,7 @@ function validValue(kind,id,v) {
 return (kind=='items' && item(v))
 || (kind=='attachments' && fields(v,['id','itemId','name','mime','data']) && ident(v.id) && ident(v.itemId) && str(v.name,1000) && str(v.mime,200) && str(v.data,500000) && v.data.matches('data:.*'))
 || (kind=='workspaces' && fields(v,['id','name','color']) && ident(v.id) && str(v.name,500) && str(v.color,50))
-|| (kind=='groups' && fields(v,['id','name','workspaceId']) && ident(v.id) && str(v.name,500) && ident(v.workspaceId))
+|| (kind=='groups' && ident(v.id) && str(v.name,500) && ident(v.workspaceId) && (fields(v,['id','name','workspaceId']) || (fields(v,['id','name','workspaceId','parentId','repeat','repeatDays','repeatStart']) && str(v.parentId,200) && v.repeat in ['','diario','semanal','dias'] && v.repeatDays is list && v.repeatDays.size()<=7 && str(v.repeatStart,10))))
 || (kind=='messages' && fields(v,['id','text','isUser']) && ident(v.id) && str(v.text,100000) && v.isUser is bool)
 || (kind=='rewards' && fields(v,['itemId']) && ident(v.itemId))
 || (kind=='steps' && fields(v,['itemId','order','id','title','done']) && ident(v.itemId) && ident(v.id) && str(v.title,1000) && v.done is bool && v.order is int && v.order>=0 && v.order<5000)

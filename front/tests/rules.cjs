@@ -260,3 +260,111 @@ test("clonar nodos automáticos mantiene el autoencuadre", () => {
   assert.equal(next.items[1].x, 0);
   assert.equal(next.items[1].y, 0);
 });
+
+// ---- V2/B: datos v2 (grupos anidados y rutinas) ----
+const v1 = (fields = {}) => ({ ...m.emptyData(), version: 1, ...fields });
+const grupo = (fields = {}) => ({
+  id: "g",
+  name: "Grupo",
+  workspaceId: "general",
+  parentId: "",
+  repeat: "",
+  repeatDays: [],
+  repeatStart: "",
+  ...fields,
+});
+test("datos: emptyData es v2", () => assert.equal(m.emptyData().version, 2));
+test("migración: v1 queda en v2 con grupos completos", () => {
+  const d = readBackup(
+    JSON.stringify(v1({ groups: [{ id: "g", name: "G", workspaceId: "general" }] })),
+  );
+  assert.equal(d.version, 2);
+  assert.deepEqual(d.groups, [grupo({ name: "G" })]);
+});
+test("migración: x pasa a ser el orden", () => {
+  const d = readBackup(
+    JSON.stringify(
+      v1({
+        groups: [{ id: "g", name: "G", workspaceId: "general" }],
+        items: [
+          item({ id: "a", groupId: "g", x: 100, y: 300 }),
+          item({ id: "b", groupId: "g", x: 400, y: 100 }),
+          item({ id: "c", groupId: "g", x: 50, y: 100 }),
+        ],
+      }),
+    ),
+  );
+  const x = Object.fromEntries(d.items.map((i) => [i.id, i.x]));
+  assert.deepEqual(x, { a: 2, b: 1, c: 0 });
+  assert.ok(d.items.every((i) => i.y === 0));
+});
+test("migración: no se pierde nada", () => {
+  const items = [
+    item({ id: "a", title: "Uno", x: 10, y: 10 }),
+    item({ id: "b", title: "Dos", dependencies: ["a"], x: 20, y: 5 }),
+  ];
+  const d = readBackup(JSON.stringify(v1({ items })));
+  assert.deepEqual(
+    d.items.map((i) => [i.id, i.title, i.dependencies]),
+    [
+      ["a", "Uno", []],
+      ["b", "Dos", ["a"]],
+    ],
+  );
+});
+test("readBackup acepta v1 y v2", () => {
+  assert.equal(readBackup(JSON.stringify(v1())).version, 2);
+  assert.equal(readBackup(JSON.stringify(m.emptyData())).version, 2);
+});
+test("readBackup rechaza repeat desconocido", () =>
+  assert.throws(() =>
+    readBackup(
+      JSON.stringify({ ...m.emptyData(), groups: [grupo({ repeat: "mensual" })] }),
+    ),
+  ));
+test("validateGroup: ciclo", () => {
+  const a = grupo({ id: "a", parentId: "b" }),
+    b = grupo({ id: "b", parentId: "a" });
+  assert.equal(
+    m.validateGroup(a, { ...m.emptyData(), groups: [a, b] }),
+    "Un grupo no puede quedar dentro de sí mismo.",
+  );
+});
+test("validateGroup: padre en otra mesa", () => {
+  const p = grupo({ id: "p", workspaceId: "w2" }),
+    g = grupo({ id: "g", parentId: "p" });
+  const d = {
+    ...m.emptyData(),
+    workspaces: [
+      ...m.emptyData().workspaces,
+      { id: "w2", name: "Trabajo", color: "#7546EC" },
+    ],
+    groups: [p, g],
+  };
+  assert.equal(m.validateGroup(g, d), "El grupo de arriba debe estar en la misma mesa.");
+});
+test("validateGroup: días vacíos", () => {
+  const g = grupo({ repeat: "dias", repeatStart: "2030-05-01", repeatDays: [] });
+  assert.equal(
+    m.validateGroup(g, { ...m.emptyData(), groups: [g] }),
+    "Elige al menos un día.",
+  );
+  assert.equal(
+    m.validateGroup(grupo({ repeat: "diario" }), m.emptyData()),
+    "Indica desde qué día se repite.",
+  );
+});
+test("migración: contenedor ya ordenado no cambia", () => {
+  const items = [
+    item({ id: "a", x: 1, y: 0 }),
+    item({ id: "b", x: 0, y: 0 }),
+  ];
+  const d = readBackup(JSON.stringify({ ...m.emptyData(), items }));
+  assert.deepEqual(
+    d.items.map((i) => [i.id, i.x]),
+    [
+      ["a", 1],
+      ["b", 0],
+    ],
+  );
+});

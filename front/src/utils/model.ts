@@ -50,7 +50,18 @@ export type Item = {
   deletedAt: string;
 };
 export type Workspace = { id: string; name: string; color: string };
-export type Group = { id: string; name: string; workspaceId: string };
+// Mesa ⊃ grupos (anidables) ⊃ cosas. Un grupo con `repeat` es una rutina (spec B §2).
+export type Repeat = "" | "diario" | "semanal" | "dias";
+export const REPEATS: Repeat[] = ["", "diario", "semanal", "dias"];
+export type Group = {
+  id: string;
+  name: string;
+  workspaceId: string;
+  parentId: string;
+  repeat: Repeat;
+  repeatDays: number[];
+  repeatStart: string;
+};
 export type Reward = {
   key: string;
   itemId: string;
@@ -58,9 +69,23 @@ export type Reward = {
   at: string;
   reason: string;
 };
+export const newGroup = (
+  name: string,
+  workspaceId: string,
+  extra: Partial<Group> = {},
+): Group => ({
+  id: uid(),
+  name,
+  workspaceId,
+  parentId: "",
+  repeat: "",
+  repeatDays: [],
+  repeatStart: "",
+  ...extra,
+});
 export type Message = { id: string; text: string; isUser: boolean };
 export type AppData = {
-  version: 1;
+  version: 2;
   items: Item[];
   workspaces: Workspace[];
   groups: Group[];
@@ -85,7 +110,7 @@ export const activeItems = (d: AppData) => d.items.filter((i) => !i.deletedAt);
 export const localDay = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 export const emptyData = (): AppData => ({
-  version: 1,
+  version: 2,
   items: [],
   groups: [],
   rewards: [],
@@ -175,7 +200,7 @@ export function validateItem(item: Item, data: AppData): string | null {
   if (!item.title.trim()) return "Escribe un título.";
   if (item.title.length > 160) return "El título admite hasta 160 caracteres.";
   if (!data.workspaces.some((w) => w.id === item.workspaceId))
-    return "El espacio ya no existe.";
+    return "La mesa ya no existe.";
   try {
     parseDateInput(item.startDate);
   } catch {
@@ -210,7 +235,7 @@ export function validateItem(item: Item, data: AppData): string | null {
       (g) => g.id === item.groupId && g.workspaceId === item.workspaceId,
     )
   )
-    return "La rutina debe pertenecer al mismo espacio.";
+    return "El grupo debe estar en la misma mesa.";
   const all = activeItems(data)
     .filter((i) => i.id !== item.id)
     .concat(item);
@@ -239,6 +264,30 @@ export function validateItem(item: Item, data: AppData): string | null {
     )
   )
     return "Reabre primero los ítems completados que dependen de este.";
+  return null;
+}
+export function validateGroup(group: Group, data: AppData): string | null {
+  if (!group.name.trim()) return "El grupo necesita un nombre.";
+  if (!data.workspaces.some((w) => w.id === group.workspaceId))
+    return "La mesa ya no existe.";
+  const byId = new Map(
+    data.groups.filter((g) => g.id !== group.id).concat(group).map((g) => [g.id, g]),
+  );
+  if (group.parentId) {
+    const parent = byId.get(group.parentId);
+    if (!parent || parent.workspaceId !== group.workspaceId)
+      return "El grupo de arriba debe estar en la misma mesa.";
+    const seen = new Set<string>([group.id]);
+    for (let p: Group | undefined = parent; p; p = byId.get(p.parentId)) {
+      if (seen.has(p.id)) return "Un grupo no puede quedar dentro de sí mismo.";
+      seen.add(p.id);
+      if (!p.parentId) break;
+    }
+  }
+  if (group.repeat && !group.repeatStart)
+    return "Indica desde qué día se repite.";
+  if (group.repeat === "dias" && !group.repeatDays.length)
+    return "Elige al menos un día.";
   return null;
 }
 export function difficultyOf(item: Item, now = Date.now()): 1 | 2 | 3 {
@@ -369,7 +418,15 @@ export function duplicateGroup(
   if (!group) throw new Error("Rutina no encontrada.");
   const source = activeItems(data).filter((i) => i.groupId === groupId);
   if (!source.length) throw new Error("La rutina no tiene ítems.");
-  const newGroup = { ...group, id: uid(), name: `${group.name} · ${day}` };
+  const newGroup: Group = {
+    ...group,
+    id: uid(),
+    name: `${group.name} · ${day}`,
+    parentId: group.parentId ?? "",
+    repeat: "",
+    repeatDays: [],
+    repeatStart: "",
+  };
   const map = new Map(source.map((i) => [i.id, uid()]));
   const origin = source.map((i) => i.startDate).sort()[0];
   parseDateInput(day);
