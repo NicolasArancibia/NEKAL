@@ -1,0 +1,60 @@
+<style>
+  .tv { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:22px; margin-top:18px; }
+  @media (max-width: 900px) { .tv { grid-template-columns:1fr; } }
+  .tv-col { background:var(--bg-secondary); border:1px solid var(--border); border-radius:18px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .tv-col h3 { margin:0; }
+  .tv-num { font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#7546EC; }
+  .crop { width:240px; overflow:hidden; align-self:center; border-radius:26px; }
+  .crop img { width:787px; max-width:none; display:block; }
+  .tv-col p { margin:0; font-size:14px; line-height:1.5; color:var(--text-primary); }
+  .refs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .refs img { width:100%; border-radius:8px; }
+  .refs-cap { font-size:12px; color:var(--text-secondary); }
+  .notes { margin-top:24px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:18px; padding:16px 20px; }
+  .notes ul { margin:8px 0 0; padding-left:20px; color:var(--text-primary); font-size:14px; line-height:1.6; }
+</style>
+
+<h2>¿Así quedan las 3 vistas?</h2>
+<p class="subtitle">Son tres formas de ver <b>los mismos datos</b>. Las tres comparten el botón de arriba, el selector de tiempo y la hoja que se abre al tocar algo.</p>
+
+<div class="tv">
+  <div class="tv-col">
+    <div class="tv-num">Vista 1 · Tiempo</div>
+    <div class="crop" style="height:370px"><img src="img/v-tiempo.png" alt="Órbitas"></div>
+    <h3>Órbitas</h3>
+    <p>Hoy al centro y lo que viene alrededor. Cada mesa es una porción del círculo. En <b>2D</b>, plano y suave.</p>
+    <p style="color:var(--text-secondary);font-size:12.5px">Base: maqueta 01, la B</p>
+  </div>
+  <div class="tv-col">
+    <div class="tv-num">Vista 2 · Mesas</div>
+    <div class="crop" style="height:418px"><img src="img/v-mesas.png" alt="Mesas 3D"></div>
+    <h3>Mesas en 3D</h3>
+    <p>La mesa grande arriba y sus mesas abajo. Tocas una para bajar. Es la vista del <b>wow</b> y de la profundidad.</p>
+    <p style="color:var(--text-secondary);font-size:12.5px">Base: maqueta 03, pantallas 1 y 2</p>
+  </div>
+  <div class="tv-col">
+    <div class="tv-num">Vista 3 · Plano</div>
+    <div class="crop" style="height:418px"><img src="img/v-detalle-3d.png" alt="Detalle con fichas"></div>
+    <h3>Fichas en 2D</h3>
+    <p>Lo mismo que la pantalla 3, con fichas que se leen y conexiones hacia afuera, y el estilo de la "Cerca" de la maqueta 02, pero <b>sí o sí en 2D</b>, como estas:</p>
+    <div class="refs"><img src="img/ref-fav1.png" alt="fav 1"><img src="img/ref-fav8.png" alt="fav 8"><img src="img/ref-fav3.png" alt="fav 3"></div>
+    <div class="refs-cap">fav 1 (cómo se ven las fichas) · fav 8 (grupos que se distinguen) · fav 3 (conexiones entre grupos)</div>
+  </div>
+</div>
+
+<div class="notes">
+  <h3>Lo que anoté para la vista Mesas</h3>
+  <ul>
+    <li>Los puntos dentro de las mesas chicas como en la maqueta 02: cúmulos con brillo y <b>conexiones entre puntos</b>.</li>
+    <li><b>Más profundidad</b>: más separación entre pisos y que se note que está debajo.</li>
+    <li><b>El tamaño depende de lo que hay dentro</b>: si una mesa tiene más cosas, es más grande y lleva más bloques debajo. Y si alguien lo necesita, se puede seguir bajando más pisos.</li>
+    <li>Las conexiones hacia la mesa grande (Google Calendar, Neka) se quedan, y puede haber más bloques conectados si hace falta.</li>
+    <li>Los <b>colores</b> (verde, naranjo…) los definimos después, porque pueden significar algo concreto.</li>
+  </ul>
+</div>
+
+<h3 style="margin-top:22px">¿Lo entendí bien?</h3>
+<div class="options">
+  <div class="option" data-choice="si" onclick="toggleSelect(this)"><div class="letter">✓</div><div class="content"><h3>Sí, son esas 3</h3><p>Tiempo (órbitas 2D), Mesas (3D) y Plano (fichas 2D).</p></div></div>
+  <div class="option" data-choice="casi" onclick="toggleSelect(this)"><div class="letter">~</div><div class="content"><h3>Casi</h3><p>Alguna vista no es así (cuéntame cuál en el chat).</p></div></div>
+</div>

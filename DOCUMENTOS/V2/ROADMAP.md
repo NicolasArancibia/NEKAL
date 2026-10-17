@@ -13,7 +13,7 @@ Cada subproyecto tiene su propio ciclo: brainstorming → spec → plan → impl
 | # | Subproyecto | Semanas | Estado |
 |---|---|---|---|
 | A | Sistema de diseño refinado | 1–2 (16–29 oct) | Implementado y probado en iPhone el 16/10 (rama `v2/a-sistema-diseno`). [Spec](A_SISTEMA_DE_DISENO.md) · [Plan](A_PLAN_IMPLEMENTACION.md) |
-| B | Espacio: General como raíz + rediseño del mapa | 1–2 (16–29 oct) | Pendiente |
+| B | Espacio: General como raíz + rediseño del mapa | 1–3 (17 oct–7 nov) | Diseño aprobado el 17/10; spec en revisión. [Spec](B_ESPACIO.md) · [Sistema visual](B_SISTEMA_VISUAL.md) · [Notas](B_NOTAS_BRAINSTORMING.md) · [Maquetas](B_MAQUETA/) |
 | C | Importar Google Calendar | 3–4 (30 oct–12 nov) | Pendiente |
 | D | Neka con IA (un solo agente) | 3–4 (30 oct–12 nov) | Pendiente |
 | E | Gamificación: puntaje + nivel, rating, logros, heatmap | 5 (13–19 nov) | Pendiente |
@@ -26,6 +26,8 @@ Refinar el estilo violeta actual con `apple-design` y `ui-ux-pro-max`: jerarquí
 
 ### B · Espacio
 El espacio **General** es la raíz con la que parte cada usuario: contiene todos los espacios que cree, y el usuario los ordena dentro de él. Grupos dentro de grupos: posible más adelante, no obligatorio. Elegir dirección visual a partir de `IDEAS_ESPACIODETRABAJO` (la investigación recomienda Territorios como vista habitual + Red para conexiones). Hoy los espacios son planos y el mapa muestra uno a la vez: cambia el modelo de datos.
+
+**Decidido el 17/10** ([spec](B_ESPACIO.md)): General más mesas secundarias de un solo nivel; grupos anidables sin límite; rutinas = grupos que se repiten. Tres vistas de los mismos datos: **Tiempo** (órbitas 2D), **Mesas** (falso 3D con Skia; se prueba primero en el iPhone y el usuario puede pedir three.js) y **Plano** (2D). Estimación de 3 semanas. Por ahora no se corren las fechas de C a G: se revisa al terminar la semana 2.
 
 ### C · Google Calendar
 Integración para que el usuario no parta de cero. Empezar por importar (lectura). Outlook usa el mismo diseño si queda tiempo.
