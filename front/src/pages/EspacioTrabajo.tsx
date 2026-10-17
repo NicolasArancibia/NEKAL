@@ -7,6 +7,7 @@ import InfiniteCanvas from "../components/ui/EspacioTrabajoUi/InfiniteCanvas";
 import CanvasContent from "../components/ui/EspacioTrabajoUi/CanvasContent";
 import ItemEditor from "../components/ui/ItemEditor";
 import ItemCard from "../components/ui/ItemCard";
+import PruebaMesas from "../components/ui/espacio/PruebaMesas";
 import {
   Button,
   Card,
@@ -48,7 +49,8 @@ export default function EspacioTrabajo() {
     [name, setName] = useState(""),
     [query, setQuery] = useState(""),
     [error, setError] = useState(""),
-    [repeatDay, setRepeatDay] = useState(localDay());
+    [repeatDay, setRepeatDay] = useState(localDay()),
+    [prueba3d, setPrueba3d] = useState(false);
   const selected =
     data.workspaces.find((w) => w.id === workspace) ?? data.workspaces[0];
   const items = activeItems(data).filter(
@@ -67,7 +69,18 @@ export default function EspacioTrabajo() {
   return (
     <View style={{ flex: 1, backgroundColor: color.background }}>
       <View style={{ padding: space.screen, gap: space.md }}>
-        <ScreenHeader title="Espacio" />
+        <ScreenHeader
+          title="Espacio"
+          right={
+            <Button
+              title="Prueba 3D"
+              variant="secondary"
+              small
+              onPress={() => setPrueba3d(true)}
+            />
+          }
+        />
+        <PruebaMesas visible={prueba3d} onClose={() => setPrueba3d(false)} />
         <WorkspaceBar
           name={selected.name}
           list={list}
