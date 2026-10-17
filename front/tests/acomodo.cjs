@@ -169,3 +169,108 @@ test("tiempo: cuenta vacía", () => {
   assert.deepEqual(r.nodos, []);
   assert.deepEqual(r.sectores, [{ workspaceId: "general", desde: 0, hasta: 360 }]);
 });
+
+// ---- Plano ----
+const pl = require("../.test-build/acomodo/plano.js");
+const g = (id, fields = {}) => ({ ...m.newGroup(id, "general"), id, ...fields });
+const muchas = (n, fields) =>
+  Array.from({ length: n }, (_, k) => cosa({ id: `${fields.groupId || fields.workspaceId}-${k}`, x: k, ...fields }));
+const dentroDe = (p, r) => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
+
+test("plano: General primero y mesas en 2 columnas", () => {
+  const d = {
+    ...conMesas([
+      cosa({ id: "s3", x: 2 }),
+      cosa({ id: "s1", x: 0 }),
+      cosa({ id: "s2", x: 1 }),
+      ...muchas(2, { groupId: "casa" }),
+      ...muchas(14, { workspaceId: "t", groupId: "lan" }),
+      ...muchas(8, { workspaceId: "t", groupId: "ope" }),
+      ...muchas(9, { workspaceId: "a" }),
+    ]),
+    groups: [
+      g("casa", { name: "Casa" }),
+      g("ope", { name: "Operación", workspaceId: "t" }),
+      g("lan", { name: "Lanzamiento", workspaceId: "t" }),
+    ],
+  };
+  const r = pl.acomodoPlanoLejos(d, "semana", ahora, 300);
+  assert.deepEqual(r.sueltas.map((i) => i.id), ["s1", "s2"]);
+  assert.equal(r.masSueltas, 1);
+  assert.deepEqual(r.zonas.map((z) => [z.id, z.tipo, z.total]), [
+    ["casa", "grupo", 2],
+    ["a", "mesa", 9],
+    ["t", "mesa", 22],
+  ]);
+  const ancho = (300 - 2 * 12 - 8) / 2;
+  const [casa, arte, trabajo] = r.zonas;
+  assert.deepEqual([casa.rect.x, arte.rect.x, casa.rect.w], [12, 12 + ancho + 8, ancho]);
+  assert.equal(casa.rect.y, arte.rect.y);
+  assert.equal(casa.rect.h, 76);
+  assert.ok(Math.abs(trabajo.rect.h - 38 * Math.sqrt(22)) < 1e-6);
+  assert.equal(trabajo.rect.x, 12); // va a la columna más corta
+  assert.deepEqual(trabajo.hijos.map((z) => [z.nombre, z.total]), [["Lanzamiento", 14], ["Operación", 8]]);
+  for (const z of r.zonas) assert.ok(r.alto >= z.rect.y + z.rect.h);
+});
+test("plano: puntos deterministas y dentro de su zona", () => {
+  const ids = Array.from({ length: 12 }, (_, k) => `p${k}`);
+  const rect = { x: 10, y: 20, w: 150, h: 100 };
+  const a = pl.puntosEn(ids, rect, () => "on");
+  assert.deepEqual(pl.puntosEn(ids, rect, () => "on"), a);
+  for (const p of a)
+    assert.ok(((p.x - 85) / 75) ** 2 + ((p.y - 70) / 50) ** 2 <= 1 + 1e-9);
+  for (let i = 0; i < a.length; i++)
+    for (let j = i + 1; j < a.length; j++)
+      assert.ok(Math.hypot(a[i].x - a[j].x, a[i].y - a[j].y) >= 8);
+  const d = conMesas([...muchas(30, { workspaceId: "t" }), ...muchas(3, { workspaceId: "a" })]);
+  for (const z of pl.acomodoPlanoLejos(d, "semana", ahora, 375).zonas)
+    for (const p of z.puntos) assert.ok(dentroDe(p, z.rect));
+});
+test("plano: grilla ordenada por x", () => {
+  const d = conMesas([cosa({ id: "a", x: 1 }), cosa({ id: "b", x: 2 }), cosa({ id: "c", x: 0 })]);
+  const r = pl.acomodoPlanoCerca(d, { workspaceId: "general", groupId: "" }, 300);
+  const w = (300 - 2 * 12 - 8) / 2;
+  assert.deepEqual(r.sueltas, [
+    { id: "c", rect: { x: 12, y: 8, w, h: 50 } },
+    { id: "a", rect: { x: 12 + w + 8, y: 8, w, h: 50 } },
+    { id: "b", rect: { x: 12, y: 66, w, h: 50 } },
+  ]);
+});
+test("plano: tope de fichas", () => {
+  const d = { ...conMesas(muchas(60, { workspaceId: "t", groupId: "G" })), groups: [g("G", { workspaceId: "t" })] };
+  const [z] = pl.acomodoPlanoCerca(d, { workspaceId: "t", groupId: "" }, 375).zonas;
+  assert.equal(pl.TOPE_FICHAS, 8);
+  assert.deepEqual([z.fichas.length, z.mas], [8, 52]);
+  assert.deepEqual(z.fichas.map((f) => f.id), muchas(8, { groupId: "G" }).map((i) => i.id));
+});
+test("plano: subgrupo debajo de su padre", () => {
+  const d = {
+    ...conMesas([...muchas(3, { groupId: "A" }), ...muchas(1, { groupId: "B" })]),
+    groups: [g("A", { name: "A" }), g("B", { name: "B", parentId: "A" })],
+  };
+  const r = pl.acomodoPlanoCerca(d, { workspaceId: "general", groupId: "" }, 300);
+  const [a] = r.zonas;
+  const [b] = a.hijos;
+  const ultima = a.fichas.at(-1).rect;
+  assert.ok(b.rect.y >= ultima.y + ultima.h);
+  assert.ok(b.rect.x > a.rect.x && b.rect.x + b.rect.w < a.rect.x + a.rect.w);
+  assert.ok(b.rect.y + b.rect.h <= a.rect.y + a.rect.h);
+  assert.deepEqual(b.fichas.map((f) => f.id), ["B-0"]);
+  assert.ok(r.alto >= a.rect.y + a.rect.h);
+});
+test("plano: indiceEn al soltar entre dos fichas", () => {
+  const d = conMesas(muchas(3, { workspaceId: "general" }));
+  const r = pl.acomodoPlanoCerca(d, { workspaceId: "general", groupId: "" }, 300);
+  const z = { fichas: r.sueltas };
+  assert.equal(pl.indiceEn(z, 5, 2), 0);
+  assert.equal(pl.indiceEn(z, 150, 30), 1);
+  assert.equal(pl.indiceEn(z, 40, 100), 2);
+  assert.equal(pl.indiceEn(z, 290, 200), 3);
+});
+test("plano: cuenta vacía", () => {
+  const lejos = pl.acomodoPlanoLejos(m.emptyData(), "semana", ahora, 375);
+  assert.deepEqual([lejos.sueltas, lejos.masSueltas, lejos.zonas], [[], 0, []]);
+  const cerca = pl.acomodoPlanoCerca(m.emptyData(), { workspaceId: "general", groupId: "" }, 375);
+  assert.deepEqual([cerca.sueltas, cerca.zonas], [[], []]);
+  assert.ok(lejos.alto >= 0 && cerca.alto >= 0);
+});
