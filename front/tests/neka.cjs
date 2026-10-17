@@ -247,3 +247,17 @@ test("timeOn: la hora que cae en el día pedido", () => {
   assert.equal(n.timeOn(i, "2030-05-01"), at("01", "09:00"));
   assert.equal(n.timeOn(i, "2030-05-02"), "");
 });
+test("neka: un modelo de rutina no cuenta para hoy", () => {
+  const d = {
+    ...data([
+      task({ id: "modelo", groupId: "R", scheduledAt: at("01", "15:00") }),
+      task({ id: "copia", groupId: "R~2030-05-01", scheduledAt: at("01", "15:00") }),
+    ]),
+    groups: [
+      { ...m.newGroup("Mañana", "general"), id: "R", repeat: "diario", repeatStart: "2030-05-01" },
+      { ...m.newGroup("Mañana · 1 may", "general"), id: "R~2030-05-01", parentId: "R" },
+    ],
+  };
+  assert.deepEqual(n.todayItems(d, now).map((i) => i.id), ["copia"]);
+  assert.equal(n.nextItem(d, now).id, "copia");
+});

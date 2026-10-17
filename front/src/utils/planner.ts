@@ -1,3 +1,4 @@
+import { timedItems } from "./espacio";
 import { AppData, Item, activeItems, passive } from "./model";
 export type Conflict = {
   id: string;
@@ -7,7 +8,7 @@ export type Conflict = {
 };
 const end = (i: Item) => Date.parse(i.scheduledAt) + i.duration * 60000;
 export function findConflicts(data: AppData, now = Date.now()): Conflict[] {
-  const items = activeItems(data).filter(
+  const items = timedItems(data).filter(
     (i) => !passive(i) && i.status !== "completado",
   );
   const result: Conflict[] = [];
@@ -95,7 +96,7 @@ export function proposeSlot(
   const item = activeItems(data).find((i) => i.id === id);
   if (!item || passive(item) || !item.flexible || item.status === "completado")
     return null;
-  const others = activeItems(data).filter(
+  const others = timedItems(data).filter(
     (i) => i.id !== id && !passive(i) && i.status !== "completado",
   );
   let earliest = Math.max(now, Date.parse(`${item.startDate}T00:00:00`));

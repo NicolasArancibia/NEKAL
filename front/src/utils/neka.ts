@@ -1,4 +1,5 @@
-import { AppData, Item, activeItems, localDay, passive } from "./model";
+import { timedItems } from "./espacio";
+import { AppData, Item, localDay, passive } from "./model";
 import { findConflicts } from "./planner";
 
 // Neka según el contexto: qué pose y qué mensaje mostrar (spec A, sección 7).
@@ -44,7 +45,7 @@ export const todayTime = (item: Item, now = Date.now()) =>
   timeOn(item, localDay(new Date(now)));
 
 export const todayItems = (data: AppData, now = Date.now()): Item[] =>
-  activeItems(data)
+  timedItems(data)
     .filter((i) => !passive(i) && todayTime(i, now))
     .sort(
       (a, b) => Date.parse(todayTime(a, now)) - Date.parse(todayTime(b, now)),
@@ -79,7 +80,7 @@ export const pointsToday = (data: AppData, now = Date.now()) => {
 };
 
 export function nekaState(data: AppData, now = Date.now()): NekaState {
-  const items = activeItems(data),
+  const items = timedItems(data),
     conflicts = findConflicts(data, now),
     byId = (id: string) => items.find((i) => i.id === id);
 

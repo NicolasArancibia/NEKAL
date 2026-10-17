@@ -16,6 +16,7 @@ const build = spawnSync(
     "src/utils/acomodo/proyeccion.ts",
     "src/utils/colores.ts",
     "src/utils/estructura.ts",
+    "src/utils/espacio.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -56,4 +57,5 @@ require("./neka.cjs");
 require("./syncBanner.cjs");
 require("./acomodo.cjs");
 require("./estructura.cjs");
+require("./espacio.cjs");
 require("./styles.cjs");

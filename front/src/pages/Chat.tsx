@@ -26,13 +26,13 @@ import {
   Item,
   ItemType,
   TYPES,
-  activeItems,
   displayDate,
   newItem,
   passive,
   uid,
   newGroup,
 } from "../utils/model";
+import { timedItems } from "../utils/espacio";
 import {
   Proposal,
   applyProposal,
@@ -52,7 +52,7 @@ export default function Chat() {
     [groupName, setGroupName] = useState(""),
     [ids, setIds] = useState<string[]>([]);
   const scroll = useRef<ScrollView>(null),
-    items = activeItems(data),
+    items = timedItems(data),
     conflicts = findConflicts(data);
   const respond = (text: string, isUser = false) =>
     change((d) => ({
