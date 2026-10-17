@@ -25,7 +25,7 @@ export const siempreVisible = (i: Item) =>
 
 // Días locales entre hoy y la fecha (negativo = atrasada). Contar en días
 // de calendario evita que un cambio de horario corra un día.
-function diasHasta(fecha: string, now: number) {
+export function diasHasta(fecha: string, now: number) {
   const dia = (t: Date) =>
     Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) / 86400000;
   return dia(new Date(fecha)) - dia(new Date(now));

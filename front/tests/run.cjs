@@ -18,6 +18,7 @@ const build = spawnSync(
     "src/utils/estructura.ts",
     "src/utils/espacio.ts",
     "src/utils/rutinas.ts",
+    "src/utils/acomodo/tiempo.ts",
     "--outDir",
     ".test-build",
     "--module",
