@@ -13,7 +13,7 @@ Cada subproyecto tiene su propio ciclo: brainstorming → spec → plan → impl
 | # | Subproyecto | Semanas | Estado |
 |---|---|---|---|
 | A | Sistema de diseño refinado | 1–2 (16–29 oct) | Implementado y probado en iPhone el 16/10 (rama `v2/a-sistema-diseno`). [Spec](A_SISTEMA_DE_DISENO.md) · [Plan](A_PLAN_IMPLEMENTACION.md) |
-| B | Espacio: General como raíz + rediseño del mapa | 1–3 (17 oct–7 nov) | Diseño aprobado el 17/10; spec en revisión. [Spec](B_ESPACIO.md) · [Sistema visual](B_SISTEMA_VISUAL.md) · [Notas](B_NOTAS_BRAINSTORMING.md) · [Maquetas](B_MAQUETA/) |
+| B | Espacio: General como raíz + rediseño del mapa | 1–3 (17 oct–7 nov) | En implementación en la rama `v2/b-espacio`: tareas 1–2 de 13 listas ([plan](B_PLAN_IMPLEMENTACION.md); avance en `.superpowers/sdd/B_PLAN_IMPLEMENTACION/progress.md`). Prueba 3D con Skia aprobada en iPhone el 17/10. [Spec](B_ESPACIO.md) · [Sistema visual](B_SISTEMA_VISUAL.md) · [Notas](B_NOTAS_BRAINSTORMING.md) · [Maquetas](B_MAQUETA/) |
 | C | Importar Google Calendar | 3–4 (30 oct–12 nov) | Pendiente |
 | D | Neka con IA (un solo agente) | 3–4 (30 oct–12 nov) | Pendiente |
 | E | Gamificación: puntaje + nivel, rating, logros, heatmap | 5 (13–19 nov) | Pendiente |
