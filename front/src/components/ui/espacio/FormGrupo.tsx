@@ -11,7 +11,13 @@ import {
   moverGrupo,
 } from "../../../utils/estructura";
 import { haptic } from "../../../utils/haptics";
-import { Group, localDay, parseDateInput, Repeat } from "../../../utils/model";
+import {
+  duplicateGroup,
+  Group,
+  localDay,
+  parseDateInput,
+  Repeat,
+} from "../../../utils/model";
 import { Button, Chip, Field, Sheet, Toggle, Txt } from "../base";
 
 const FRECUENCIAS: [Exclude<Repeat, "">, string][] = [
@@ -57,6 +63,7 @@ export default function FormGrupo({
   );
   const [dias, setDias] = useState<number[]>(inicial?.repeatDays ?? []);
   const [desde, setDesde] = useState(inicial?.repeatStart || localDay());
+  const [dia, setDia] = useState(localDay());
   const [error, setError] = useState("");
   const hacer = (fn: () => void) => {
     try {
@@ -228,6 +235,19 @@ export default function FormGrupo({
       />
       {inicial && (
         <>
+          <Txt variant="callout" weight={600}>
+            Aplicar ahora
+          </Txt>
+          <Txt variant="caption" tone="secondary">
+            Crea una copia de lo que tiene, con las fechas movidas a ese día y
+            todo pendiente.
+          </Txt>
+          <Field label="Día" value={dia} onChange={setDia} placeholder="AAAA-MM-DD" />
+          <Button
+            title="Aplicar ahora"
+            variant="secondary"
+            onPress={() => hacer(() => change((d) => duplicateGroup(d, inicial.id, dia.trim())))}
+          />
           <Button
             title="Borrar grupo"
             variant="plain"

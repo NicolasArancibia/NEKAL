@@ -45,3 +45,13 @@ export function tonos(color: string): Tonos {
 
 // Colores para elegir al crear una mesa (B_SISTEMA_VISUAL §2, provisorios).
 export const COLORES_MESA = ["#7546EC", "#2E9E6B", "#D9693C", "#948BA6"];
+
+// Para la interfaz: un color guardado que no sea hex (datos viejos) no rompe
+// la pantalla; usa el violeta.
+export function tonosDe(hex: string | undefined): Tonos {
+  try {
+    return tonos(hex ?? COLORES_MESA[0]);
+  } catch {
+    return tonos(COLORES_MESA[0]);
+  }
+}

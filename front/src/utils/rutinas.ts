@@ -106,3 +106,20 @@ export function ocurrencias(
   );
   return { actuales: todas.filter((g) => !anteriores.includes(g)), anteriores };
 }
+
+// Los datos sin las ocurrencias "Anteriores" de cada rutina (ni sus cosas),
+// para que Mesas y Plano no se llenen. Misma referencia si no hay nada que
+// esconder.
+export function sinAnteriores(d: AppData, now: number): AppData {
+  const fuera = new Set(
+    d.groups
+      .filter(esRutina)
+      .flatMap((g) => ocurrencias(d, g.id, now).anteriores.map((o) => o.id)),
+  );
+  if (!fuera.size) return d;
+  return {
+    ...d,
+    groups: d.groups.filter((g) => !fuera.has(g.id)),
+    items: d.items.filter((i) => !fuera.has(i.groupId)),
+  };
+}

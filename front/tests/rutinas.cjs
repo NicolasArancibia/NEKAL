@@ -155,3 +155,19 @@ test("rutinas: anteriores completas se separan", () => {
     ["R~2030-05-02", "R~2030-05-03"],
   );
 });
+test("rutinas: sinAnteriores esconde las pasadas completas", () => {
+  const oc = (dia) => ({ ...m.newGroup(`Mañana · ${dia}`, "general"), id: `R~${dia}`, parentId: "R" });
+  const d = {
+    ...datos(rutina(), [
+      item({ id: "m1", groupId: "R" }),
+      item({ id: "vieja", groupId: "R~2030-05-01", status: "completado" }),
+      item({ id: "pendiente", groupId: "R~2030-05-02" }),
+    ]),
+    groups: [rutina(), oc("2030-05-01"), oc("2030-05-02")],
+  };
+  const s = r.sinAnteriores(d, now);
+  assert.deepEqual(s.groups.map((g) => g.id), ["R", "R~2030-05-02"]);
+  assert.deepEqual(s.items.map((i) => i.id), ["m1", "pendiente"]);
+  const limpio = datos(rutina());
+  assert.equal(r.sinAnteriores(limpio, now), limpio);
+});

@@ -57,10 +57,10 @@ export function cargaDe(i: Item, now: number): number {
   return difficultyOf(i, now) * Math.min(4, Math.max(0.25, i.duration / 60));
 }
 
-// Incluye subgrupos; groupId "" = la mesa entera. Sin modelos de rutina.
-export function cargaDeContenedor(d: AppData, a: Destino, now: number): number {
+// El grupo y todos los que tiene adentro; groupId "" = la mesa entera.
+export function gruposBajo(d: AppData, a: Destino): Set<string> {
   const grupos = new Set([a.groupId]);
-  for (let creció = true; creció;) {
+  for (let creció = true; creció; ) {
     creció = false;
     for (const g of d.groups)
       if (
@@ -72,6 +72,16 @@ export function cargaDeContenedor(d: AppData, a: Destino, now: number): number {
         creció = true;
       }
   }
+  return grupos;
+}
+
+// Incluye subgrupos. Sin modelos de rutina.
+export function cargaDeContenedor(
+  d: AppData,
+  a: Destino,
+  now: number,
+): number {
+  const grupos = gruposBajo(d, a);
   return timedItems(d)
     .filter((i) => i.workspaceId === a.workspaceId && grupos.has(i.groupId))
     .reduce((suma, i) => suma + cargaDe(i, now), 0);
