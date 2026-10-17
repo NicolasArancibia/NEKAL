@@ -17,6 +17,7 @@ const build = spawnSync(
     "src/utils/colores.ts",
     "src/utils/estructura.ts",
     "src/utils/espacio.ts",
+    "src/utils/rutinas.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -58,4 +59,5 @@ require("./syncBanner.cjs");
 require("./acomodo.cjs");
 require("./estructura.cjs");
 require("./espacio.cjs");
+require("./rutinas.cjs");
 require("./styles.cjs");

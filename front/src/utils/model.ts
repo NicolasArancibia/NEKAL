@@ -409,6 +409,49 @@ export function restoreItem(data: AppData, id: string): AppData {
   if (error) throw new Error(`No se puede restaurar todavía: ${error}`);
   return { ...data, items: data.items.map((i) => (i.id === id ? item : i)) };
 }
+// Copia las cosas de un grupo a `nuevo`, corridas `dias` días con la hora
+// local intacta, pendientes y con sus dependencias internas reconectadas.
+// `x` (el orden) se conserva.
+export function copiarGrupo(
+  d: AppData,
+  origenId: string,
+  dias: number,
+  nuevo: Group,
+  idItem: (viejo: string) => string,
+  idPaso: (item: string, viejo: string) => string,
+  ahora = new Date().toISOString(),
+): AppData {
+  const source = activeItems(d).filter((i) => i.groupId === origenId);
+  const map = new Map(source.map((i) => [i.id, idItem(i.id)]));
+  const shift = (s: string) => {
+    if (!s) return "";
+    const date = new Date(s);
+    date.setDate(date.getDate() + dias);
+    return date.toISOString();
+  };
+  const copies = source.map((i) => {
+    const id = map.get(i.id)!;
+    return {
+      ...i,
+      id,
+      groupId: nuevo.id,
+      startDate: localDay(new Date(shift(parseDateInput(i.startDate)))),
+      scheduledAt: shift(i.scheduledAt),
+      dueAt: shift(i.dueAt),
+      status: "pendiente" as Status,
+      steps: i.steps.map((s) => ({ ...s, id: idPaso(id, s.id), done: false })),
+      dependencies: i.dependencies.map((x) => map.get(x) ?? x),
+      createdAt: ahora,
+      updatedAt: ahora,
+      y: 0,
+    };
+  });
+  return {
+    ...d,
+    groups: [...d.groups, nuevo],
+    items: [...d.items, ...copies],
+  };
+}
 export function duplicateGroup(
   data: AppData,
   groupId: string,
@@ -418,16 +461,6 @@ export function duplicateGroup(
   if (!group) throw new Error("Rutina no encontrada.");
   const source = activeItems(data).filter((i) => i.groupId === groupId);
   if (!source.length) throw new Error("La rutina no tiene ítems.");
-  const newGroup: Group = {
-    ...group,
-    id: uid(),
-    name: `${group.name} · ${day}`,
-    parentId: group.parentId ?? "",
-    repeat: "",
-    repeatDays: [],
-    repeatStart: "",
-  };
-  const map = new Map(source.map((i) => [i.id, uid()]));
   const origin = source.map((i) => i.startDate).sort()[0];
   parseDateInput(day);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day))
@@ -435,30 +468,20 @@ export function duplicateGroup(
   const offset =
     (Date.parse(day + "T12:00:00Z") - Date.parse(origin + "T12:00:00Z")) /
     86400000;
-  const shift = (s: string) => {
-    if (!s) return "";
-    const date = new Date(s);
-    date.setDate(date.getDate() + offset);
-    return date.toISOString();
-  };
-  const copies = source.map((i) => ({
-    ...i,
-    id: map.get(i.id)!,
-    groupId: newGroup.id,
-    startDate: localDay(new Date(shift(parseDateInput(i.startDate)))),
-    scheduledAt: shift(i.scheduledAt),
-    dueAt: shift(i.dueAt),
-    status: "pendiente" as Status,
-    steps: i.steps.map((s) => ({ ...s, id: uid(), done: false })),
-    dependencies: i.dependencies.map((id) => map.get(id) ?? id),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    x: i.x ? Math.min(950, i.x + 30) : 0,
-    y: i.y ? Math.min(950, i.y + 30) : 0,
-  }));
-  return {
-    ...data,
-    groups: [...data.groups, newGroup],
-    items: [...data.items, ...copies],
-  };
+  return copiarGrupo(
+    data,
+    groupId,
+    offset,
+    {
+      ...group,
+      id: uid(),
+      name: `${group.name} · ${day}`,
+      parentId: group.parentId ?? "",
+      repeat: "",
+      repeatDays: [],
+      repeatStart: "",
+    },
+    () => uid(),
+    () => uid(),
+  );
 }
