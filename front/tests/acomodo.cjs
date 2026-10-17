@@ -274,3 +274,132 @@ test("plano: cuenta vacía", () => {
   assert.deepEqual([cerca.sueltas, cerca.zonas], [[], []]);
   assert.ok(lejos.alto >= 0 && cerca.alto >= 0);
 });
+
+// ---- Mesas ----
+const me = require("../.test-build/acomodo/mesas.js");
+const arriba = { workspaceId: "general", ruta: [] };
+const centro = (p) => ({ x: p.x + p.w / 2, y: p.y + p.h / 2 });
+const tres = () => ({
+  ...conMesas([
+    cosa({ id: "s1" }),
+    ...muchas(4, { workspaceId: "t" }),
+    ...muchas(2, { workspaceId: "a" }),
+    ...muchas(3, { workspaceId: "e" }),
+  ]),
+  workspaces: [
+    ...conMesas([]).workspaces,
+    { id: "e", name: "Estudios", color: "#2e9e6b" },
+  ],
+});
+
+test("mesas: General arriba y mesas debajo en el mismo eje", () => {
+  const { pisos } = me.acomodoMesas(tres(), arriba, "semana", ahora);
+  const general = pisos.find((p) => p.id === "general");
+  assert.deepEqual([general.tipo, general.z, general.vidrio], ["general", 0, false]);
+  assert.deepEqual(centro(general), { x: 0, y: 0 });
+  assert.deepEqual(general.cubitos.map((c) => c.id), ["s1"]);
+  const mesas = pisos.filter((p) => p.tipo === "mesa");
+  assert.deepEqual(mesas.map((p) => p.id).sort(), ["a", "e", "t"]);
+  for (const p of mesas) assert.equal(p.z, -150);
+  const xs = mesas.map((p) => centro(p).x),
+    ys = mesas.map((p) => centro(p).y);
+  assert.ok(Math.abs(Math.min(...xs) + Math.max(...xs)) < 1e-9);
+  assert.ok(Math.abs(Math.min(...ys) + Math.max(...ys)) < 1e-9);
+  assert.equal(mesas.find((p) => p.id === "t").puntos.length, 4);
+  assert.deepEqual(mesas.find((p) => p.id === "t").cubitos, []);
+});
+test("mesas: tamaño acotado", () => {
+  assert.equal(me.tamanoPiso(0), 120);
+  assert.equal(me.tamanoPiso(9), 188);
+  assert.equal(me.tamanoPiso(500), 260);
+  const d = {
+    ...m.emptyData(),
+    workspaces: [
+      ...m.emptyData().workspaces,
+      ...Array.from({ length: 25 }, (_, k) => ({ id: `w${k}`, name: `Mesa ${k}`, color: "#3366ff" })),
+    ],
+    items: muchas(60, { workspaceId: "w0" }),
+  };
+  const { pisos } = me.acomodoMesas(d, arriba, "semana", ahora);
+  assert.equal(pisos.length, 26);
+  for (const p of pisos) assert.ok(p.w <= 260 && p.h <= 260);
+  const nivel = pisos.filter((p) => p.z === -150);
+  for (let i = 0; i < nivel.length; i++)
+    for (let j = i + 1; j < nivel.length; j++) {
+      const a = nivel[i], b = nivel[j];
+      assert.ok(
+        a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y,
+        `${a.id} y ${b.id} se tapan`,
+      );
+    }
+});
+test("mesas: altura = carga y nota plana", () => {
+  assert.equal(me.altoCubito(0), 1);
+  assert.equal(me.altoCubito(0.25), 3);
+  assert.equal(me.altoCubito(9), 20);
+  assert.equal(me.altoCubito(100), 26);
+  assert.deepEqual(
+    [me.grosorPiso(0, "mesa"), me.grosorPiso(1000, "general"), me.grosorPiso(0, "grupo"), me.grosorPiso(1000, "rutina")],
+    [10, 24, 5, 10],
+  );
+  assert.ok(me.grosorPiso(8, "mesa") > me.grosorPiso(2, "mesa"));
+  const d = conMesas([
+    cosa({ id: "nota", type: "Nota", x: 0 }),
+    cosa({ id: "dura", type: "Meeting", difficulty: 3, duration: 180, x: 1 }),
+  ]);
+  const [general] = me.acomodoMesas(d, arriba, "semana", ahora).pisos;
+  assert.deepEqual(general.cubitos.map((c) => [c.id, c.alto]), [["nota", 1], ["dura", 20]]);
+  const [a, b] = general.cubitos;
+  assert.equal(b.x - a.x, 56);
+  assert.equal(a.lado, 48);
+});
+test("mesas: en una mesa, General es vidrio y aparecen sus grupos", () => {
+  const d = {
+    ...tres(),
+    groups: [g("lan", { workspaceId: "t", name: "Lanzamiento" })],
+  };
+  d.items.push(cosa({ id: "l1", workspaceId: "t", groupId: "lan" }));
+  const { pisos, cables } = me.acomodoMesas(d, { workspaceId: "t", ruta: [] }, "semana", ahora);
+  const p = Object.fromEntries(pisos.map((x) => [x.id, x]));
+  assert.deepEqual([p.general.vidrio, p.general.cubitos, p.general.puntos], [true, [], []]);
+  assert.deepEqual([p.t.vidrio, p.t.z], [false, -150]);
+  assert.deepEqual(p.t.cubitos.map((c) => c.id), ["t-0", "t-1", "t-2", "t-3"]);
+  assert.deepEqual([p.lan.tipo, p.lan.z, p.lan.puntos.map((x) => x.id)], ["grupo", -290, ["l1"]]);
+  assert.deepEqual([p.a.vidrio, p.e.vidrio], [true, true]);
+  assert.deepEqual(cables, []);
+  // Las mesas siguen en el mismo lugar que vistas desde arriba.
+  const desdeArriba = me.acomodoMesas(d, arriba, "semana", ahora).pisos.find((x) => x.id === "t");
+  assert.deepEqual([p.t.x, p.t.y], [desdeArriba.x, desdeArriba.y]);
+  const sub = centro(p.lan), padre = centro(p.t);
+  assert.ok(Math.hypot(sub.x - padre.x, sub.y - padre.y) < 1e-9);
+});
+test("mesas: mesa conectada sólida y con cable", () => {
+  const d = tres();
+  d.items.find((i) => i.id === "t-1").dependencies = ["a-0"];
+  const { pisos, cables } = me.acomodoMesas(d, { workspaceId: "t", ruta: [] }, "semana", ahora);
+  const p = Object.fromEntries(pisos.map((x) => [x.id, x]));
+  assert.deepEqual([p.a.vidrio, p.e.vidrio], [false, true]);
+  assert.equal(p.a.puntos.length, 2);
+  assert.equal(cables.length, 1);
+  const cubo = p.t.cubitos.find((c) => c.id === "t-1");
+  const punto = p.a.puntos.find((x) => x.id === "a-0");
+  assert.deepEqual(cables[0].hasta, { x: punto.x, y: punto.y, z: -150 });
+  assert.deepEqual(cables[0].desde, { x: cubo.x + cubo.lado / 2, y: cubo.y + cubo.lado / 2, z: -150 + cubo.alto });
+});
+test("mesas: elegir cubito antes que piso", () => {
+  const d = conMesas([cosa({ id: "c1", type: "Meeting", difficulty: 2, duration: 60 })]);
+  const { pisos } = me.acomodoMesas(d, arriba, "semana", ahora);
+  const cam = { giro: 0.4, inclinacion: 0.95, zoom: 1, cx: 200, cy: 300 };
+  const [general] = pisos;
+  const c = general.cubitos[0];
+  const arribaDelCubo = pr.proyectar({ x: c.x + c.lado / 2, y: c.y + c.lado / 2, z: c.alto }, cam);
+  assert.deepEqual(me.elegir(pisos, cam, arribaDelCubo.x, arribaDelCubo.y), { tipo: "cubito", id: "c1" });
+  const esquina = pr.proyectar({ x: general.x + general.w - 6, y: general.y + general.h - 6, z: 0 }, cam);
+  assert.deepEqual(me.elegir(pisos, cam, esquina.x, esquina.y), { tipo: "piso", id: "general" });
+  assert.equal(me.elegir(pisos, cam, -5000, -5000), null);
+});
+test("mesas: cuenta vacía", () => {
+  const { pisos, cables } = me.acomodoMesas(m.emptyData(), arriba, "semana", ahora);
+  assert.deepEqual(pisos.map((p) => [p.id, p.cubitos.length, p.puntos.length]), [["general", 0, 0]]);
+  assert.deepEqual(cables, []);
+});
