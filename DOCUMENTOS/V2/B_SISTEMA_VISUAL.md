@@ -68,8 +68,8 @@ El significado de cada color se define más adelante. El color identifica la mes
 | Gesto | Tiempo | Mesas | Plano |
 |---|---|---|---|
 | Tocar | Abre la hoja y muestra conexiones | Mesa o grupo: bajar · cubito: hoja | Zona: entrar · ficha: hoja |
-| Mantener y mover | Cambia la fecha (encaja por día, vibra) | Meter una cosa o grupo en otro | Reordenar o cambiar de zona |
-| Mantener quieto | Selección múltiple | Selección múltiple | Selección múltiple |
+| Mantener y mover | Cambia la fecha (encaja por día, vibra) | — (en 3D no se arrastra: mover con la barra de selección) | Reordenar o cambiar de zona |
+| Mantener quieto | Selección múltiple · en una mesa: editarla | Cubito: selección múltiple · piso: editar mesa o grupo | Ficha: selección múltiple · zona: editar mesa o grupo |
 | Pellizcar | Cambia el tiempo elegido | Acercar y alejar (pisos) | Acercar y alejar |
 | Dos dedos girar | — | Girar alrededor del eje | — |
 | Arrastrar del puntito | — | — | Conectar |
