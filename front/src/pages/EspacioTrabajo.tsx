@@ -20,6 +20,7 @@ import {
 } from "../components/ui/espacio";
 import PlanoCerca from "../components/ui/espacio/PlanoCerca";
 import PlanoLejos from "../components/ui/espacio/PlanoLejos";
+import TiempoVista from "../components/ui/espacio/TiempoVista";
 import { color, radius, shadow, size, space } from "../styles/theme";
 import { useApp } from "../utils/AppContext";
 import { gruposBajo } from "../utils/espacio";
@@ -210,6 +211,24 @@ export default function EspacioTrabajo() {
               }
             />
           )
+        ) : prefs.vista === "tiempo" ? (
+          <TiempoVista
+            ventana={prefs.ventana}
+            now={now}
+            seleccion={seleccion}
+            marcada={marcada}
+            onAbrir={setAbierta}
+            onSeleccion={setSeleccion}
+            onMarcar={setMarcada}
+            onCrear={setCrear}
+            onVentana={prefs.setVentana}
+            onEditarMesa={setEditarMesa}
+            onEntrar={(d) => {
+              prefs.setVista("plano");
+              entrar(d);
+            }}
+            onAviso={setAviso}
+          />
         ) : (
           <View
             style={{
@@ -220,8 +239,7 @@ export default function EspacioTrabajo() {
             }}
           >
             <Txt tone="secondary" align="center">
-              {prefs.vista === "tiempo" ? "Tiempo" : "Mesas"} llega en las
-              próximas tareas. Mientras, usa Plano.
+              Mesas llega en la próxima tarea. Mientras, usa Plano o Tiempo.
             </Txt>
           </View>
         )}
