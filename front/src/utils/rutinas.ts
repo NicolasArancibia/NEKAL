@@ -1,5 +1,12 @@
-import { esRutina } from "./espacio";
-import { activeItems, AppData, copiarGrupo, Group, localDay } from "./model";
+import { esRutina, fechaDe } from "./espacio";
+import {
+  activeItems,
+  AppData,
+  copiarGrupo,
+  Group,
+  Item,
+  localDay,
+} from "./model";
 
 // Rutinas que se repiten (spec B §2.1). Puro. Los ids y los nombres son
 // deterministas para que dos dispositivos generen los mismos registros: por
@@ -46,9 +53,18 @@ export function diasQueToca(g: Group, desde: string, hasta: string): string[] {
 export const idOcurrencia = (rutinaId: string, dia: string) =>
   `${rutinaId}~${dia}`;
 
-// Crea las ocurrencias que faltan de hoy a hoy+6. Misma referencia si no hay
-// nada nuevo.
-export function aplicarRutinas(d: AppData, now: number): AppData {
+const entreDias = (desde: string, hasta: string) =>
+  (Date.parse(hasta + "T12:00:00Z") - Date.parse(desde + "T12:00:00Z")) /
+  86400000;
+// El día de una cosa del modelo: su fecha o, si no tiene, su inicio. Cada copia
+// cae en el día de la ocurrencia aunque el modelo se haya hecho otro día.
+const diaDelModelo = (i: Item) =>
+  fechaDe(i) ? localDay(new Date(fechaDe(i))) : i.startDate;
+
+// Crea las ocurrencias que faltan de hoy a hoy+6, hasta `tope` por vez (para
+// sincronizar de a poco). Misma referencia si no hay nada nuevo.
+export function aplicarRutinas(d: AppData, now: number, tope = Infinity): AppData {
+  let creadas = 0;
   const hoy = new Date(now);
   const desde = localDay(hoy);
   const hasta = localDay(
@@ -60,13 +76,12 @@ export function aplicarRutinas(d: AppData, now: number): AppData {
     for (const dia of diasQueToca(g, desde, hasta)) {
       const id = idOcurrencia(g.id, dia);
       if (data.groups.some((x) => x.id === id)) continue;
+      if (creadas++ >= tope) return data;
       const t = fecha(dia);
       data = copiarGrupo(
         data,
         g.id,
-        (Date.parse(dia + "T12:00:00Z") -
-          Date.parse(g.repeatStart + "T12:00:00Z")) /
-          86400000,
+        (i) => entreDias(diaDelModelo(i), dia),
         {
           id,
           name: `${g.name} · ${t.getDate()} ${MESES[t.getMonth()]}`,

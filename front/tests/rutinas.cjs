@@ -171,3 +171,28 @@ test("rutinas: sinAnteriores esconde las pasadas completas", () => {
   const limpio = datos(rutina());
   assert.equal(r.sinAnteriores(limpio, now), limpio);
 });
+test("rutinas: una cosa agregada después cae en su día", () => {
+  // La rutina empezó el 1; el modelo se agregó el 3 (hoy) a las 07:30.
+  const d = r.aplicarRutinas(
+    datos(rutina(), [
+      item({
+        id: "m1",
+        groupId: "R",
+        startDate: "2030-05-03",
+        scheduledAt: new Date(2030, 4, 3, 7, 30).toISOString(),
+      }),
+    ]),
+    now,
+  );
+  const c = d.items.find((i) => i.id === "R~2030-05-04~m1");
+  assert.equal(c.scheduledAt, new Date(2030, 4, 4, 7, 30).toISOString());
+  assert.equal(c.startDate, "2030-05-04");
+});
+test("rutinas: de a una ocurrencia llega a lo mismo", () => {
+  const base = datos(rutina());
+  const una = r.aplicarRutinas(base, now, 1);
+  assert.equal(una.groups.length, base.groups.length + 1);
+  let d = base;
+  for (let k = 0; k < 10; k++) d = r.aplicarRutinas(d, now, 1);
+  assert.equal(s.operation(d, r.aplicarRutinas(base, now)), null);
+});

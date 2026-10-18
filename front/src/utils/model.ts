@@ -409,13 +409,14 @@ export function restoreItem(data: AppData, id: string): AppData {
   if (error) throw new Error(`No se puede restaurar todavía: ${error}`);
   return { ...data, items: data.items.map((i) => (i.id === id ? item : i)) };
 }
-// Copia las cosas de un grupo a `nuevo`, corridas `dias` días con la hora
+// Copia las cosas de un grupo a `nuevo`, corridas `dias` días (o lo que diga
+// la función para cada cosa) con la hora
 // local intacta, pendientes y con sus dependencias internas reconectadas.
 // `x` (el orden) se conserva.
 export function copiarGrupo(
   d: AppData,
   origenId: string,
-  dias: number,
+  dias: number | ((i: Item) => number),
   nuevo: Group,
   idItem: (viejo: string) => string,
   idPaso: (item: string, viejo: string) => string,
@@ -423,13 +424,14 @@ export function copiarGrupo(
 ): AppData {
   const source = activeItems(d).filter((i) => i.groupId === origenId);
   const map = new Map(source.map((i) => [i.id, idItem(i.id)]));
-  const shift = (s: string) => {
-    if (!s) return "";
-    const date = new Date(s);
-    date.setDate(date.getDate() + dias);
-    return date.toISOString();
-  };
   const copies = source.map((i) => {
+    const corrida = typeof dias === "number" ? dias : dias(i);
+    const shift = (s: string) => {
+      if (!s) return "";
+      const date = new Date(s);
+      date.setDate(date.getDate() + corrida);
+      return date.toISOString();
+    };
     const id = map.get(i.id)!;
     return {
       ...i,

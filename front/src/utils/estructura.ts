@@ -92,9 +92,21 @@ export function editarGrupo(d: AppData, g: Group): AppData {
   return { ...d, groups: d.groups.map((x) => (x.id === g.id ? grupo : x)) };
 }
 
-// Sus grupos hijos y sus cosas (también las borradas) suben a su padre.
+// Un día de una rutina (`<idRutina>~<día>`): lo crea aplicarRutinas.
+export const esOcurrencia = (d: AppData, g: Group) =>
+  !!g.parentId &&
+  g.id.startsWith(`${g.parentId}~`) &&
+  d.groups.some((p) => p.id === g.parentId && !!p.repeat);
+
+// Sus grupos hijos y sus cosas (también las borradas) suben a su padre. Un día
+// de rutina no: sus cosas quedarían en la rutina como modelo (se copiarían
+// todos los días) y la rutina volvería a crear ese día.
 export function borrarGrupo(d: AppData, id: string): AppData {
   const g = grupoDe(d, id);
+  if (esOcurrencia(d, g))
+    throw new Error(
+      "Un día de rutina no se borra: borra sus cosas o cambia la rutina.",
+    );
   const arriba = { workspaceId: g.workspaceId, groupId: g.parentId };
   const suyas = enOrden(d, { workspaceId: g.workspaceId, groupId: id });
   const items = colocar(
@@ -200,15 +212,21 @@ export function juntarEnGrupo(
   };
 }
 
-// Cada cosa sube al padre de su grupo; las sueltas quedan igual.
+// Cada cosa sube al padre de su grupo; las sueltas quedan igual. Si ese padre
+// es una rutina (la cosa estaba en uno de sus días), sube un nivel más: dentro
+// de la rutina se volvería modelo y se copiaría todos los días.
 export function sacarDeGrupo(d: AppData, ids: string[]): AppData {
   let data = d;
-  for (const i of activas(d, ids))
-    if (i.groupId)
-      data = moverItems(data, [i.id], {
-        workspaceId: i.workspaceId,
-        groupId: d.groups.find((g) => g.id === i.groupId)?.parentId ?? "",
-      });
+  for (const i of activas(d, ids)) {
+    if (!i.groupId) continue;
+    let arriba = d.groups.find((g) => g.id === i.groupId)?.parentId ?? "";
+    const padre = d.groups.find((g) => g.id === arriba);
+    if (padre?.repeat) arriba = padre.parentId;
+    data = moverItems(data, [i.id], {
+      workspaceId: i.workspaceId,
+      groupId: arriba,
+    });
+  }
   return data;
 }
 

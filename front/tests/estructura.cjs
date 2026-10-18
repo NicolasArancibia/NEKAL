@@ -271,3 +271,28 @@ test("estructura: hijosDe ordena grupos por nombre", () => {
     ["b", "z"],
   );
 });
+test("estructura: un día de rutina no se borra", () => {
+  const d = datos({
+    groups: [
+      grupo("R", { repeat: "diario", repeatStart: "2030-05-01" }),
+      grupo("R~2030-05-01", { parentId: "R" }),
+    ],
+    items: [cosa("c1", { groupId: "R~2030-05-01" })],
+  });
+  assert.equal(e.esOcurrencia(d, d.groups[1]), true);
+  assert.equal(e.esOcurrencia(d, d.groups[0]), false);
+  assert.throws(() => e.borrarGrupo(d, "R~2030-05-01"), {
+    message: "Un día de rutina no se borra: borra sus cosas o cambia la rutina.",
+  });
+});
+test("estructura: sacar de un día de rutina no lo vuelve modelo", () => {
+  const d = datos({
+    groups: [
+      grupo("S"),
+      grupo("R", { parentId: "S", repeat: "diario", repeatStart: "2030-05-01" }),
+      grupo("R~2030-05-01", { parentId: "R" }),
+    ],
+    items: [cosa("c1", { groupId: "R~2030-05-01" })],
+  });
+  assert.equal(de(e.sacarDeGrupo(d, ["c1"]), "c1").groupId, "S");
+});

@@ -4,6 +4,7 @@ import { space } from "../../../styles/theme";
 import { useApp } from "../../../utils/AppContext";
 import {
   borrarGrupo,
+  esOcurrencia,
   crearGrupo,
   Destino,
   editarGrupo,
@@ -248,16 +249,25 @@ export default function FormGrupo({
             variant="secondary"
             onPress={() => hacer(() => change((d) => duplicateGroup(d, inicial.id, dia.trim())))}
           />
-          <Button
-            title="Borrar grupo"
-            variant="plain"
-            onPress={() =>
-              hacer(() => change((d) => borrarGrupo(d, inicial.id)))
-            }
-          />
-          <Txt variant="caption" tone="secondary" align="center">
-            Lo que tiene adentro no se borra: sube a donde estaba el grupo.
-          </Txt>
+          {esOcurrencia(data, inicial) ? (
+            <Txt variant="caption" tone="secondary" align="center">
+              Es un día de la rutina: no se borra. Para quitar algo de este
+              día, borra esa cosa.
+            </Txt>
+          ) : (
+            <>
+              <Button
+                title="Borrar grupo"
+                variant="plain"
+                onPress={() =>
+                  hacer(() => change((d) => borrarGrupo(d, inicial.id)))
+                }
+              />
+              <Txt variant="caption" tone="secondary" align="center">
+                Lo que tiene adentro no se borra: sube a donde estaba el grupo.
+              </Txt>
+            </>
+          )}
         </>
       )}
     </Sheet>
