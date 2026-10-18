@@ -20,10 +20,12 @@ import {
 } from "../components/ui/espacio";
 import PlanoCerca from "../components/ui/espacio/PlanoCerca";
 import PlanoLejos from "../components/ui/espacio/PlanoLejos";
+import MesasVista from "../components/ui/espacio/MesasVista";
 import TiempoVista from "../components/ui/espacio/TiempoVista";
 import { color, radius, shadow, size, space } from "../styles/theme";
 import { useApp } from "../utils/AppContext";
-import { gruposBajo } from "../utils/espacio";
+import type { Foco } from "../utils/acomodo/mesas";
+import { gruposBajo, rutaDe } from "../utils/espacio";
 import { Destino, GENERAL } from "../utils/estructura";
 import { activeItems, Group, Item, Workspace } from "../utils/model";
 
@@ -33,6 +35,7 @@ export default function EspacioTrabajo() {
   const { data } = useApp();
   const prefs = useEspacioPrefs();
   const [planoDestino, setPlanoDestino] = useState<Destino | null>(null);
+  const [foco, setFoco] = useState<Foco>({ workspaceId: GENERAL, ruta: [] });
   const [seleccion, setSeleccion] = useState<string[]>([]);
   const [abierta, setAbierta] = useState<Item | null>(null);
   const [marcada, setMarcada] = useState("");
@@ -47,22 +50,48 @@ export default function EspacioTrabajo() {
     const t = setTimeout(() => setAviso(""), 4000);
     return () => clearTimeout(t);
   }, [aviso]);
+  // Dónde estás: en Plano, el lugar abierto; en Mesas, el piso en foco.
+  // `null` = arriba (todo General).
+  const focoLugar: Destino | null =
+    foco.ruta.length || foco.workspaceId !== GENERAL
+      ? { workspaceId: foco.workspaceId, groupId: foco.ruta.at(-1) ?? "" }
+      : null;
+  const existe = (d: Destino | null) =>
+    !d ||
+    (data.workspaces.some((w) => w.id === d.workspaceId) &&
+      (!d.groupId || data.groups.some((g) => g.id === d.groupId)));
   // Si otro dispositivo borró la mesa o el grupo en que estás, vuelve arriba.
-  const existe =
-    !planoDestino ||
-    (data.workspaces.some((w) => w.id === planoDestino.workspaceId) &&
-      (!planoDestino.groupId ||
-        data.groups.some((g) => g.id === planoDestino.groupId)));
+  const planoOk = existe(planoDestino),
+    focoOk = existe(focoLugar);
   useEffect(() => {
-    if (!existe) setPlanoDestino(null);
-  }, [existe]);
+    if (!planoOk) setPlanoDestino(null);
+    if (!focoOk) setFoco({ workspaceId: GENERAL, ruta: [] });
+  }, [planoOk, focoOk]);
+  const ir = (d: Destino | null) => {
+    setSeleccion([]);
+    if (prefs.vista === "mesas")
+      setFoco(
+        d
+          ? {
+              workspaceId: d.workspaceId,
+              ruta: d.groupId ? rutaDe(data, d.groupId).map((g) => g.id) : [],
+            }
+          : { workspaceId: GENERAL, ruta: [] },
+      );
+    else setPlanoDestino(d);
+  };
 
   const mesaDe = (id: string) => data.workspaces.find((w) => w.id === id);
   const grupoDe = (id: string) => data.groups.find((g) => g.id === id);
   const vivas = activeItems(data);
   const vacia =
     !vivas.length && !data.groups.length && data.workspaces.length === 1;
-  const lugar = prefs.vista === "plano" && existe ? planoDestino : null;
+  const lugar =
+    prefs.vista === "plano" && planoOk
+      ? planoDestino
+      : prefs.vista === "mesas" && focoOk
+        ? focoLugar
+        : null;
   const grupo = lugar && grupoDe(lugar.groupId);
   const mesa = mesaDe(lugar?.workspaceId ?? GENERAL);
   const titulo = grupo?.name ?? mesa?.name ?? "General";
@@ -78,14 +107,11 @@ export default function EspacioTrabajo() {
       ? {
           texto: grupoDe(grupo.parentId)?.name ?? mesa?.name ?? "General",
           ir: () =>
-            setPlanoDestino({
-              workspaceId: grupo.workspaceId,
-              groupId: grupo.parentId,
-            }),
+            ir({ workspaceId: grupo.workspaceId, groupId: grupo.parentId }),
         }
       : {
           texto: lugar.workspaceId === GENERAL ? "Todo" : "General",
-          ir: () => setPlanoDestino(null),
+          ir: () => ir(null),
         };
   const entrar = (d: Destino) => {
     setSeleccion([]);
@@ -230,18 +256,22 @@ export default function EspacioTrabajo() {
             onAviso={setAviso}
           />
         ) : (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              padding: space.xxl,
+          <MesasVista
+            foco={foco}
+            ventana={prefs.ventana}
+            now={now}
+            seleccion={seleccion}
+            marcada={marcada}
+            onFoco={(f) => {
+              setSeleccion([]);
+              setFoco(f);
             }}
-          >
-            <Txt tone="secondary" align="center">
-              Mesas llega en la próxima tarea. Mientras, usa Plano o Tiempo.
-            </Txt>
-          </View>
+            onAbrir={setAbierta}
+            onSeleccion={setSeleccion}
+            onMarcar={setMarcada}
+            onEditarMesa={setEditarMesa}
+            onEditarGrupo={setEditarGrupo}
+          />
         )}
       </View>
 
