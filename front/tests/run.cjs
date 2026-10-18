@@ -21,6 +21,7 @@ const build = spawnSync(
     "src/utils/acomodo/tiempo.ts",
     "src/utils/acomodo/plano.ts",
     "src/utils/acomodo/mesas.ts",
+    "src/utils/demo.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -63,4 +64,5 @@ require("./acomodo.cjs");
 require("./estructura.cjs");
 require("./espacio.cjs");
 require("./rutinas.cjs");
+require("./demo.cjs");
 require("./styles.cjs");

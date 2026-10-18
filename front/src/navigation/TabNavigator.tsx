@@ -7,6 +7,7 @@ import Calendario from "../pages/Calendario";
 import EspacioTrabajo from "../pages/EspacioTrabajo";
 import Chat from "../pages/Chat";
 import Perfil from "../pages/Perfil";
+import { useDemo } from "../utils/useDemo";
 import { useRutinas } from "../utils/useRutinas";
 
 export type TabParamList = {
@@ -21,6 +22,7 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function TabNavigator() {
   useRutinas();
+  useDemo();
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: color.background }}
