@@ -47,12 +47,19 @@ function Section({
   );
 }
 
+// `acciones` va bajo el tipo (la hoja del Espacio agrega "Conectar con…" y
+// "Ver dónde está"). `sinCompletar`: el modelo de una rutina no se completa,
+// se completa cada día que toca (spec B §2.1).
 export default function ItemEditor({
   item,
   onClose,
+  acciones,
+  sinCompletar = false,
 }: {
   item: Item;
   onClose: () => void;
+  acciones?: React.ReactNode;
+  sinCompletar?: boolean;
 }) {
   const { data, change } = useApp();
   const [original] = useState(item);
@@ -188,6 +195,7 @@ export default function ItemEditor({
       ) : (
         <Tag text={draft.type} tone="primary" />
       )}
+      {acciones}
 
       <Section title="Qué">
         <Field
@@ -436,7 +444,10 @@ export default function ItemEditor({
           <View
             style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
           >
-            {(["pendiente", "en curso", "completado"] as const).map(
+            {(sinCompletar
+              ? (["pendiente", "en curso"] as const)
+              : (["pendiente", "en curso", "completado"] as const)
+            ).map(
               (status) => (
                 <Chip
                   key={status}
@@ -447,6 +458,12 @@ export default function ItemEditor({
               ),
             )}
           </View>
+          {sinCompletar && (
+            <Txt variant="caption" tone="secondary">
+              Es el modelo de la rutina: se copia en cada día que toca y ahí se
+              completa.
+            </Txt>
+          )}
           <View
             style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
           >

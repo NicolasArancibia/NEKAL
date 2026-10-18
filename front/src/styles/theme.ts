@@ -21,6 +21,11 @@ export const color = {
   // Decorativos del mapa del Espacio (no se usan como texto).
   mapDot: "#DBCEF6",
   mapEdge: "#CFBAF6",
+  // Espacio (subproyecto B): cables entre mesas, mesas en vidrio y sombras de piso.
+  cable: "#B9A6F4",
+  vidrio: "rgba(255, 255, 255, 0.18)",
+  vidrioBorde: "#D3C6F5",
+  sombraPiso: "rgba(70, 40, 140, 0.20)",
 } as const;
 export const space = {
   xs: 4,

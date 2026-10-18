@@ -42,3 +42,4 @@ yarn-error.*
 .test-build/
 .env
 dist-ios/
+public/canvaskit.wasm

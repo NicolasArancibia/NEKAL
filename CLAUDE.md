@@ -16,6 +16,7 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 
 - Antes de escribir código Expo, consultar la doc de **Expo v57** (MCP `context7`); ver `front/AGENTS.md`.
 - Lógica en `front/src/utils` (`model.ts`, `planner.ts`, sync, `neka.ts`). Pantallas en `front/src/pages`.
+- Espacio (V2/B): `utils/estructura.ts` (mesas, grupos, mover), `utils/espacio.ts` (estados, carga, árbol), `utils/rutinas.ts` y `utils/acomodo/` (Tiempo, Plano, Mesas y proyección 3D), todos puros y con pruebas. Vistas en `components/ui/espacio/`. Mesas dibuja con **Skia** (`@shopify/react-native-skia`); en web carga CanvasKit con `WithSkiaWeb` (`front/public/canvaskit.wasm`, lo copia `postinstall`).
 - UI: usar `front/src/styles/theme.ts` y `front/src/components/ui/base/`; sin colores ni tamaños sueltos (lo verifica `tests/styles.cjs`). Texto siempre con `Txt`; íconos Ionicons de línea.
 - `DOCUMENTOS/V0`, `DOCUMENTOS/V1` e `IDEAS_ESPACIODETRABAJO` son históricos: no sobrescribir. Documentar la V2 en `DOCUMENTOS/V2/`.
 - Las maquetas de `IDEAS_ESPACIODETRABAJO` son propuestas, no funciones implementadas.

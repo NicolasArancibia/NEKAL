@@ -1,417 +1,363 @@
-import React, { useState } from "react";
-import { View, ScrollView, TextInput } from "react-native";
-import WorkspaceBar from "../components/ui/EspacioTrabajoUi/WorkspaceBar";
-import ZoomControl from "../components/ui/EspacioTrabajoUi/ZoomControl";
-import AddFab from "../components/ui/EspacioTrabajoUi/AddFab";
-import InfiniteCanvas from "../components/ui/EspacioTrabajoUi/InfiniteCanvas";
-import CanvasContent from "../components/ui/EspacioTrabajoUi/CanvasContent";
-import ItemEditor from "../components/ui/ItemEditor";
-import ItemCard from "../components/ui/ItemCard";
+import React, { useEffect, useMemo, useState } from "react";
+import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Button,
-  Card,
-  Chip,
   EmptyState,
-  Field,
+  PressableScale,
   ScreenHeader,
-  Sheet,
-  Tag,
   Txt,
 } from "../components/ui/base";
-import { useApp } from "../utils/AppContext";
 import {
-  Item,
-  activeItems,
-  newItem,
-  uid,
-  duplicateGroup,
-  localDay,
-  parseDateInput,
-} from "../utils/model";
-import { color, font, radius, size, space, type } from "../styles/theme";
+  BarraSeleccion,
+  FormGrupo,
+  FormMesa,
+  HojaCosa,
+  MenuCrear,
+  SelectorTiempo,
+  useEspacioPrefs,
+  VistaSelector,
+} from "../components/ui/espacio";
+import PlanoCerca from "../components/ui/espacio/PlanoCerca";
+import PlanoLejos from "../components/ui/espacio/PlanoLejos";
+import MesasVista from "../components/ui/espacio/MesasVista";
+import TiempoVista from "../components/ui/espacio/TiempoVista";
+import { color, radius, shadow, size, space } from "../styles/theme";
+import { useApp } from "../utils/AppContext";
+import type { Foco } from "../utils/acomodo/mesas";
+import { gruposBajo, rutaDe } from "../utils/espacio";
+import { Destino, GENERAL } from "../utils/estructura";
+import { activeItems, Group, Item, Workspace } from "../utils/model";
 
-const row = {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: space.sm,
-} as const;
-
+// El Espacio (spec B §3): tres vistas de los mismos datos, con la misma hoja,
+// el mismo menú de crear y la misma selección múltiple.
 export default function EspacioTrabajo() {
-  const { data, change } = useApp();
-  const [workspace, setWorkspace] = useState("general"),
-    [list, setList] = useState(false),
-    [zoom, setZoom] = useState(1),
-    [moving, setMoving] = useState(false),
-    [reset, setReset] = useState(0),
-    [editor, setEditor] = useState<Item | null>(null),
-    [modal, setModal] = useState<"spaces" | "groups" | null>(null),
-    [name, setName] = useState(""),
-    [query, setQuery] = useState(""),
-    [error, setError] = useState(""),
-    [repeatDay, setRepeatDay] = useState(localDay());
-  const selected =
-    data.workspaces.find((w) => w.id === workspace) ?? data.workspaces[0];
-  const items = activeItems(data).filter(
-    (i) =>
-      i.workspaceId === selected.id &&
-      `${i.title} ${i.description}`.toLowerCase().includes(query.toLowerCase()),
-  );
-  const act = (fn: () => void) => {
-    try {
-      fn();
-      setError("");
-    } catch (e) {
-      setError((e as Error).message);
-    }
+  const { data } = useApp();
+  const prefs = useEspacioPrefs();
+  const [planoDestino, setPlanoDestino] = useState<Destino | null>(null);
+  const [foco, setFoco] = useState<Foco>({ workspaceId: GENERAL, ruta: [] });
+  const [seleccion, setSeleccion] = useState<string[]>([]);
+  const [abierta, setAbierta] = useState<Item | null>(null);
+  const [marcada, setMarcada] = useState("");
+  const [crear, setCrear] = useState<(Destino & { dia?: string }) | null>(null);
+  const [editarMesa, setEditarMesa] = useState<Workspace | null>(null);
+  const [editarGrupo, setEditarGrupo] = useState<Group | null>(null);
+  const [aviso, setAviso] = useState("");
+  const now = useMemo(() => Date.now(), [data]);
+
+  useEffect(() => {
+    if (!aviso) return;
+    const t = setTimeout(() => setAviso(""), 4000);
+    return () => clearTimeout(t);
+  }, [aviso]);
+  // Dónde estás: en Plano, el lugar abierto; en Mesas, el piso en foco.
+  // `null` = arriba (todo General).
+  const focoLugar: Destino | null =
+    foco.ruta.length || foco.workspaceId !== GENERAL
+      ? { workspaceId: foco.workspaceId, groupId: foco.ruta.at(-1) ?? "" }
+      : null;
+  const existe = (d: Destino | null) =>
+    !d ||
+    (data.workspaces.some((w) => w.id === d.workspaceId) &&
+      (!d.groupId || data.groups.some((g) => g.id === d.groupId)));
+  // Si otro dispositivo borró la mesa o el grupo en que estás, vuelve arriba.
+  const planoOk = existe(planoDestino),
+    focoOk = existe(focoLugar);
+  useEffect(() => {
+    if (!planoOk) setPlanoDestino(null);
+    if (!focoOk) setFoco({ workspaceId: GENERAL, ruta: [] });
+  }, [planoOk, focoOk]);
+  const ir = (d: Destino | null) => {
+    setSeleccion([]);
+    if (prefs.vista === "mesas")
+      setFoco(
+        d
+          ? {
+              workspaceId: d.workspaceId,
+              ruta: d.groupId ? rutaDe(data, d.groupId).map((g) => g.id) : [],
+            }
+          : { workspaceId: GENERAL, ruta: [] },
+      );
+    else setPlanoDestino(d);
   };
+
+  const mesaDe = (id: string) => data.workspaces.find((w) => w.id === id);
+  const grupoDe = (id: string) => data.groups.find((g) => g.id === id);
+  const vivas = activeItems(data);
+  const vacia =
+    !vivas.length && !data.groups.length && data.workspaces.length === 1;
+  const lugar =
+    prefs.vista === "plano" && planoOk
+      ? planoDestino
+      : prefs.vista === "mesas" && focoOk
+        ? focoLugar
+        : null;
+  const grupo = lugar && grupoDe(lugar.groupId);
+  const mesa = mesaDe(lugar?.workspaceId ?? GENERAL);
+  const titulo = grupo?.name ?? mesa?.name ?? "General";
+  const enLugar = lugar && gruposBajo(data, lugar);
+  const cantidad = lugar
+    ? vivas.filter(
+        (i) => i.workspaceId === lugar.workspaceId && enLugar!.has(i.groupId),
+      ).length
+    : vivas.length;
+  const atras = !lugar
+    ? null
+    : grupo
+      ? {
+          texto: grupoDe(grupo.parentId)?.name ?? mesa?.name ?? "General",
+          ir: () =>
+            ir({ workspaceId: grupo.workspaceId, groupId: grupo.parentId }),
+        }
+      : {
+          texto: lugar.workspaceId === GENERAL ? "Todo" : "General",
+          ir: () => ir(null),
+        };
+  const entrar = (d: Destino) => {
+    setSeleccion([]);
+    setPlanoDestino(d);
+  };
+  const verDonde = (i: Item) => {
+    prefs.setVista("plano");
+    setPlanoDestino({ workspaceId: i.workspaceId, groupId: i.groupId });
+    setMarcada(i.id);
+  };
+
+  if (!prefs.listo)
+    return <View style={{ flex: 1, backgroundColor: color.background }} />;
   return (
     <View style={{ flex: 1, backgroundColor: color.background }}>
-      <View style={{ padding: space.screen, gap: space.md }}>
-        <ScreenHeader title="Espacio" />
-        <WorkspaceBar
-          name={selected.name}
-          list={list}
-          onToggle={() => setList(!list)}
-          onSelect={() => {
-            setModal("spaces");
-            setName("");
-          }}
-          onAdd={() => {
-            setModal("spaces");
-            setName("");
-          }}
-        />
-        <View style={row}>
-          <TextInput
-            accessibilityLabel="Buscar ítems"
-            placeholder="Buscar en este espacio"
-            placeholderTextColor={color.inkSecondary}
-            value={query}
-            onChangeText={setQuery}
-            style={{
-              flex: 1,
-              minHeight: size.minTouch,
-              paddingHorizontal: space.lg,
-              borderRadius: radius.pill,
-              borderWidth: 1,
-              borderColor: color.lineStrong,
-              backgroundColor: color.surface,
-              color: color.ink,
-              fontFamily: font[500],
-              fontSize: type.callout.size,
-            }}
-          />
-          <Button
-            title="Rutinas"
-            variant="secondary"
-            small
-            onPress={() => {
-              setModal("groups");
-              setName("");
-            }}
-          />
-        </View>
-        {!list && (
-          <View style={[row, { justifyContent: "space-between" }]}>
-            <Chip
-              title={moving ? "Moviendo nodos" : "Mover nodos"}
-              selected={moving}
-              onPress={() => setMoving(!moving)}
-            />
-            <Button
-              title="Centrar"
-              variant="plain"
-              small
-              onPress={() => {
-                setReset((v) => v + 1);
-                setZoom(1);
-              }}
-            />
-          </View>
-        )}
-      </View>
-      {list ? (
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: space.screen,
-            paddingBottom: 96,
-            gap: space.md,
-            width: "100%",
-            maxWidth: 960,
-            alignSelf: "center",
-          }}
-        >
-          {items.map((i) => (
-            <ItemCard key={i.id} item={i} onPress={() => setEditor(i)} />
-          ))}
-          {!items.length && (
-            <EmptyState
-              pose={3}
-              text={
-                query
-                  ? "No hay ítems con esa búsqueda."
-                  : "Pulsa + para crear tu primer ítem."
-              }
-            />
-          )}
-        </ScrollView>
-      ) : (
-        <>
-          <InfiniteCanvas
-            key={`${selected.id}-${reset}`}
-            zoomLevel={zoom}
-            moveNodes={moving}
-          >
-            <CanvasContent
-              items={items}
-              groups={data.groups}
-              name={data.profile.name.split(" ")[0]}
-              onOpen={setEditor}
-              moveNodes={moving}
-              zoom={zoom}
-              onMove={(id, x, y) =>
-                change((d) => ({
-                  ...d,
-                  items: d.items.map((i) =>
-                    i.id === id
-                      ? { ...i, x, y, updatedAt: new Date().toISOString() }
-                      : i,
-                  ),
-                }))
-              }
-            />
-          </InfiniteCanvas>
-          {!items.length && (
-            <View
-              pointerEvents="none"
-              style={{
-                position: "absolute",
-                top: "58%",
-                alignSelf: "center",
-                paddingHorizontal: space.xxl,
-              }}
-            >
-              <Txt tone="secondary" align="center">
-                Pulsa + para crear tu primer ítem.
-              </Txt>
-            </View>
-          )}
-        </>
-      )}
       <View
         style={{
-          position: "absolute",
-          bottom: space.lg,
-          left: space.screen,
-          right: space.screen,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
+          paddingHorizontal: space.screen,
+          paddingTop: space.screen,
+          gap: space.sm,
         }}
       >
-        {!list ? (
-          <ZoomControl
-            zoomLevel={zoom}
-            onZoomIn={() => setZoom((v) => Math.min(2, v + 0.1))}
-            onZoomOut={() => setZoom((v) => Math.max(0.4, v - 0.1))}
+        <View
+          style={{
+            minHeight: 24,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          {atras ? (
+            <PressableScale
+              onPress={atras.ir}
+              accessibilityRole="button"
+              accessibilityLabel={`Volver a ${atras.texto}`}
+              hitSlop={10}
+              style={{ flexDirection: "row", alignItems: "center", gap: 2 }}
+            >
+              <Ionicons name="chevron-back" size={16} color={color.primary} />
+              <Txt variant="callout" weight={700} tone="primary">
+                {atras.texto}
+              </Txt>
+            </PressableScale>
+          ) : (
+            <View />
+          )}
+          {!vacia && (
+            <Button
+              title="Editar"
+              variant="plain"
+              small
+              onPress={() =>
+                grupo ? setEditarGrupo(grupo) : mesa && setEditarMesa(mesa)
+              }
+            />
+          )}
+        </View>
+        <ScreenHeader
+          title={titulo}
+          right={
+            <VistaSelector
+              vista={prefs.vista}
+              onCambio={(v) => {
+                prefs.setVista(v);
+                setSeleccion([]);
+                setMarcada("");
+                if (v === "plano") setPlanoDestino(null);
+              }}
+            />
+          }
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: space.sm,
+          }}
+        >
+          <SelectorTiempo ventana={prefs.ventana} onCambio={prefs.setVentana} />
+          <Txt variant="caption" tone="secondary">
+            {cantidad} {cantidad === 1 ? "cosa" : "cosas"}
+          </Txt>
+        </View>
+      </View>
+
+      <View style={{ flex: 1, marginTop: space.sm }}>
+        {vacia ? (
+          <EmptyState
+            pose={3}
+            text="Crea tu primera cosa: una tarea, una nota o una mesa para ordenar lo tuyo."
+            action={{
+              label: "Crear",
+              onPress: () => setCrear({ workspaceId: GENERAL, groupId: "" }),
+            }}
+          />
+        ) : prefs.vista === "plano" ? (
+          lugar ? (
+            <PlanoCerca
+              key={`${lugar.workspaceId}|${lugar.groupId}`}
+              destino={lugar}
+              ventana={prefs.ventana}
+              now={now}
+              seleccion={seleccion}
+              marcada={marcada}
+              onAbrir={setAbierta}
+              onSeleccion={setSeleccion}
+              onMarcar={setMarcada}
+              onEntrar={entrar}
+              onCrear={setCrear}
+              onEditar={setEditarGrupo}
+              onAviso={setAviso}
+            />
+          ) : (
+            <PlanoLejos
+              ventana={prefs.ventana}
+              now={now}
+              onEntrar={entrar}
+              onEditar={(z) =>
+                z.tipo === "mesa"
+                  ? setEditarMesa(mesaDe(z.workspaceId) ?? null)
+                  : setEditarGrupo(grupoDe(z.groupId) ?? null)
+              }
+            />
+          )
+        ) : prefs.vista === "tiempo" ? (
+          <TiempoVista
+            ventana={prefs.ventana}
+            now={now}
+            seleccion={seleccion}
+            marcada={marcada}
+            onAbrir={setAbierta}
+            onSeleccion={setSeleccion}
+            onMarcar={setMarcada}
+            onCrear={setCrear}
+            onVentana={prefs.setVentana}
+            onEditarMesa={setEditarMesa}
+            onEntrar={(d) => {
+              prefs.setVista("plano");
+              entrar(d);
+            }}
+            onAviso={setAviso}
           />
         ) : (
-          <Txt variant="caption" tone="secondary">
-            {items.length} {items.length === 1 ? "ítem" : "ítems"}
-          </Txt>
+          <MesasVista
+            foco={foco}
+            ventana={prefs.ventana}
+            now={now}
+            seleccion={seleccion}
+            marcada={marcada}
+            onFoco={(f) => {
+              setSeleccion([]);
+              setFoco(f);
+            }}
+            onAbrir={setAbierta}
+            onSeleccion={setSeleccion}
+            onMarcar={setMarcada}
+            onEditarMesa={setEditarMesa}
+            onEditarGrupo={setEditarGrupo}
+          />
         )}
-        <AddFab onPress={() => setEditor(newItem(selected.id))} />
       </View>
-      {editor && (
-        <ItemEditor
-          key={editor.id}
-          item={editor}
-          onClose={() => setEditor(null)}
+
+      {!!aviso && (
+        <View
+          accessibilityLiveRegion="polite"
+          style={{
+            position: "absolute",
+            left: space.screen,
+            right: space.screen,
+            bottom: seleccion.length ? 150 : 88,
+            padding: space.md,
+            borderRadius: radius.sm,
+            backgroundColor: color.surface,
+            boxShadow: shadow.card,
+          }}
+        >
+          <Txt variant="callout">{aviso}</Txt>
+        </View>
+      )}
+      {seleccion.length > 0 ? (
+        <View
+          style={{
+            position: "absolute",
+            left: space.screen,
+            right: space.screen,
+            bottom: space.lg,
+          }}
+        >
+          <BarraSeleccion ids={seleccion} onListo={() => setSeleccion([])} />
+        </View>
+      ) : (
+        !vacia && (
+          <PressableScale
+            onPress={() =>
+              setCrear(lugar ?? { workspaceId: GENERAL, groupId: "" })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Crear"
+            style={{
+              position: "absolute",
+              right: space.screen,
+              bottom: space.lg,
+              width: 56,
+              height: 56,
+              borderRadius: radius.pill,
+              backgroundColor: color.primary,
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: shadow.raised,
+            }}
+          >
+            <Ionicons name="add" size={size.icon + 6} color={color.onPrimary} />
+          </PressableScale>
+        )
+      )}
+
+      {abierta && (
+        <HojaCosa
+          item={abierta}
+          onClose={() => setAbierta(null)}
+          onVerDonde={verDonde}
         />
       )}
-      <Sheet
-        visible={!!modal}
-        title={modal === "spaces" ? "Tus espacios" : "Rutinas"}
-        onClose={() => {
-          setModal(null);
-          setError("");
-        }}
-      >
-        {modal === "spaces" ? (
-          <>
-            {data.workspaces.map((w) => (
-              <Card
-                key={w.id}
-                accessibilityLabel={`Abrir ${w.name}`}
-                onPress={() => {
-                  setWorkspace(w.id);
-                  setModal(null);
-                  setQuery("");
-                }}
-                style={row}
-              >
-                <View
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: radius.pill,
-                    backgroundColor: w.color,
-                  }}
-                />
-                <Txt weight={600} numberOfLines={1} style={{ flex: 1 }}>
-                  {w.name}
-                </Txt>
-                {w.id === selected.id && <Tag text="Actual" tone="primary" />}
-              </Card>
-            ))}
-            <Field
-              label="Nombre del espacio"
-              value={name}
-              onChange={setName}
-              placeholder="Universidad, trabajo, personal…"
-            />
-            <Button
-              title="Crear espacio"
-              onPress={() =>
-                act(() => {
-                  if (!name.trim()) throw new Error("Escribe un nombre.");
-                  const w = {
-                    id: uid(),
-                    name: name.trim(),
-                    color: color.primary,
-                  };
-                  change((d) => ({ ...d, workspaces: [...d.workspaces, w] }));
-                  setWorkspace(w.id);
-                  setName("");
-                  setModal(null);
-                })
-              }
-            />
-            <Button
-              title={`Renombrar ${selected.name}`}
-              variant="secondary"
-              onPress={() =>
-                act(() => {
-                  if (!name.trim()) throw new Error("Escribe el nuevo nombre.");
-                  change((d) => ({
-                    ...d,
-                    workspaces: d.workspaces.map((w) =>
-                      w.id === selected.id ? { ...w, name: name.trim() } : w,
-                    ),
-                  }));
-                  setName("");
-                })
-              }
-            />
-            {selected.id !== "general" && (
-              <Button
-                title="Eliminar espacio vacío"
-                variant="plain"
-                onPress={() =>
-                  act(() => {
-                    if (
-                      data.items.some((i) => i.workspaceId === selected.id) ||
-                      data.groups.some((g) => g.workspaceId === selected.id)
-                    )
-                      throw new Error(
-                        "Mueve sus ítems y rutinas antes de eliminar el espacio.",
-                      );
-                    change((d) => ({
-                      ...d,
-                      workspaces: d.workspaces.filter(
-                        (w) => w.id !== selected.id,
-                      ),
-                    }));
-                    setWorkspace("general");
-                  })
-                }
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <Txt tone="secondary">
-              Agrupa ítems desde su formulario. Reutilizar crea una copia con
-              las fechas movidas y el progreso en cero.
-            </Txt>
-            <Field
-              label="Nombre de la rutina"
-              value={name}
-              onChange={setName}
-            />
-            <Button
-              title="Crear rutina"
-              onPress={() =>
-                act(() => {
-                  if (!name.trim()) throw new Error("Escribe un nombre.");
-                  change((d) => ({
-                    ...d,
-                    groups: [
-                      ...d.groups,
-                      {
-                        id: uid(),
-                        name: name.trim(),
-                        workspaceId: selected.id,
-                      },
-                    ],
-                  }));
-                  setName("");
-                })
-              }
-            />
-            <Field
-              label="Fecha para reutilizar"
-              value={repeatDay}
-              onChange={setRepeatDay}
-              placeholder="AAAA-MM-DD"
-            />
-            {data.groups
-              .filter((g) => g.workspaceId === selected.id)
-              .map((g) => (
-                <Card key={g.id}>
-                  <Txt variant="headline">{g.name}</Txt>
-                  <Txt variant="caption" tone="secondary">
-                    {activeItems(data).filter((i) => i.groupId === g.id).length}{" "}
-                    ítems
-                  </Txt>
-                  <Button
-                    title={`Reutilizar ${g.name}`}
-                    variant="secondary"
-                    onPress={() =>
-                      act(() => {
-                        parseDateInput(repeatDay);
-                        if (!repeatDay) throw new Error("Indica una fecha.");
-                        change((d) => duplicateGroup(d, g.id, repeatDay));
-                        setModal(null);
-                      })
-                    }
-                  />
-                  <Button
-                    title={`Desagrupar ${g.name}`}
-                    variant="plain"
-                    small
-                    onPress={() =>
-                      act(() =>
-                        change((d) => ({
-                          ...d,
-                          groups: d.groups.filter((x) => x.id !== g.id),
-                          items: d.items.map((i) =>
-                            i.groupId === g.id ? { ...i, groupId: "" } : i,
-                          ),
-                        })),
-                      )
-                    }
-                  />
-                </Card>
-              ))}
-          </>
-        )}
-        {!!error && (
-          <Txt tone="danger" accessibilityRole="alert">
-            {error}
-          </Txt>
-        )}
-      </Sheet>
+      {crear && (
+        <MenuCrear visible destino={crear} onClose={() => setCrear(null)} />
+      )}
+      {editarMesa && (
+        <FormMesa
+          visible
+          inicial={editarMesa}
+          onClose={() => setEditarMesa(null)}
+        />
+      )}
+      {editarGrupo && (
+        <FormGrupo
+          visible
+          inicial={editarGrupo}
+          destino={{
+            workspaceId: editarGrupo.workspaceId,
+            groupId: editarGrupo.parentId,
+          }}
+          rutina={!!editarGrupo.repeat}
+          onClose={() => setEditarGrupo(null)}
+        />
+      )}
     </View>
   );
 }

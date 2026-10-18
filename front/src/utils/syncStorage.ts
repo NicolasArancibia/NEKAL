@@ -9,6 +9,24 @@ import {
   readEnvelope,
 } from "./syncModel";
 
+// Antes de que la V2/B migre datos v1, guarda el texto original una sola vez.
+export async function respaldarV1(
+  clave: string,
+  ...textos: (string | null)[]
+) {
+  const v1 = textos.find((t) => {
+    if (!t) return false;
+    try {
+      const d = JSON.parse(t);
+      return d.version === 1 || d.data?.version === 1;
+    } catch {
+      return false;
+    }
+  });
+  if (v1 && !(await AsyncStorage.getItem(clave)))
+    await AsyncStorage.setItem(clave, v1);
+}
+
 // Immutable operation IDs avoid one browser tab overwriting another tab's outbox.
 export function accountStorage(userId: string) {
   const prefix = `nekal:v2:${userId}:`,
@@ -18,6 +36,7 @@ export function accountStorage(userId: string) {
     async load(): Promise<Envelope> {
       const old = await AsyncStorage.getItem(legacy);
       const cached = await AsyncStorage.getItem(prefix + "cache");
+      await respaldarV1(prefix + "respaldo-v1", cached, old);
       let state: Envelope = cached
         ? readEnvelope(cached)
         : newEnvelope(

@@ -1,5 +1,5 @@
 import { AppData, emptyData, uid, Reward } from "./model";
-import { readBackup } from "./storage";
+import { normalizeGroup, ordenarLegado, readBackup } from "./storage";
 
 export type Value = Record<string, any>;
 export type Records = Record<string, Value>;
@@ -87,13 +87,14 @@ export function dataOf(records: Records, notifications = false): AppData {
         }),
       } as any);
     else if (collection === "workspaces") data.workspaces.push(value as any);
-    else if (collection === "groups") data.groups.push(value as any);
+    else if (collection === "groups") data.groups.push(normalizeGroup(value));
     else if (collection === "messages") data.messages.push(value as any);
     else if (collection === "rewards") data.rewards.push(...value.entries);
     else if (path === "settings/profile") data.profile = value as any;
     else if (path === "settings/preferences")
       data.preferences = { ...value, notifications } as any;
   }
+  data.items = ordenarLegado(data.items);
   return data;
 }
 export function diff(before: Records, after: Records): Edit[] {
@@ -302,6 +303,14 @@ export function validateRecords(records: Records): AppData {
     }
     if (collection === "workspaces" || collection === "groups")
       bound(value.name, 500);
+    if (collection === "groups") {
+      if (value.repeatStart !== undefined) bound(value.repeatStart, 10);
+      if (
+        value.repeatDays !== undefined &&
+        (!Array.isArray(value.repeatDays) || value.repeatDays.length > 7)
+      )
+        throw new Error("Un grupo tiene días de repetición inválidos.");
+    }
     if (collection === "messages") bound(value.text, 100000);
     if (path === "settings/profile") {
       bound(value.name, 500);
@@ -317,8 +326,9 @@ export function readEnvelope(raw: string): Envelope {
   const e = JSON.parse(raw);
   if (e.version !== 2 || !Array.isArray(e.pending))
     throw new Error("Copia de sincronización inválida.");
-  readBackup(JSON.stringify(e.data));
-  if (e.base) readBackup(JSON.stringify(e.base));
+  // Copias guardadas antes de la V2/B se leen ya migradas (readBackup migra).
+  e.data = readBackup(JSON.stringify(e.data));
+  if (e.base) e.base = readBackup(JSON.stringify(e.base));
   for (const op of e.pending)
     if (
       typeof op.id !== "string" ||

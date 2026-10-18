@@ -6,11 +6,11 @@ import {
   Item,
   ItemType,
   TYPES,
-  activeItems,
   localDay,
   newItem,
   passive,
 } from "../utils/model";
+import { timedItems } from "../utils/espacio";
 import { hhmm, timeOn } from "../utils/neka";
 import { useToggleDone } from "../utils/useToggleDone";
 import { color, radius, size, space as spacing } from "../styles/theme";
@@ -43,7 +43,7 @@ export default function Calendario() {
     // Lo completado en esta visita sigue visible (tachado) aunque el filtro oculte completados.
     [justDone, setJustDone] = useState<string[]>([]);
   useEffect(() => setJustDone([]), [selected]);
-  const items = activeItems(data).filter(
+  const items = timedItems(data).filter(
     (i) =>
       (space === "all" || i.workspaceId === space) &&
       (!type || i.type === type) &&

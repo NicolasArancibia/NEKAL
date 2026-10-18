@@ -14,7 +14,7 @@ import { readBackup } from "./storage";
 import { scheduleReminders } from "./notifications";
 import { SyncEngine } from "./SyncEngine";
 import { firestoreRemote } from "./cloudSync";
-import { accountStorage } from "./syncStorage";
+import { accountStorage, respaldarV1 } from "./syncStorage";
 import { Conflict } from "./syncModel";
 
 type Context = {
@@ -127,6 +127,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         } else {
           const raw = await AsyncStorage.getItem(key.current);
           if (disposed || generation !== session.current) return;
+          await respaldarV1(key.current + ":respaldo-v1", raw);
           const next = raw ? readBackup(raw) : emptyData();
           ref.current = next;
           setData(next);

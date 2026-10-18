@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
-import { AppData, activeItems, passive } from "./model";
+import { timedItems } from "./espacio";
+import { AppData, passive } from "./model";
 export async function requestReminders(): Promise<void> {
   if (Platform.OS === "web")
     throw new Error(
@@ -33,7 +34,7 @@ export async function scheduleReminders(data: AppData) {
     }),
   });
   const { quiet, quietStart, quietEnd } = data.preferences;
-  const upcoming = activeItems(data)
+  const upcoming = timedItems(data)
     .filter(
       (i) =>
         !passive(i) && i.status !== "completado" && (i.scheduledAt || i.dueAt),

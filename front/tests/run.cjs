@@ -13,6 +13,15 @@ const build = spawnSync(
     "src/utils/syncStorage.ts",
     "src/utils/neka.ts",
     "src/utils/syncBanner.ts",
+    "src/utils/acomodo/proyeccion.ts",
+    "src/utils/colores.ts",
+    "src/utils/estructura.ts",
+    "src/utils/espacio.ts",
+    "src/utils/rutinas.ts",
+    "src/utils/acomodo/tiempo.ts",
+    "src/utils/acomodo/plano.ts",
+    "src/utils/acomodo/mesas.ts",
+    "src/utils/demo.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -51,4 +60,9 @@ require("./outbox.cjs");
 require("./theme.cjs");
 require("./neka.cjs");
 require("./syncBanner.cjs");
+require("./acomodo.cjs");
+require("./estructura.cjs");
+require("./espacio.cjs");
+require("./rutinas.cjs");
+require("./demo.cjs");
 require("./styles.cjs");

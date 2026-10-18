@@ -26,12 +26,13 @@ import {
   Item,
   ItemType,
   TYPES,
-  activeItems,
   displayDate,
   newItem,
   passive,
   uid,
+  newGroup,
 } from "../utils/model";
+import { timedItems } from "../utils/espacio";
 import {
   Proposal,
   applyProposal,
@@ -51,7 +52,7 @@ export default function Chat() {
     [groupName, setGroupName] = useState(""),
     [ids, setIds] = useState<string[]>([]);
   const scroll = useRef<ScrollView>(null),
-    items = activeItems(data),
+    items = timedItems(data),
     conflicts = findConflicts(data);
   const respond = (text: string, isUser = false) =>
     change((d) => ({
@@ -339,11 +340,10 @@ export default function Chat() {
                 throw new Error("Ponle un nombre y elige al menos un ítem.");
               if (new Set(chosen.map((i) => i.workspaceId)).size !== 1)
                 throw new Error("Elige ítems de un mismo espacio.");
-              const group = {
-                id: uid(),
-                name: groupName.trim(),
-                workspaceId: chosen[0].workspaceId,
-              };
+              const group = newGroup(
+                groupName.trim(),
+                chosen[0].workspaceId,
+              );
               change((d) => ({
                 ...d,
                 groups: [...d.groups, group],
