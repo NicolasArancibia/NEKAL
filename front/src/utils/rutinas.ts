@@ -11,7 +11,7 @@ import {
 // Rutinas que se repiten (spec B §2.1). Puro. Los ids y los nombres son
 // deterministas para que dos dispositivos generen los mismos registros: por
 // eso el mes va fijo y no con toLocaleString.
-const MESES = [
+export const MESES = [
   "ene",
   "feb",
   "mar",
