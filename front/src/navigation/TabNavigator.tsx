@@ -11,6 +11,7 @@ import Perfil from "../pages/Perfil";
 import { useDemo } from "../utils/useDemo";
 import { useRutinas } from "../utils/useRutinas";
 import { NekaProvider } from "../utils/NekaContext";
+import HojaPlan from "../components/ui/neka/HojaPlan";
 
 export type TabParamList = {
   Resumen: undefined;
@@ -59,7 +60,12 @@ export default function TabNavigator() {
             headerShown: false,
             sceneStyle: { backgroundColor: color.background },
           }}
-          tabBar={(props) => <TabBar {...props} />}
+          tabBar={(props) => (
+            <>
+              <TabBar {...props} />
+              <HojaPlan onAbrirChat={() => props.navigation.navigate("Chat")} />
+            </>
+          )}
         >
           <Tab.Screen name="Resumen" component={Resumen} />
           <Tab.Screen name="Calendario" component={Calendario} />

@@ -702,3 +702,14 @@ test("dia: pasos de otro día solo en la lista", () => {
   assert.ok(!r.bloques.some((b) => b.id === "est"));
   assert.ok(r.bloques.some((b) => b.id === "gym" && b.tipo === "despues"));
 });
+test("herramientas: Gemini no acepta opciones vacías", () => {
+  const vacias = [];
+  const revisar = (x, ruta) => {
+    if (!x || typeof x !== "object") return;
+    if (Array.isArray(x.enum) && x.enum.some((v) => v === ""))
+      vacias.push(ruta);
+    for (const [k, v] of Object.entries(x)) revisar(v, `${ruta}.${k}`);
+  };
+  h.DECLARACIONES.forEach((d) => revisar(d.parameters, d.name));
+  assert.deepEqual(vacias, []);
+});

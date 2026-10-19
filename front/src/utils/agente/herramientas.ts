@@ -168,8 +168,8 @@ export const DECLARACIONES: Declaracion[] = [
         nombre: cadena("Nombre."),
         mesa: cadena("Id o nombre de la mesa."),
         padre: cadena("Id o nombre del grupo que lo contiene (opcional)."),
-        repetir: cadena("Repetición, vacío si no se repite.", {
-          enum: REPEATS,
+        repetir: cadena("Repetición; se omite si no se repite.", {
+          enum: REPEATS.filter((r) => r),
         }),
         dias: {
           type: "array",
