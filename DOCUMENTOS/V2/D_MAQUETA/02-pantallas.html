@@ -1,0 +1,147 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .phones { display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin:14px 0 6px; }
+  .pw { display:flex; flex-direction:column; align-items:center; gap:8px; width:300px; }
+  .pw .num { font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#7546EC; }
+  .pw p.cap { margin:0; font-size:13.5px; color:var(--text-secondary); text-align:center; line-height:1.5; }
+  .phone { width:300px; color:#241D38; background:#FAF8FF; border:1px solid #E4DDF0; border-radius:36px; padding:12px 10px 8px; box-shadow:0 12px 40px rgba(60,30,120,.10); font-family:"Plus Jakarta Sans",system-ui,sans-serif; display:flex; flex-direction:column; height:580px; position:relative; overflow:hidden; }
+  .head { display:flex; align-items:center; justify-content:space-between; padding:4px 10px 2px; }
+  .ph-title { font-size:22px; font-weight:800; }
+  .voz { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#6F6683; }
+  .sw { width:34px; height:20px; border-radius:10px; background:#7546EC; position:relative; }
+  .sw:after { content:""; position:absolute; right:2px; top:2px; width:16px; height:16px; border-radius:8px; background:#fff; }
+  .priv { font-size:10.5px; color:#6F6683; text-align:center; margin:2px 0 8px; }
+  .thread { flex:1; display:flex; flex-direction:column; gap:8px; padding:0 6px; overflow:hidden; }
+  .b { max-width:82%; padding:8px 11px; border-radius:16px; font-size:12.5px; line-height:1.4; }
+  .b.me { align-self:flex-end; background:#7546EC; color:#fff; border-bottom-right-radius:5px; }
+  .b.neka { align-self:flex-start; background:#fff; border:1px solid #EEE9F6; border-bottom-left-radius:5px; }
+  .audio { display:flex; align-items:center; gap:7px; }
+  .wave { display:flex; gap:2px; align-items:center; }
+  .wave i { display:block; width:2.5px; border-radius:2px; background:rgba(255,255,255,.85); }
+  .heard { font-size:10.5px; opacity:.85; margin-top:3px; font-style:italic; }
+  .spk { display:inline-flex; vertical-align:-2px; margin-left:4px; color:#7546EC; }
+  .mini { align-self:flex-start; display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #E2DBF0; border-radius:14px; padding:8px 10px; font-size:12px; font-weight:700; }
+  .mini .tag { font-size:10px; font-weight:800; padding:3px 7px; border-radius:8px; background:#E6F6EF; color:#2F9E77; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; padding:6px 6px 0; }
+  .chip { font-size:11px; font-weight:700; padding:6px 10px; border-radius:999px; background:#fff; border:1px solid #E2DBF0; color:#4B2BB0; }
+  .input { display:flex; align-items:center; gap:6px; margin:6px 4px 4px; background:#fff; border:1px solid #EEE9F6; border-radius:20px; padding:6px 6px 6px 12px; font-size:12px; color:#948BA6; }
+  .input .grow { flex:1; }
+  .mic { width:30px; height:30px; border-radius:15px; background:#7546EC; color:#fff; display:flex; align-items:center; justify-content:center; }
+  .tabbar { display:flex; justify-content:space-around; align-items:center; border-top:1px solid #EEE9F6; background:#fff; margin:4px -10px -8px; padding:8px 4px 10px; }
+  .tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:8.5px; font-weight:700; color:#948BA6; }
+  .tab .ic { width:20px; height:20px; border-radius:7px; border:1.7px solid #948BA6; }
+  .tab.on { color:#7546EC; } .tab.on .ic { border-color:#7546EC; background:#EFE7FF; }
+  .sheet { position:absolute; left:0; right:0; bottom:0; background:#fff; border-radius:24px 24px 0 0; box-shadow:0 -8px 30px rgba(60,30,120,.18); padding:10px 12px 12px; display:flex; flex-direction:column; }
+  .grab { width:36px; height:4px; border-radius:2px; background:#DDD6EA; align-self:center; margin-bottom:8px; }
+  .sh-t { font-size:15px; font-weight:800; margin-bottom:2px; }
+  .sh-s { font-size:10.5px; color:#6F6683; margin-bottom:6px; }
+  .day { position:relative; border-left:1px solid #EEE9F6; margin-left:34px; }
+  .hr { position:absolute; left:-34px; font-size:9.5px; font-weight:700; color:#948BA6; width:28px; text-align:right; }
+  .hl { position:absolute; left:0; right:0; border-top:1px dashed #F0ECF7; }
+  .blk { position:absolute; border-radius:9px; font-size:10.5px; font-weight:700; padding:4px 7px; }
+  .ghost { left:8px; width:44%; border:1.5px dashed #CFC6E2; color:#948BA6; }
+  .solid { right:8px; width:44%; background:#EFE7FF; color:#4B2BB0; border:1.5px solid #7546EC; }
+  .fixed { left:8px; right:8px; background:#F3EFFA; color:#6F6683; border:1.5px solid #DDD6EA; }
+  .now { position:absolute; left:-4px; right:0; border-top:2px solid #B42A55; }
+  .now:before { content:""; position:absolute; left:-3px; top:-5px; width:8px; height:8px; border-radius:4px; background:#B42A55; }
+  .row { display:flex; align-items:center; gap:8px; padding:6px 2px; border-top:1px solid #F3EFFA; font-size:12px; }
+  .ck { width:18px; height:18px; border-radius:6px; background:#7546EC; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:11px; }
+  .ck.off { background:#fff; border:1.5px solid #CFC6E2; }
+  .row .t { flex:1; font-weight:700; }
+  .old { color:#948BA6; text-decoration:line-through; font-size:11px; }
+  .new { color:#7546EC; font-weight:800; }
+  .btns { display:flex; gap:6px; margin-top:8px; }
+  .btn { flex:1; text-align:center; padding:9px 6px; border-radius:12px; font-size:12px; font-weight:700; }
+  .btn.p { background:#7546EC; color:#fff; } .btn.s { background:#EFE7FF; color:#7546EC; }
+  .link { font-size:11px; font-weight:700; color:#7546EC; text-align:center; margin-top:6px; }
+  .dim { position:absolute; inset:0; background:rgba(36,29,56,.28); }
+  .card { background:#fff; border:1px solid #EEE9F6; border-radius:16px; padding:10px; }
+  .ghostline { height:9px; border-radius:5px; background:#F0ECF7; margin:5px 0; }
+  .quote { font-size:11.5px; font-style:italic; color:#6F6683; background:#FAF8FF; border-radius:10px; padding:6px 9px; margin-bottom:6px; }
+  .nekasays { font-size:12.5px; line-height:1.4; margin-bottom:6px; }
+</style>
+
+<h2>3 · Las pantallas de Neka</h2>
+<p class="subtitle">Todo lo que elegiste, junto. Mira si algo sobra o falta.</p>
+
+<div class="phones">
+  <div class="pw">
+    <span class="num">El chat</span>
+    <div class="phone">
+      <div class="head"><span class="ph-title">Neka</span><span class="voz"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6F6683" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg>Voz<span class="sw"></span></span></div>
+      <div class="priv">Neka usa Gemini de Google. Tú apruebas cada cambio.</div>
+      <div class="thread">
+        <div class="b me">¿Qué tengo hoy en la tarde?</div>
+        <div class="b neka">Tres cosas: estudiar a las 15:00, el dentista a las 17:00 y la compra sin hora.<span class="spk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg></span></div>
+        <div class="b me"><div class="audio"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="#fff"/></svg><span class="wave"><i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:14px"></i><i style="height:7px"></i><i style="height:11px"></i><i style="height:5px"></i><i style="height:9px"></i></span> 0:04</div><div class="heard">«voy atrasado como 20 minutos»</div></div>
+        <div class="b neka">Tranqui. Te corro 20 min lo que viene. La reunión con la profe no se mueve.<span class="spk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg></span></div>
+        <div class="mini">Plan · 2 cambios <span class="tag">Aceptado</span></div>
+      </div>
+      <div class="chips"><span class="chip">Voy atrasado</span><span class="chip">¿Qué tengo hoy?</span><span class="chip">Arregla los choques</span></div>
+      <div class="input"><span class="grow">Escríbele a Neka…</span><span class="mic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+      <div class="tabbar"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab on"><span class="ic"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+    <p class="cap">Arriba, el interruptor de voz. Cada plan queda en el chat como una tarjetita (Aceptado / Descartado / Pendiente: tocarla lo reabre). Los atajos de abajo reemplazan las secciones "Choques" y "Buscar hueco" de hoy.</p>
+  </div>
+
+  <div class="pw">
+    <span class="num">El plan · elegir cuáles</span>
+    <div class="phone">
+      <div class="head"><span class="ph-title">Neka</span></div>
+      <div class="dim"></div>
+      <div class="sheet" style="top:70px">
+        <div class="grab"></div>
+        <div class="sh-t">Tu mañana, corrida 20 min</div>
+        <div class="sh-s">Punteado = como estaba · Violeta = como quedaría</div>
+        <div class="day" style="height:190px">
+          <span class="hr" style="top:-6px">9:00</span><span class="hl" style="top:0"></span>
+          <span class="hr" style="top:44px">10:00</span><span class="hl" style="top:50px"></span>
+          <span class="hr" style="top:94px">11:00</span><span class="hl" style="top:100px"></span>
+          <span class="hr" style="top:144px">12:00</span><span class="hl" style="top:150px"></span>
+          <div class="now" style="top:8px"></div>
+          <div class="blk ghost" style="top:25px;height:44px">Gimnasio</div>
+          <div class="blk solid" style="top:42px;height:44px">Gimnasio 9:50</div>
+          <div class="blk ghost" style="top:76px;height:68px;border-style:solid;border-color:#DDD6EA;color:#6F6683">Estudiar 10:30</div>
+          <div class="blk fixed" style="top:170px;height:20px;padding:2px 7px">🔒 Reunión con la profe 12:30</div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="row"><span class="ck">✓</span><span class="t">Gimnasio</span><span><span class="old">9:30</span> → <span class="new">9:50</span></span></div>
+          <div class="row"><span class="ck off"></span><span class="t">Estudiar para la prueba</span><span><span class="old">10:30</span> → <span class="new">10:50</span></span></div>
+        </div>
+        <div class="btns"><span class="btn p">Aceptar 1 cambio</span><span class="btn s">Descartar</span></div>
+      </div>
+    </div>
+    <p class="cap">"Elegir cuáles" abre la lista bajo el dibujo. Desmarcas "Estudiar" y su bloque violeta desaparece: queda donde estaba. El botón cuenta cuántos aplicas.</p>
+  </div>
+
+  <div class="pw">
+    <span class="num">Desde otra pantalla</span>
+    <div class="phone">
+      <div class="head"><span class="ph-title">Espacio</span></div>
+      <div style="padding:6px;display:flex;flex-direction:column;gap:8px">
+        <div class="card"><div class="ghostline" style="width:60%"></div><div class="ghostline"></div></div>
+        <div class="card"><div class="ghostline" style="width:45%"></div><div class="ghostline"></div></div>
+      </div>
+      <div class="dim"></div>
+      <div class="sheet" style="top:150px">
+        <div class="grab"></div>
+        <div class="quote">🎙 «voy atrasado como 20 minutos»</div>
+        <div class="nekasays">Tranqui. Te corro 20 min lo que viene. La reunión con la profe no se mueve.<span class="spk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg></span></div>
+        <div class="day" style="height:150px">
+          <span class="hr" style="top:-6px">9:00</span><span class="hl" style="top:0"></span>
+          <span class="hr" style="top:44px">10:00</span><span class="hl" style="top:50px"></span>
+          <span class="hr" style="top:94px">11:00</span><span class="hl" style="top:100px"></span>
+          <div class="now" style="top:8px"></div>
+          <div class="blk ghost" style="top:25px;height:40px">Gimnasio</div>
+          <div class="blk solid" style="top:42px;height:40px">Gimnasio 9:50</div>
+          <div class="blk ghost" style="top:76px;height:60px">Estudiar</div>
+          <div class="blk solid" style="top:92px;height:56px">Estudiar 10:50</div>
+        </div>
+        <div class="btns"><span class="btn p">Aceptar</span><span class="btn s">Descartar</span></div>
+        <div class="link">Elegir cuáles · Abrir chat</div>
+      </div>
+      <div class="tabbar" style="position:absolute;left:10px;right:10px;bottom:8px;margin:0 -10px -8px"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab" style="color:#7546EC"><span class="ic" style="border-color:#7546EC;background:#7546EC"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+    <p class="cap">Mantienes apretada "Neka", hablas y sueltas. La hoja sale encima del Espacio con lo que entendió, la respuesta y tu día dibujado. No te cambia de pantalla. Lo mismo pasa con el micrófono de la tarjeta del Resumen.</p>
+  </div>
+</div>
