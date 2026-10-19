@@ -417,3 +417,140 @@ test("herramientas: cada declaración tiene su ejecución", () => {
   ]);
   assert.deepEqual([...h.ACEPTA].sort(), nombres);
 });
+
+// Conversación con un cerebro falso (Task 6).
+const cv = require("../.test-build/agente/conversar.js");
+function cerebroFalso(guion, registro = {}) {
+  return {
+    transcribir: guion.transcribir ?? (async () => guion.oir ?? ""),
+    sesion(instrucciones, historial, declaraciones) {
+      Object.assign(registro, {
+        instrucciones,
+        historial,
+        declaraciones,
+        devueltos: [],
+      });
+      let n = 0;
+      const siguiente = () => {
+        const r = guion.respuestas[Math.min(n++, guion.respuestas.length - 1)];
+        return typeof r === "function" ? r() : Promise.resolve(r);
+      };
+      return {
+        enviar: async (t) => ((registro.enviado = t), siguiente()),
+        devolver: async (res) => (registro.devueltos.push(res), siguiente()),
+      };
+    },
+  };
+}
+const dice = (texto, ...llamadas) => ({ texto, llamadas });
+const pide = (nombre, args = {}) => ({ nombre, args });
+
+test("conversar: responde sin herramientas", async () => {
+  const r = await cv.conversar(
+    cerebroFalso({ respuestas: [dice("Hoy tienes 2 cosas.")] }),
+    datos(),
+    "¿qué tengo?",
+    now,
+  );
+  assert.deepEqual(r, { respuesta: "Hoy tienes 2 cosas.", plan: null });
+});
+test("conversar: dos vueltas arman un plan", async () => {
+  const c = cerebroFalso({
+    respuestas: [
+      dice("", pide("correrDesde", { minutos: 20, desde: "2030-05-06 09:10" })),
+      dice("Te propongo correr el gimnasio."),
+    ],
+  });
+  const r = await cv.conversar(c, datos(), "voy atrasado 20 minutos", now);
+  assert.equal(r.respuesta, "Te propongo correr el gimnasio.");
+  assert.equal(r.plan.resumen, "1 cambio");
+  assert.deepEqual(
+    r.plan.pasos.map((p) => [p.id, p.scheduledAt]),
+    [["gym", ti(9, 50)]],
+  );
+});
+test("conversar: el error de una herramienta vuelve a Gemini", async () => {
+  const registro = {};
+  const c = cerebroFalso(
+    {
+      respuestas: [
+        dice("", pide("completar", { id: "fantasma" })),
+        dice("No encontré eso."),
+      ],
+    },
+    registro,
+  );
+  const r = await cv.conversar(c, datos(), "ya hice la tarea", now);
+  assert.deepEqual(registro.devueltos[0], [
+    { nombre: "completar", respuesta: { error: "Esa cosa ya no existe." } },
+  ]);
+  assert.deepEqual([r.respuesta, r.plan], ["No encontré eso.", null]);
+});
+test("conversar: tope de 5 vueltas", async () => {
+  const registro = {};
+  const c = cerebroFalso(
+    { respuestas: [dice("", pide("buscar", { texto: "x" }))] },
+    registro,
+  );
+  const r = await cv.conversar(c, datos(), "busca", now);
+  assert.equal(cv.TOPE_VUELTAS, 5);
+  assert.equal(registro.devueltos.length, 5);
+  assert.equal(r.respuesta, "No logré armarlo del todo.");
+});
+test("conversar: sin IA si el cerebro falla", async () => {
+  const c = cerebroFalso({
+    respuestas: [() => Promise.reject(new Error("429 cupo"))],
+  });
+  const r = await cv.conversar(c, datos(), "hola", now);
+  assert.deepEqual(r, {
+    respuesta: "Ahora no puedo pensar con IA; te dejo lo de siempre.",
+    plan: null,
+    fallo: "sin-ia",
+    motivo: "429 cupo",
+  });
+});
+test("conversar: tarde si pasa el tiempo", async () => {
+  const c = cerebroFalso({ respuestas: [() => new Promise(() => {})] });
+  const r = await cv.conversar(c, datos(), "hola", now, 10);
+  assert.deepEqual(
+    [r.respuesta, r.fallo],
+    ["No alcancé, inténtalo de nuevo.", "tarde"],
+  );
+});
+test("oir: audio vacío pide repetir", async () => {
+  const audio = { base64: "AAA", mime: "audio/mp4" };
+  assert.deepEqual(await cv.oir(cerebroFalso({ oir: "  " }), audio), {
+    texto: "",
+    fallo: "no-oi",
+  });
+  assert.equal(cv.MENSAJES["no-oi"], "No te escuché bien, ¿me lo repites?");
+  assert.deepEqual(
+    await cv.oir(cerebroFalso({ oir: " voy atrasado " }), audio),
+    { texto: "voy atrasado" },
+  );
+  const roto = cerebroFalso({
+    transcribir: () => Promise.reject(new Error("red")),
+  });
+  assert.equal((await cv.oir(roto, audio)).fallo, "sin-ia");
+});
+test("conversar: el contexto va en las instrucciones", async () => {
+  const registro = {};
+  const d = {
+    ...datos(),
+    messages: [{ id: "m1", text: "hola", isUser: true }],
+  };
+  await cv.conversar(
+    cerebroFalso({ respuestas: [dice("Hola")] }, registro),
+    d,
+    "¿y mañana?",
+    now,
+  );
+  assert.ok(registro.instrucciones.startsWith(cv.INSTRUCCIONES));
+  assert.ok(
+    registro.instrucciones.includes("Ahora:") &&
+      registro.instrucciones.includes("[gym]"),
+  );
+  assert.equal(registro.declaraciones, h.DECLARACIONES);
+  assert.deepEqual(registro.historial, [{ deUsuario: true, texto: "hola" }]);
+  assert.equal(registro.enviado, "¿y mañana?");
+});
