@@ -368,3 +368,34 @@ test("migración: contenedor ya ordenado no cambia", () => {
     ],
   );
 });
+// V2/D: mensajes con audio y plan (3 claves o las 6, como exigen las reglas).
+const sm = require("../.test-build/syncModel.js");
+const cr = require("../.test-build/cloudRecords.js");
+const conMensajes = (messages) => ({ ...m.emptyData(), messages });
+test("mensajes: audio y plan pasan readBackup", () => {
+  const d = conMensajes([
+    { id: "a", text: "hola", isUser: true },
+    { id: "b", text: "voy atrasado", isUser: true, audio: true, plan: "", estado: "" },
+    { id: "c", text: "", isUser: false, audio: false, plan: "2 cambios", estado: "pendiente" },
+  ]);
+  assert.deepEqual(readBackup(JSON.stringify(d)), d);
+});
+test("mensajes: estado desconocido se rechaza", () => {
+  const d = conMensajes([
+    { id: "c", text: "", isUser: false, audio: false, plan: "x", estado: "hecho" },
+  ]);
+  assert.throws(() => readBackup(JSON.stringify(d)), /Conversación inválida/);
+});
+test("mensajes: mitad de campos se rechaza", () => {
+  const d = conMensajes([{ id: "c", text: "hola", isUser: true, audio: true }]);
+  assert.throws(() => readBackup(JSON.stringify(d)), /Conversación inválida/);
+});
+test("sync: mensaje con plan va y vuelve", () => {
+  const d = conMensajes([
+    { id: "a", text: "hola", isUser: true },
+    { id: "c", text: "", isUser: false, audio: false, plan: "2 cambios", estado: "aceptado" },
+  ]);
+  const vuelta = sm.dataOf(cr.fromCloud(cr.toCloud(sm.recordsOf(d))));
+  assert.deepEqual(vuelta.messages, d.messages);
+  assert.doesNotThrow(() => sm.validateRecords(sm.recordsOf(d)));
+});

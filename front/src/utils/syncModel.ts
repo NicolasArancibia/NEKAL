@@ -311,7 +311,10 @@ export function validateRecords(records: Records): AppData {
       )
         throw new Error("Un grupo tiene días de repetición inválidos.");
     }
-    if (collection === "messages") bound(value.text, 100000);
+    if (collection === "messages") {
+      bound(value.text, 100000);
+      if (value.plan !== undefined) bound(value.plan, 500);
+    }
     if (path === "settings/profile") {
       bound(value.name, 500);
       bound(value.roles, 2000);

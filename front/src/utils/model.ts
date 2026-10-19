@@ -83,7 +83,17 @@ export const newGroup = (
   repeatStart: "",
   ...extra,
 });
-export type Message = { id: string; text: string; isUser: boolean };
+// Un mensaje tiene sus 3 claves o, si es audio o plan de Neka (spec D §8), las 6.
+export type EstadoPlan = "" | "pendiente" | "aceptado" | "descartado";
+export const ESTADOS_PLAN: EstadoPlan[] = ["", "pendiente", "aceptado", "descartado"];
+export type Message = {
+  id: string;
+  text: string;
+  isUser: boolean;
+  audio?: boolean;
+  plan?: string;
+  estado?: EstadoPlan;
+};
 export type AppData = {
   version: 2;
   items: Item[];
