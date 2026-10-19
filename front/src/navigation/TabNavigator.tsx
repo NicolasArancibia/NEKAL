@@ -12,6 +12,7 @@ import { useDemo } from "../utils/useDemo";
 import { useRutinas } from "../utils/useRutinas";
 import { NekaProvider } from "../utils/NekaContext";
 import HojaPlan from "../components/ui/neka/HojaPlan";
+import CapaGrabando from "../components/ui/neka/CapaGrabando";
 
 export type TabParamList = {
   Resumen: undefined;
@@ -77,6 +78,7 @@ export default function TabNavigator() {
           <Tab.Screen name="Chat" component={Chat} />
           <Tab.Screen name="Perfil" component={Perfil} />
         </Tab.Navigator>
+        <CapaGrabando />
       </SafeAreaView>
     </NekaProvider>
   );

@@ -10,6 +10,7 @@ import Animated, {
 import { color, motion, size } from "../../../styles/theme";
 import { haptic } from "../../../utils/haptics";
 import PressableScale from "./PressableScale";
+import { useNeka } from "../../../utils/NekaContext";
 
 const tabs: Record<
   string,
@@ -53,6 +54,7 @@ function TabIcon({
 // Barra inferior a todo el ancho, solo íconos (spec A, sección 5).
 export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const neka = useNeka();
   return (
     <View
       accessibilityRole="tablist"
@@ -82,11 +84,20 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
             navigation.navigate(route.name);
           }
         };
+        // Mantener apretada la pestaña Neka graba desde cualquier pantalla (spec D §5.3).
+        const esNeka = route.name === "Chat";
         return (
           <PressableScale
             key={route.key}
             accessibilityRole="tab"
             accessibilityLabel={tab.label}
+            accessibilityHint={
+              esNeka ? "Mantén apretado para hablarle a Neka" : undefined
+            }
+            onLongPress={
+              esNeka ? () => void neka.empezarGrabar("rapido") : undefined
+            }
+            onPressOut={esNeka ? () => void neka.soltar() : undefined}
             accessibilityState={{ selected: active }}
             onPress={onPress}
             style={{

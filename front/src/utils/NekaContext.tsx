@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import {
   RecordingPresets,
   requestRecordingPermissionsAsync,
@@ -35,6 +36,8 @@ export type TurnoNeka = {
 export type Neka = {
   pensando: boolean;
   grabando: boolean;
+  origen: Origen; // de dónde viene lo que se está grabando o pensando
+  limpiarError(): void;
   sinIA: boolean;
   voz: boolean;
   setVoz(v: boolean): void;
@@ -74,6 +77,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
   const [pendienteId, setPendienteId] = useState<string | null>(null);
   const [hoja, setHoja] = useState(false);
   const [error, setError] = useState("");
+  const [origen, setOrigen] = useState<Origen>("chat");
   const datos = useRef(data);
   datos.current = data;
   const vozRef = useRef(voz);
@@ -161,10 +165,11 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const enviar = (texto: string, origen: Origen) =>
-    texto.trim()
-      ? conGuardia(() => turnoCon(texto.trim(), origen, false))
-      : Promise.resolve();
+  const enviar = (texto: string, desde: Origen) => {
+    if (!texto.trim()) return Promise.resolve();
+    if (!ocupado.current) setOrigen(desde);
+    return conGuardia(() => turnoCon(texto.trim(), desde, false));
+  };
 
   const detener = async () => {
     clearTimeout(tope.current);
@@ -212,11 +217,16 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     if (ocupado.current || enGrabacion.current) return;
     soltado.current = false;
     origenGrabacion.current = origen;
+    setOrigen(origen);
     setError("");
     try {
       const permiso = await requestRecordingPermissionsAsync();
       if (!permiso.granted) {
-        setError("Activa el micrófono para Nekal en Ajustes del iPhone.");
+        setError(
+          Platform.OS === "web"
+            ? "Permite el micrófono para Nekal en tu navegador."
+            : "Activa el micrófono para Nekal en Ajustes del iPhone.",
+        );
         return;
       }
       Speech.stop();
@@ -272,6 +282,8 @@ export function NekaProvider({ children }: { children: ReactNode }) {
       value={{
         pensando,
         grabando,
+        origen,
+        limpiarError: () => setError(""),
         sinIA,
         voz,
         setVoz,
