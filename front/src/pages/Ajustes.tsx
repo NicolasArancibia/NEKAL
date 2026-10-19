@@ -440,8 +440,15 @@ export default function Ajustes({
         </Disclosure>
         <Disclosure title="Privacidad">
           <Txt>
-            Tú revisas y aceptas cada cambio sugerido. Neka funciona con reglas
-            en tu dispositivo y no envía conversaciones a servicios de IA.
+            Tú revisas y aceptas cada cambio que propone Neka. Para entenderte,
+            Neka manda a Gemini de Google tu mensaje, tus mesas y grupos y tus
+            cosas desde ayer hasta dentro de 14 días, sin adjuntos ni el
+            contenido de tus notas; tus audios se transcriben y no se guardan.
+          </Txt>
+          <Txt>
+            En el plan gratis de Gemini, Google puede usar esos mensajes para
+            mejorar sus modelos. Sin internet, Neka usa sus reglas de siempre en
+            tu dispositivo.
           </Txt>
           <Txt>
             Como invitado, tus datos quedan en este navegador o teléfono. Con
