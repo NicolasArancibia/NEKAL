@@ -9,8 +9,9 @@ import {
 import { firebaseApp } from "../firebase";
 import type { Cerebro, Respuesta, Turno } from "./tipos";
 
-// Único archivo que habla con Gemini (Firebase AI Logic, API gratis).
-export const MODELO = "gemini-3.5-flash";
+// Único archivo que habla con Gemini (Firebase AI Logic, API gratis). Flash-Lite:
+// en el plan gratis Flash (3.5 → 3.6) da solo 20 consultas al día al proyecto.
+export const MODELO = "gemini-3.5-flash-lite";
 
 const TRANSCRIBIR =
   "Escribe exactamente lo que dice este audio, en español. Si no se entiende, responde vacío.";

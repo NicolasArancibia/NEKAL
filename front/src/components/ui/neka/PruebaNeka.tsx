@@ -1,9 +1,10 @@
 // TEMPORAL (Task 1 del plan D): prueba de Gemini, App Check, audio y voz.
-// Se borra en la Task 8.
-import { useState } from "react";
+// Ahora con diagnóstico de la grabación. Se borra en la Task 8.
+import { useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 import {
   RecordingPresets,
+  createAudioPlayer,
   requestRecordingPermissionsAsync,
   setAudioModeAsync,
   useAudioRecorder,
@@ -11,8 +12,8 @@ import {
 import * as Speech from "expo-speech";
 import { Button, Field, Sheet, Txt } from "../base";
 import { color, radius, size, space } from "../../../styles/theme";
-import { crearCerebro } from "../../../utils/agente/cerebro";
-import type { Declaracion } from "../../../utils/agente/tipos";
+import { MODELO, crearCerebro } from "../../../utils/agente/cerebro";
+import type { AudioGrabado, Declaracion } from "../../../utils/agente/tipos";
 import { leerAudio } from "../../../utils/audio";
 
 const HORA: Declaracion = {
@@ -24,13 +25,18 @@ const HORA: Declaracion = {
 export default function PruebaNeka({ onClose }: { onClose: () => void }) {
   const grabadora = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [texto, setTexto] = useState("¿Qué hora es?");
-  const [oido, setOido] = useState("");
   const [respuesta, setRespuesta] = useState("");
   const [estado, setEstado] = useState("");
   const [grabando, setGrabando] = useState(false);
+  const [log, setLog] = useState<string[]>([]);
+  const [audio, setAudio] = useState<AudioGrabado | null>(null);
+  const [uri, setUri] = useState("");
+  const t0 = useRef(0);
+  const anotar = (m: string) =>
+    setLog((l) => [...l, `+${Date.now() - t0.current} ms · ${m}`]);
 
   const preguntar = async (pregunta: string) => {
-    const t0 = Date.now();
+    const inicio = Date.now();
     setEstado("Pensando…");
     try {
       const sesion = crearCerebro().sesion(
@@ -47,52 +53,90 @@ export default function PruebaNeka({ onClose }: { onClose: () => void }) {
           })),
         );
       setRespuesta(r.texto);
-      setEstado(`Listo en ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+      setEstado(`Listo en ${((Date.now() - inicio) / 1000).toFixed(1)} s`);
       Speech.speak(r.texto, { language: "es-CL" });
     } catch (e) {
-      setEstado(`Error: ${(e as Error).message}`);
+      setEstado(`Error: ${(e as Error).message.slice(0, 300)}`);
     }
   };
 
   const empezar = async () => {
-    const permiso = await requestRecordingPermissionsAsync();
-    if (!permiso.granted) {
-      setEstado("Sin permiso de micrófono.");
-      return;
+    t0.current = Date.now();
+    setLog([]);
+    anotar("apretado");
+    try {
+      const permiso = await requestRecordingPermissionsAsync();
+      anotar(`permiso: ${permiso.granted ? "sí" : "no"}`);
+      if (!permiso.granted) return;
+      Speech.stop();
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      });
+      anotar("modo de audio listo");
+      await grabadora.prepareToRecordAsync();
+      anotar("grabadora preparada");
+      grabadora.record();
+      setGrabando(true);
+      anotar(`grabando (isRecording=${grabadora.isRecording})`);
+    } catch (e) {
+      anotar(`error al empezar: ${(e as Error).message}`);
     }
-    Speech.stop();
-    await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
-    await grabadora.prepareToRecordAsync();
-    grabadora.record();
-    setGrabando(true);
-    setEstado("Grabando…");
   };
 
   const soltar = async () => {
+    anotar(
+      `soltado (estado=${grabando}, isRecording=${grabadora.isRecording})`,
+    );
     if (!grabando) return;
     setGrabando(false);
-    const t0 = Date.now();
     try {
       await grabadora.stop();
+      anotar(`detenida · ${grabadora.uri ? "con archivo" : "SIN archivo"}`);
       await setAudioModeAsync({
         allowsRecording: false,
         playsInSilentMode: true,
       });
-      if (!grabadora.uri) throw new Error("La grabación no dejó archivo.");
-      setEstado("Escuchando…");
-      const audio = await leerAudio(grabadora.uri);
-      const oyo = await crearCerebro().transcribir(audio);
-      setOido(
-        `${oyo || "(vacío)"} · ${audio.mime} · ${((Date.now() - t0) / 1000).toFixed(1)} s`,
+      if (!grabadora.uri) return;
+      setUri(grabadora.uri);
+      const a = await leerAudio(grabadora.uri);
+      setAudio(a);
+      anotar(
+        `audio: ${Math.round((a.base64.length * 3) / 4 / 1024)} KB · ${a.mime}`,
       );
+    } catch (e) {
+      anotar(`error al soltar: ${(e as Error).message}`);
+    }
+  };
+
+  const escuchar = () => {
+    if (!uri) return;
+    const reproductor = createAudioPlayer(uri);
+    reproductor.play();
+    anotar("reproduciendo la grabación");
+  };
+
+  const transcribir = async () => {
+    if (!audio) return;
+    const inicio = Date.now();
+    setEstado("Escuchando…");
+    try {
+      const oyo = await crearCerebro().transcribir(audio);
+      anotar(
+        `Gemini oyó: «${oyo || "(vacío)"}» en ${((Date.now() - inicio) / 1000).toFixed(1)} s`,
+      );
+      setEstado("");
       if (oyo) await preguntar(oyo);
     } catch (e) {
-      setEstado(`Error: ${(e as Error).message}`);
+      setEstado(`Error: ${(e as Error).message.slice(0, 300)}`);
     }
   };
 
   return (
     <Sheet visible title="Prueba IA" onClose={onClose}>
+      <Txt variant="caption" tone="secondary">
+        Modelo: {MODELO}
+      </Txt>
       <Field label="Pregunta" value={texto} onChange={setTexto} />
       <Button title="Enviar" onPress={() => preguntar(texto)} />
       <Pressable
@@ -112,8 +156,32 @@ export default function PruebaNeka({ onClose }: { onClose: () => void }) {
           {grabando ? "Suelta para enviar" : "Mantén para grabar"}
         </Txt>
       </Pressable>
-      <View style={{ gap: space.sm }}>
-        {!!oido && <Txt tone="secondary">Oí: {oido}</Txt>}
+      <View style={{ flexDirection: "row", gap: space.sm }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            title="Escuchar grabación"
+            variant="secondary"
+            small
+            disabled={!uri}
+            onPress={escuchar}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            title="Transcribir"
+            variant="secondary"
+            small
+            disabled={!audio}
+            onPress={transcribir}
+          />
+        </View>
+      </View>
+      <View style={{ gap: space.xs }}>
+        {log.map((l, n) => (
+          <Txt key={n} variant="caption">
+            {l}
+          </Txt>
+        ))}
         {!!respuesta && <Txt weight={600}>{respuesta}</Txt>}
         {!!estado && <Txt variant="callout">{estado}</Txt>}
       </View>
