@@ -26,6 +26,7 @@ const build = spawnSync(
     "src/utils/agente/contexto.ts",
     "src/utils/agente/herramientas.ts",
     "src/utils/agente/conversar.ts",
+    "src/utils/agente/mensajes.ts",
     "--outDir",
     ".test-build",
     "--module",

@@ -554,3 +554,73 @@ test("conversar: el contexto va en las instrucciones", async () => {
   assert.deepEqual(registro.historial, [{ deUsuario: true, texto: "hola" }]);
   assert.equal(registro.enviado, "¿y mañana?");
 });
+
+// Mensajes (Task 7).
+const ms = require("../.test-build/agente/mensajes.js");
+const { readBackup } = require("../.test-build/storage.js");
+test("mensajes: tres o seis claves", () => {
+  const simple = ms.nuevoMensaje("hola", true);
+  const audio = ms.nuevoMensaje("voy atrasado", true, { audio: true });
+  const plan = ms.nuevoMensaje("", false, {
+    plan: "2 cambios",
+    estado: "pendiente",
+  });
+  assert.deepEqual(Object.keys(simple).sort(), ["id", "isUser", "text"]);
+  assert.deepEqual([audio.audio, audio.plan, audio.estado], [true, "", ""]);
+  assert.deepEqual(
+    [plan.audio, plan.plan, plan.estado],
+    [false, "2 cambios", "pendiente"],
+  );
+  const d = { ...m.emptyData(), messages: [simple, audio, plan] };
+  assert.deepEqual(readBackup(JSON.stringify(d)), d);
+});
+test("mensajes: tope de 100", () => {
+  const viejos = Array.from({ length: 99 }, (_, n) => ({
+    id: `m${n}`,
+    text: "x",
+    isUser: true,
+  }));
+  const d = ms.agregar(
+    { ...m.emptyData(), messages: viejos },
+    ms.nuevoMensaje("a", true),
+    ms.nuevoMensaje("b", false),
+  );
+  assert.equal(d.messages.length, 100);
+  assert.deepEqual([d.messages[0].id, d.messages[99].text], ["m1", "b"]);
+});
+test("mensajes: marcar plan", () => {
+  const p = ms.nuevoMensaje("", false, {
+    plan: "1 cambio",
+    estado: "pendiente",
+  });
+  const otro = ms.nuevoMensaje("", false, {
+    plan: "2 cambios",
+    estado: "pendiente",
+  });
+  const d = ms.marcarPlan(
+    { ...m.emptyData(), messages: [p, otro] },
+    p.id,
+    "aceptado",
+  );
+  assert.deepEqual(
+    d.messages.map((x) => x.estado),
+    ["aceptado", "pendiente"],
+  );
+});
+test("mensajes: pendiente ajeno se ve vencido", () => {
+  const p = ms.nuevoMensaje("", false, {
+    plan: "1 cambio",
+    estado: "pendiente",
+  });
+  assert.equal(ms.estadoVisible(p, p.id), "pendiente");
+  assert.equal(ms.estadoVisible(p, null), "vencido");
+  assert.equal(ms.estadoVisible(p, "otro"), "vencido");
+  assert.equal(
+    ms.estadoVisible({ ...p, estado: "aceptado" }, null),
+    "aceptado",
+  );
+  assert.equal(
+    ms.estadoVisible({ ...p, estado: "descartado" }, p.id),
+    "descartado",
+  );
+});
