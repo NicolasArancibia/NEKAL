@@ -624,3 +624,81 @@ test("mensajes: pendiente ajeno se ve vencido", () => {
     "descartado",
   );
 });
+
+// Día dibujado (Task 8).
+const dd = require("../.test-build/agente/dia.js");
+const tm = (h, min = 0, dia = 6) => new Date(2030, 4, dia, h, min).getTime();
+const mananaPlan = () => ({
+  ...m.emptyData(),
+  items: [
+    cosa("gym", { title: "Gimnasio", scheduledAt: ti(9, 30), duration: 60 }),
+    cosa("est", { title: "Estudiar", scheduledAt: ti(10, 30), duration: 90 }),
+    cosa("reu", {
+      title: "Reunión",
+      type: "Meeting",
+      flexible: false,
+      scheduledAt: ti(12, 30),
+      duration: 60,
+    }),
+    cosa("cena", {
+      title: "Cena",
+      type: "Meeting",
+      flexible: false,
+      scheduledAt: ti(20, 0),
+      duration: 60,
+    }),
+  ],
+});
+const correr = plan(mover("gym", 9, 50), mover("est", 10, 50));
+const resumir = (r) =>
+  r.bloques
+    .map((b) => [b.id, b.tipo])
+    .sort((a, b) => (a.join() < b.join() ? -1 : 1));
+test("dia: antes punteado y después violeta", () => {
+  const r = dd.bloquesDelDia(mananaPlan(), correr, [true, true]);
+  assert.equal(r.dia, "2030-05-06");
+  assert.deepEqual(resumir(r), [
+    ["est", "antes"],
+    ["est", "despues"],
+    ["gym", "antes"],
+    ["gym", "despues"],
+    ["reu", "fijo"],
+  ]);
+  const gym = r.bloques.find((b) => b.id === "gym" && b.tipo === "despues");
+  assert.deepEqual(
+    [gym.inicio, gym.fin, gym.titulo, gym.paso],
+    [tm(9, 50), tm(10, 50), "Gimnasio", 0],
+  );
+});
+test("dia: desmarcado no tiene después", () => {
+  const r = dd.bloquesDelDia(mananaPlan(), correr, [true, false]);
+  assert.ok(r.bloques.some((b) => b.id === "est" && b.tipo === "antes"));
+  assert.ok(!r.bloques.some((b) => b.id === "est" && b.tipo === "despues"));
+});
+test("dia: tramo redondeado a la hora", () => {
+  const r = dd.bloquesDelDia(mananaPlan(), correr, [true, true]);
+  assert.deepEqual([r.desde, r.hasta], [tm(9, 0), tm(14, 0)]);
+});
+test("dia: plan sin horarios no dibuja", () => {
+  assert.equal(
+    dd.bloquesDelDia(datos(), plan(paso({ tipo: "completar", id: "compra" })), [
+      true,
+    ]),
+    null,
+  );
+});
+test("dia: pasos de otro día solo en la lista", () => {
+  const p = plan(
+    mover("gym", 9, 50),
+    paso({
+      tipo: "mover",
+      id: "est",
+      scheduledAt: ti(10, 30, 7),
+      dueAt: "",
+      startDate: "2030-05-01",
+    }),
+  );
+  const r = dd.bloquesDelDia(mananaPlan(), p, [true, true]);
+  assert.ok(!r.bloques.some((b) => b.id === "est"));
+  assert.ok(r.bloques.some((b) => b.id === "gym" && b.tipo === "despues"));
+});
