@@ -21,6 +21,7 @@ import { color, space } from "../styles/theme";
 import ChatMessage from "../components/ui/ChatUi/ChatMessage";
 import ChatInput from "../components/ui/ChatUi/ChatInput";
 import ItemEditor from "../components/ui/ItemEditor";
+import PruebaNeka from "../components/ui/neka/PruebaNeka";
 import { useApp } from "../utils/AppContext";
 import {
   Item,
@@ -50,7 +51,8 @@ export default function Chat() {
     [error, setError] = useState(""),
     [grouping, setGrouping] = useState(false),
     [groupName, setGroupName] = useState(""),
-    [ids, setIds] = useState<string[]>([]);
+    [ids, setIds] = useState<string[]>([]),
+    [prueba, setPrueba] = useState(false);
   const scroll = useRef<ScrollView>(null),
     items = timedItems(data),
     conflicts = findConflicts(data);
@@ -136,6 +138,12 @@ export default function Chat() {
     >
       <View style={{ paddingHorizontal: space.screen }}>
         <ScreenHeader title="Neka" />
+        <Button
+          title="Prueba IA"
+          variant="secondary"
+          small
+          onPress={() => setPrueba(true)}
+        />
       </View>
       <ScrollView
         ref={scroll}
@@ -236,6 +244,7 @@ export default function Chat() {
         </View>
       </ScrollView>
       <ChatInput onSend={send} />
+      {prueba && <PruebaNeka onClose={() => setPrueba(false)} />}
       {editor && (
         <ItemEditor
           key={editor.id}
