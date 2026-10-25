@@ -56,11 +56,23 @@ Brainstorming empezado el 25 de octubre de 2026, después de cerrar D. Parte del
 - Al lanzar E: un solo modal «Ya tenías 9 logros» en vez de uno por logro. En F se puede sumar «Primer amigo».
 - Pruebas: cada umbral justo antes y justo en el número; logro que se queda aunque se borre lo que lo dio; semana perfecta con descanso al medio; primera entrada sin fechas guardadas.
 
+**4b · Modal de logro** (aprobada el 25/10, [maqueta 04](E_MAQUETA/04-modal-de-logro.html), opción B): tarjeta al centro sobre lo que estabas haciendo, fondo atenuado (`color.backdrop`), Neka pose 5 saltando desde la esquina de arriba. Animación: el anillo se completa, la medalla gira de gris con candado a violeta, brillo suave, vibración de éxito; con «reducir movimiento» solo aparece. «Genial» cierra; «Ver mis logros» lleva al Perfil. Sale una vez por logro aunque se abra en otro dispositivo. Al lanzar E: un solo modal «Ya tenías N logros».
+
+**5 · Pantallas** (aprobada el 25/10):
+- Perfil (`pages/Perfil.tsx`): encabezado con engranaje (abre Ajustes); identidad con avatar, nombre, roles y «En Nekal desde agosto de 2026», lápiz = hoja de editar perfil; tarjeta de nivel lavanda (nivel, puntos, barra, «X pts para el nivel N»; `ProgressBar` con variante de riel blanco); logros (8 + «Ver los 24 logros» en hoja por familia); tus mesas (filas con anillo, se abren ahí mismo). La sección «Cuenta» (correo, sincronización, reintentar, conflictos, cerrar sesión, modo invitado) se muda tal cual al inicio de Ajustes.
+- Resumen (`pages/Resumen.tsx`): sale la tarjeta «Progreso»; debajo de «Hoy» van «Tus días» (título con «+N pts esta semana»; racha, récord y heatmap) y «Desde el día 1» (texto + curva de puntos con un punto por subida de nivel y etiqueta en la primera y la última; día 1 = fecha más antigua entre cosas y puntos; con menos de 2 semanas solo texto; VoiceOver lee un resumen). El anillo de nivel queda igual y al tocarlo lleva al Perfil.
+- Modal de logro (`components/ui/progreso/LogroNuevo.tsx`): montado una vez en el TabNavigator (como HojaPlan); cuando cambian los datos revisa logros desbloqueados sin ver y los muestra de a uno; 4 o más juntos → tarjeta resumen «Ya tenías N logros». Al cerrar guarda la fecha vista. Resortes del sistema de diseño, `haptic.success`, «reducir movimiento» = solo aparece. VoiceOver anuncia «Logro nuevo: …» y el modal bloquea lo de atrás.
+- Ajustes reescribe «¿Cómo se calculan los puntos?» (fórmula, bonus a tiempo, curva). Editor: «48 pts estimados (+20% si lo terminas antes del viernes)». FormMesa: 6 chips de área.
+
+**6 · Datos, reglas y pruebas** (aprobada el 25/10): solo se guardan el área de la mesa y un documento por logro visto (id y fecha; máximo 24); reglas con forma vieja o nueva para mesas y tipo nuevo `logros`; `/security-review` y skill de auditoría; publicar reglas solo con permiso; la tarjeta del lanzamiento suma «Ahora cada nivel cuesta un poco más. Tus puntos siguen intactos.» Precisión al escribir la spec: la mesa sin el campo `area` usa la sugerida (no se guarda un área vacía).
+
+**Spec escrita:** [E_GAMIFICACION.md](E_GAMIFICACION.md).
+
 ## Pendiente
 
-- **Reparto Perfil / Resumen** (revisa la fila "Dónde vive"): pensando en F, el usuario eligió **Perfil = lo que muestras** (nombre, nivel, logros, tus mesas; en F se suman los amigos y un amigo ve lo mismo en corto) y **Resumen = tu día a día** (racha, tus días con el heatmap, desde el día 1; reemplaza la tarjeta "Progreso"; el anillo de nivel lleva al Perfil). Maqueta [03](E_MAQUETA/03-perfil-y-resumen.html) por aprobar.
+- Revisión de la spec por el usuario; después, el plan de implementación.
 
-- Diseño por secciones (fórmula de puntaje revisada, rating, heatmap, rachas, catálogo de logros, modal de revelado, "desde el día 1", datos y reglas), spec `E_GAMIFICACION.md`, plan y ejecución.
+**Reparto Perfil / Resumen** (aprobado con la [maqueta 03](E_MAQUETA/03-perfil-y-resumen.html); revisa la fila «Dónde vive»): pensando en F, **Perfil = lo que muestras** (nombre, nivel, logros, tus mesas; en F se suman los amigos y un amigo ve lo mismo en corto) y **Resumen = tu día a día** (tus días con racha y heatmap, desde el día 1; reemplaza la tarjeta «Progreso»). El anillo de nivel del Resumen queda igual que hoy y lleva al Perfil (al usuario no le gustó verlo cambiado en la maqueta).
 
 ## Contexto que existe hoy
 
