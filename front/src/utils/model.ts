@@ -110,6 +110,35 @@ export type Message = {
   plan?: string;
   estado?: EstadoPlan;
 };
+// Logros vistos (spec E §6): un documento por logro, con la fecha en que se vio.
+export const LOGRO_IDS = [
+  "racha-3",
+  "racha-7",
+  "racha-14",
+  "racha-30",
+  "racha-60",
+  "racha-100",
+  "semana-perfecta",
+  "listas-10",
+  "listas-50",
+  "listas-100",
+  "listas-250",
+  "listas-500",
+  "listas-1000",
+  "nivel-5",
+  "nivel-10",
+  "nivel-15",
+  "nivel-20",
+  "primera-cosa",
+  "primera-mesa",
+  "primera-rutina",
+  "primera-meta",
+  "primer-dia-100",
+  "primer-audio",
+  "primer-plan",
+] as const;
+export type LogroId = (typeof LOGRO_IDS)[number];
+export type LogroVisto = { id: LogroId; at: string };
 export type AppData = {
   version: 2;
   items: Item[];
@@ -117,6 +146,7 @@ export type AppData = {
   groups: Group[];
   rewards: Reward[];
   messages: Message[];
+  logros: LogroVisto[];
   profile: { name: string; roles: string };
   preferences: {
     softAlerts: boolean;
@@ -141,6 +171,7 @@ export const emptyData = (): AppData => ({
   groups: [],
   rewards: [],
   messages: [],
+  logros: [],
   workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
   profile: { name: "", roles: "" },
   preferences: {

@@ -455,3 +455,193 @@ test("mesas: areaDe usa la guardada", () => {
 test("mesas: cuenta vacía", () => {
   assert.deepEqual(mes.ratings(m.emptyData(), now), []);
 });
+
+// ---------- Task 4: logros ----------
+const lg = require("../.test-build/progreso/logros.js");
+const hechosBase = (fields = {}) => ({
+  record: 0,
+  semanaPerfecta: false,
+  dia100: false,
+  listas: 0,
+  puntos: 0,
+  nivel: 1,
+  mesas: 0,
+  rutinas: 0,
+  metas: 0,
+  audio: false,
+  plan: false,
+  ...fields,
+});
+const visto = (id, y = 2030, mo = 4, d = 1) => ({
+  id,
+  at: iso(new Date(y, mo, d, 12).getTime()),
+});
+
+test("logros: catálogo de 24 con ids únicos", () => {
+  const ids = lg.CATALOGO.map((l) => l.id);
+  assert.equal(ids.length, 24);
+  assert.equal(new Set(ids).size, 24);
+  assert.deepEqual(ids, [...m.LOGRO_IDS]);
+});
+
+test("logros: umbrales", () => {
+  assert.equal(lg.cumple("racha-7", hechosBase({ record: 6 })), false);
+  assert.equal(lg.cumple("racha-7", hechosBase({ record: 7 })), true);
+  assert.equal(lg.cumple("listas-10", hechosBase({ listas: 9 })), false);
+  assert.equal(lg.cumple("listas-10", hechosBase({ listas: 10 })), true);
+  const conPuntos = (p) => hechosBase({ puntos: p, nivel: niv.nivelDe(p).nivel });
+  assert.equal(lg.cumple("nivel-5", conPuntos(999)), false);
+  assert.equal(lg.cumple("nivel-5", conPuntos(1000)), true);
+});
+
+test("logros: se queda aunque se borre lo que lo dio", () => {
+  const d = { ...m.emptyData(), logros: [visto("primera-mesa")] };
+  const h = lg.hechosDe(d, now);
+  assert.equal(h.mesas, 0);
+  assert.ok(lg.desbloqueados(d, h).includes("primera-mesa"));
+  assert.ok(!lg.porVer(d, h).includes("primera-mesa"));
+});
+
+test("logros: desmarcar no quita lo visto", () => {
+  let d = m.emptyData();
+  const cosas = Array.from({ length: 10 }, (_, k) =>
+    item({ id: `c${k}`, status: "completado" }),
+  );
+  for (const c of cosas) d = m.saveItem(d, c, now);
+  const puntos = m.totalPoints(d);
+  d = { ...d, logros: [visto("listas-10")] };
+  d = m.saveItem(d, { ...cosas[0], status: "pendiente" }, now);
+  const h = lg.hechosDe(d, now);
+  assert.equal(h.listas, 9);
+  assert.ok(lg.desbloqueados(d, h).includes("listas-10"));
+  assert.equal(m.totalPoints(d), puntos);
+});
+
+test("logros: semana perfecta con descanso al medio", () => {
+  const hecho = (dia, extra = {}) =>
+    item({
+      createdAt: iso(new Date(2030, 4, 4, 8).getTime()),
+      scheduledAt: iso(new Date(2030, 4, dia, 10).getTime()),
+      status: "completado",
+      ...extra,
+    });
+  const dias100 = [4, 5, 6, 8, 9, 10, 11].map((dia) => hecho(dia));
+  assert.equal(
+    lg.hechosDe({ ...m.emptyData(), items: dias100 }, now).semanaPerfecta,
+    true,
+  );
+  const conTropiezo = [
+    ...dias100,
+    hecho(8, { status: "pendiente" }),
+    hecho(8),
+    hecho(8),
+  ];
+  const h = lg.hechosDe({ ...m.emptyData(), items: conTropiezo }, now);
+  assert.equal(h.semanaPerfecta, false);
+  assert.equal(h.dia100, true);
+});
+
+test("logros: cola", () => {
+  const mesa = { id: "U", name: "Universidad", color: "#2E9E6B" };
+  const rutina = m.newGroup("Mañana", "general", {
+    repeat: "diario",
+    repeatStart: "2030-05-01",
+  });
+  let d = {
+    ...m.emptyData(),
+    workspaces: [...m.emptyData().workspaces, mesa],
+    groups: [rutina],
+  };
+  assert.deepEqual(lg.siguiente(d, lg.hechosDe(d, now)), {
+    tipo: "uno",
+    id: "primera-mesa",
+  });
+  d = lg.verLogros(d, ["primera-mesa"], now);
+  assert.deepEqual(lg.siguiente(d, lg.hechosDe(d, now)), {
+    tipo: "uno",
+    id: "primera-rutina",
+  });
+  const cuatro = {
+    ...d,
+    logros: [],
+    items: [
+      item({ status: "completado" }),
+      item({ type: "Goal", status: "completado" }),
+    ],
+  };
+  assert.deepEqual(lg.siguiente(cuatro, lg.hechosDe(cuatro, now)), {
+    tipo: "resumen",
+    ids: ["primera-cosa", "primera-mesa", "primera-rutina", "primera-meta"],
+    lanzamiento: true,
+  });
+  const conVisto = { ...cuatro, logros: [visto("racha-3")] };
+  assert.equal(lg.siguiente(conVisto, lg.hechosDe(conVisto, now)).lanzamiento, false);
+  assert.equal(lg.siguiente(m.emptyData(), lg.hechosDe(m.emptyData(), now)), null);
+});
+
+test("logros: avance y textos", () => {
+  const h = hechosBase({ record: 12, puntos: 3140, nivel: 8, listas: 187 });
+  assert.deepEqual(lg.avance("racha-30", h), { valor: 0.4, texto: "12/30" });
+  assert.equal(lg.avance("nivel-10", h).texto, "70%");
+  assert.equal(lg.avance("listas-1000", h).texto, "187/1.000");
+  assert.deepEqual(lg.avance("primer-audio", h), { valor: 0, texto: "Pendiente" });
+  assert.deepEqual(lg.avance("racha-7", h), { valor: 1, texto: "Logrado" });
+  assert.equal(lg.CATALOGO.find((l) => l.id === "listas-1000").nombre, "1.000 cosas listas");
+});
+
+test("logros: paraPerfil", () => {
+  const h = hechosBase({ record: 12, puntos: 3140, nivel: 8, listas: 9 });
+  const d = {
+    ...m.emptyData(),
+    logros: [
+      visto("primera-cosa", 2030, 4, 1),
+      visto("primera-mesa", 2030, 4, 5),
+      visto("primera-rutina", 2030, 4, 3),
+      visto("primera-meta", 2030, 4, 9),
+      visto("primer-audio", 2030, 4, 7),
+    ],
+  };
+  // Con récord 12 y nivel 8 también cumplen racha-3/7 y nivel-5: son de hoy.
+  const r = lg.paraPerfil(d, h, now);
+  assert.equal(r.length, 8);
+  assert.deepEqual(
+    r.slice(0, 4).map((x) => [x.id, x.logrado]),
+    [
+      ["racha-3", true],
+      ["racha-7", true],
+      ["nivel-5", true],
+      ["primera-meta", true],
+    ],
+  );
+  assert.deepEqual(
+    r.slice(4).map((x) => [x.id, x.logrado]),
+    [
+      ["listas-10", false],
+      ["racha-14", false],
+      ["nivel-10", false],
+      ["racha-30", false],
+    ],
+  );
+  const uno = lg.paraPerfil(
+    { ...m.emptyData(), logros: [visto("primera-mesa")] },
+    hechosBase(),
+    now,
+  );
+  assert.equal(uno.length, 8);
+  assert.deepEqual(uno.filter((x) => x.logrado).map((x) => x.id), ["primera-mesa"]);
+});
+
+test("logros: verLogros no duplica", () => {
+  let d = lg.verLogros(m.emptyData(), ["primera-mesa"], now);
+  d = lg.verLogros(d, ["primera-mesa", "racha-3"], now);
+  assert.deepEqual(
+    d.logros.map((v) => v.id),
+    ["primera-mesa", "racha-3"],
+  );
+  assert.equal(d.logros[0].at, iso(now));
+});
+
+test("logros: cuenta vacía", () => {
+  const vacio = m.emptyData();
+  assert.deepEqual(lg.desbloqueados(vacio, lg.hechosDe(vacio, now)), []);
+});
