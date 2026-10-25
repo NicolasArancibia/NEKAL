@@ -4,8 +4,9 @@ import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
-import { Item, newItem, totalPoints } from "../utils/model";
-import { nivelDe } from "../utils/progreso/nivel";
+import { Item, newItem } from "../utils/model";
+import { miles } from "../utils/progreso/logros";
+import { useProgreso } from "../utils/useProgreso";
 import { findConflicts } from "../utils/planner";
 import {
   NekaAction,
@@ -28,33 +29,15 @@ import {
   LevelRing,
   ListRow,
   NekaCard,
-  ProgressBar,
+  PressableScale,
   ScreenHeader,
+  SectionTitle,
   Txt,
 } from "../components/ui/base";
 import { typeIcons } from "../components/ui/ItemCard";
 import ItemEditor from "../components/ui/ItemEditor";
-
-function SectionTitle({ title, detail }: { title: string; detail?: string }) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-        gap: space.md,
-        marginTop: space.sm,
-      }}
-    >
-      <Txt variant="headline">{title}</Txt>
-      {!!detail && (
-        <Txt variant="callout" tone="secondary">
-          {detail}
-        </Txt>
-      )}
-    </View>
-  );
-}
+import TusDias from "../components/ui/progreso/TusDias";
+import CurvaDesde from "../components/ui/progreso/CurvaDesde";
 
 export default function Resumen() {
   const { data } = useApp();
@@ -63,9 +46,8 @@ export default function Resumen() {
   const { toggle, error } = useToggleDone();
   const now = useNow();
   const asistente = useNeka();
-  const points = totalPoints(data),
-    nivel = nivelDe(points),
-    level = nivel.nivel;
+  const progreso = useProgreso(),
+    level = progreso.nivel.nivel;
   const neka = nekaState(data, now),
     next = nextItem(data, now),
     today = todayItems(data, now),
@@ -76,15 +58,6 @@ export default function Resumen() {
       .flatMap((c) => c.itemIds),
   );
   const space_ = (id: string) => data.workspaces.find((w) => w.id === id);
-  const weekStart = new Date();
-  weekStart.setHours(0, 0, 0, 0);
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekPoints = data.rewards
-    .filter(
-      (r) =>
-        !r.key.endsWith(":budget") && Date.parse(r.at) >= weekStart.getTime(),
-    )
-    .reduce((n, r) => n + r.points, 0);
   const name = data.profile.name.trim().split(" ")[0];
 
   const onNeka = (a: NekaAction) => {
@@ -120,7 +93,15 @@ export default function Resumen() {
       <ScreenHeader
         showDate
         title={name ? `Hola, ${name}` : "Hola"}
-        right={<LevelRing level={level} progress={nivel.avance} />}
+        right={
+          <PressableScale
+            onPress={() => navigation.navigate("Perfil")}
+            accessibilityRole="button"
+            accessibilityLabel={`Nivel ${level}. Ver tu perfil`}
+          >
+            <LevelRing level={level} progress={progreso.nivel.avance} />
+          </PressableScale>
+        }
       />
       <NekaCard
         state={neka}
@@ -196,29 +177,18 @@ export default function Resumen() {
         </>
       )}
 
-      <SectionTitle title="Progreso" />
-      <Card>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          <Txt variant="headline">Nivel {level}</Txt>
-          <Txt variant="callout" tone="secondary">
-            {points} pts
-          </Txt>
-        </View>
-        <ProgressBar
-          value={nivel.avance}
-          accessibilityLabel={`Avance al nivel ${level + 1}`}
-        />
-        <Txt variant="caption" tone="secondary">
-          {nivel.hasta - points} pts para el nivel {level + 1} · {weekPoints}{" "}
-          esta semana
-        </Txt>
-      </Card>
+      <SectionTitle
+        title="Tus días"
+        detail={`+${miles(progreso.puntosSemana)} pts esta semana`}
+      />
+      <TusDias
+        dias={progreso.semanas12}
+        rachas={progreso.rachas}
+        hoy={progreso.hoy}
+      />
+
+      <SectionTitle title="Desde el día 1" />
+      <CurvaDesde desde={progreso.desde} hoy={progreso.hoy} />
 
       {editor && (
         <ItemEditor

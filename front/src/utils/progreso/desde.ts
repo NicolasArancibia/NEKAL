@@ -30,17 +30,23 @@ export const diasEntre = (a: string, b: string) => {
   );
 };
 
+// El día más antiguo entre la creación de tus cosas y tus puntos (o hoy).
+export function dia1De(d: AppData, now: number): string {
+  const hoy = localDay(new Date(now));
+  const fechas = [
+    ...d.items.map((i) => localDay(new Date(i.createdAt))),
+    ...d.rewards.map((r) => localDay(new Date(r.at))),
+  ].sort();
+  return fechas[0] && fechas[0] < hoy ? fechas[0] : hoy;
+}
+
 export function desdeElDia1(d: AppData, now: number): Desde {
   const hoy = localDay(new Date(now));
   const premios = d.rewards
     .filter((r) => !r.key.endsWith(":budget"))
     .map((r) => ({ dia: localDay(new Date(r.at)), puntos: r.points }))
     .sort((a, b) => a.dia.localeCompare(b.dia));
-  const fechas = [
-    ...d.items.map((i) => localDay(new Date(i.createdAt))),
-    ...d.rewards.map((r) => localDay(new Date(r.at))),
-  ].sort();
-  const dia1 = fechas[0] && fechas[0] < hoy ? fechas[0] : hoy;
+  const dia1 = dia1De(d, now);
   const hasta = (dia: string) =>
     premios.filter((p) => p.dia <= dia).reduce((n, p) => n + p.puntos, 0);
   const curva: Desde["curva"] = [];

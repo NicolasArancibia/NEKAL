@@ -1,7 +1,7 @@
 import { AppData, LOGRO_IDS, LogroId, localDay, totalPoints } from "../model";
 import { GENERAL } from "../estructura";
-import { cosasListas, desdeElDia1 } from "./desde";
-import { historial, rachas } from "./dias";
+import { cosasListas } from "./desde";
+import { historial, inicioHistoria, rachas } from "./dias";
 import { nivelDe, puntosParaNivel } from "./nivel";
 
 // Logros (spec E §6): 24 iguales para todas las cuentas. Nunca se pierden.
@@ -144,7 +144,7 @@ export const CATALOGO: Logro[] = [
 
 export function hechosDe(d: AppData, now: number): Hechos {
   const hoy = localDay(new Date(now));
-  const dias = historial(d, desdeElDia1(d, now).dia1, hoy);
+  const dias = historial(d, inicioHistoria(d, now), hoy);
   let corrida = 0,
     semanaPerfecta = false;
   for (const x of dias) {

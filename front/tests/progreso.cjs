@@ -200,13 +200,10 @@ test("dias: sin agenda con algo hecho es tono 2 y suma", () => {
     conItems([sinFecha], [premioDe("s", 2030, 4, 9)]),
     "2030-05-09",
   );
-  assert.deepEqual([x.tenias, x.sinAgenda, x.tono, x.suma, x.descanso], [
-    0,
-    1,
-    2,
-    true,
-    false,
-  ]);
+  assert.deepEqual(
+    [x.tenias, x.sinAgenda, x.tono, x.suma, x.descanso],
+    [0, 1, 2, true, false],
+  );
 });
 
 test("dias: nada agendado ni hecho es descanso", () => {
@@ -278,7 +275,9 @@ test("historial: cruza mes, año y horario", () => {
     dias.historial(vacio, "2030-12-30", "2031-01-02").map((x) => x.dia),
     ["2030-12-30", "2030-12-31", "2031-01-01", "2031-01-02"],
   );
-  const sep = dias.historial(vacio, "2030-09-01", "2030-09-10").map((x) => x.dia);
+  const sep = dias
+    .historial(vacio, "2030-09-01", "2030-09-10")
+    .map((x) => x.dia);
   assert.equal(sep.length, 10);
   assert.equal(new Set(sep).size, 10);
   assert.deepEqual([sep[0], sep[9]], ["2030-09-01", "2030-09-10"]);
@@ -287,7 +286,10 @@ test("historial: cruza mes, año y horario", () => {
 test("semanas12: cuenta nueva empieza en su primera semana", () => {
   const nueva = conItems([item({ createdAt: alas(2030, 4, 1) })]);
   const s = dias.semanas12(nueva, now);
-  assert.deepEqual([s[0].dia, s[s.length - 1].dia], ["2030-04-29", "2030-05-12"]);
+  assert.deepEqual(
+    [s[0].dia, s[s.length - 1].dia],
+    ["2030-04-29", "2030-05-12"],
+  );
   const vieja = conItems([item({ createdAt: alas(2029, 0, 15) })]);
   const v = dias.semanas12(vieja, now);
   assert.deepEqual([v[0].dia, v.length], ["2030-02-18", 84]);
@@ -309,7 +311,10 @@ test("puntosSemana", () => {
 test("textoDia", () => {
   const base = { sinAgenda: 0, tono: 4, suma: true, descanso: false };
   assert.equal(
-    dias.textoDia({ ...base, dia: "2030-05-09", tenias: 5, hechas: 4 }, "2030-05-12"),
+    dias.textoDia(
+      { ...base, dia: "2030-05-09", tenias: 5, hechas: 4 },
+      "2030-05-12",
+    ),
     "jueves 9 de may · 4 de 5 (80%)",
   );
   assert.equal(
@@ -327,7 +332,10 @@ test("textoDia", () => {
     "Sin nada agendado · completaste 2",
   );
   assert.equal(
-    dias.textoDia({ ...base, dia: "2030-05-12", tenias: 4, hechas: 3 }, "2030-05-12"),
+    dias.textoDia(
+      { ...base, dia: "2030-05-12", tenias: 4, hechas: 3 },
+      "2030-05-12",
+    ),
     "Hoy · 3 de 4 (75%)",
   );
 });
@@ -446,10 +454,18 @@ test("mesas: areaSugerida", () => {
 
 test("mesas: areaDe usa la guardada", () => {
   assert.equal(
-    mes.areaDe({ id: "U", name: "Universidad", color: "#000000", area: "social" }),
+    mes.areaDe({
+      id: "U",
+      name: "Universidad",
+      color: "#000000",
+      area: "social",
+    }),
     "social",
   );
-  assert.equal(mes.areaDe({ id: "U", name: "Universidad", color: "#000000" }), "estudio");
+  assert.equal(
+    mes.areaDe({ id: "U", name: "Universidad", color: "#000000" }),
+    "estudio",
+  );
 });
 
 test("mesas: cuenta vacía", () => {
@@ -489,7 +505,8 @@ test("logros: umbrales", () => {
   assert.equal(lg.cumple("racha-7", hechosBase({ record: 7 })), true);
   assert.equal(lg.cumple("listas-10", hechosBase({ listas: 9 })), false);
   assert.equal(lg.cumple("listas-10", hechosBase({ listas: 10 })), true);
-  const conPuntos = (p) => hechosBase({ puntos: p, nivel: niv.nivelDe(p).nivel });
+  const conPuntos = (p) =>
+    hechosBase({ puntos: p, nivel: niv.nivelDe(p).nivel });
   assert.equal(lg.cumple("nivel-5", conPuntos(999)), false);
   assert.equal(lg.cumple("nivel-5", conPuntos(1000)), true);
 });
@@ -575,8 +592,14 @@ test("logros: cola", () => {
     lanzamiento: true,
   });
   const conVisto = { ...cuatro, logros: [visto("racha-3")] };
-  assert.equal(lg.siguiente(conVisto, lg.hechosDe(conVisto, now)).lanzamiento, false);
-  assert.equal(lg.siguiente(m.emptyData(), lg.hechosDe(m.emptyData(), now)), null);
+  assert.equal(
+    lg.siguiente(conVisto, lg.hechosDe(conVisto, now)).lanzamiento,
+    false,
+  );
+  assert.equal(
+    lg.siguiente(m.emptyData(), lg.hechosDe(m.emptyData(), now)),
+    null,
+  );
 });
 
 test("logros: avance y textos", () => {
@@ -584,9 +607,15 @@ test("logros: avance y textos", () => {
   assert.deepEqual(lg.avance("racha-30", h), { valor: 0.4, texto: "12/30" });
   assert.equal(lg.avance("nivel-10", h).texto, "70%");
   assert.equal(lg.avance("listas-1000", h).texto, "187/1.000");
-  assert.deepEqual(lg.avance("primer-audio", h), { valor: 0, texto: "Pendiente" });
+  assert.deepEqual(lg.avance("primer-audio", h), {
+    valor: 0,
+    texto: "Pendiente",
+  });
   assert.deepEqual(lg.avance("racha-7", h), { valor: 1, texto: "Logrado" });
-  assert.equal(lg.CATALOGO.find((l) => l.id === "listas-1000").nombre, "1.000 cosas listas");
+  assert.equal(
+    lg.CATALOGO.find((l) => l.id === "listas-1000").nombre,
+    "1.000 cosas listas",
+  );
 });
 
 test("logros: paraPerfil", () => {
@@ -628,7 +657,10 @@ test("logros: paraPerfil", () => {
     now,
   );
   assert.equal(uno.length, 8);
-  assert.deepEqual(uno.filter((x) => x.logrado).map((x) => x.id), ["primera-mesa"]);
+  assert.deepEqual(
+    uno.filter((x) => x.logrado).map((x) => x.id),
+    ["primera-mesa"],
+  );
 });
 
 test("logros: verLogros no duplica", () => {
@@ -644,4 +676,17 @@ test("logros: verLogros no duplica", () => {
 test("logros: cuenta vacía", () => {
   const vacio = m.emptyData();
   assert.deepEqual(lg.desbloqueados(vacio, lg.hechosDe(vacio, now)), []);
+});
+
+test("dias: la historia empieza en la primera cosa con fecha, aunque se creara hoy", () => {
+  const creadaHoy = iso(now - 3600000);
+  const d = conItems(
+    [9, 10, 11].map((dia) =>
+      conHora(2030, 4, dia, { createdAt: creadaHoy, status: "completado" }),
+    ),
+  );
+  assert.equal(des.desdeElDia1(d, now).dia1, "2030-05-12");
+  assert.equal(dias.inicioHistoria(d, now), "2030-05-09");
+  assert.equal(dias.semanas12(d, now)[0].dia, "2030-05-06");
+  assert.equal(lg.hechosDe(d, now).record, 3);
 });
