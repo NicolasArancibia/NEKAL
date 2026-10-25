@@ -340,3 +340,118 @@ test("dias: cuenta vacía", () => {
     hoySuma: false,
   });
 });
+
+// ---------- Task 3: tus mesas ----------
+const mes = require("../.test-build/progreso/mesas.js");
+const enDia = (offset, fields = {}) =>
+  item({
+    workspaceId: "U",
+    scheduledAt: iso(new Date(2030, 4, 12 + offset, 9).getTime()),
+    ...fields,
+  });
+const grupo = (offset, total, hechas) =>
+  Array.from({ length: total }, (_, k) =>
+    enDia(offset, { status: k < hechas ? "completado" : "pendiente" }),
+  );
+const conMesa = (items, rewards = []) => ({
+  ...m.emptyData(),
+  workspaces: [
+    ...m.emptyData().workspaces,
+    { id: "U", name: "Universidad", color: "#2E9E6B" },
+  ],
+  items,
+  rewards,
+});
+const ejemplo = () =>
+  conMesa([
+    ...grupo(0, 5, 5),
+    ...grupo(-7, 6, 4),
+    ...grupo(-14, 4, 3),
+    ...grupo(-21, 5, 2),
+  ]);
+const diaX = (n) => m.localDay(new Date(2030, 4, 12 + n));
+
+test("mesas: ejemplo de la spec", () => {
+  assert.equal(mes.ratingEn(ejemplo(), "U", diaX(0), now), 78);
+  assert.deepEqual(mes.ratingMesa(ejemplo(), "U", now), {
+    mesaId: "U",
+    valor: 78,
+    etiqueta: "Sube",
+    completadas: 14,
+    vencidas: 6,
+  });
+});
+
+test("mesas: quieta 3 semanas resta 15", () => {
+  assert.equal(mes.ratingEn(ejemplo(), "U", diaX(21), now), 63);
+});
+
+test("mesas: nueva con menos de 3 es null", () => {
+  assert.equal(mes.ratingEn(conMesa(grupo(-1, 2, 2)), "U", diaX(0), now), null);
+  assert.equal(mes.ratingMesa(conMesa([]), "U", now).valor, null);
+});
+
+test("mesas: etiqueta en +5 y −5", () => {
+  assert.equal(mes.etiquetaDe(70, 65), "Sube");
+  assert.equal(mes.etiquetaDe(60, 65), "Baja");
+  assert.equal(mes.etiquetaDe(69, 65), "Igual");
+  assert.equal(mes.etiquetaDe(null, 65), null);
+  assert.equal(mes.etiquetaDe(70, null), null);
+});
+
+test("mesas: General no tiene rating", () => {
+  assert.deepEqual(
+    mes.ratings(ejemplo(), now).map((r) => r.mesaId),
+    ["U"],
+  );
+});
+
+test("mesas: sin fecha completadas suman el día de sus puntos", () => {
+  const sinFecha = item({ id: "s", workspaceId: "U", status: "completado" });
+  const d = conMesa(
+    [...grupo(-2, 2, 0), sinFecha],
+    [premioDe("s", 2030, 4, 11)],
+  );
+  assert.equal(mes.ratingEn(d, "U", diaX(0), now), 33);
+});
+
+test("mesas: cuenta una vez", () => {
+  const doble = enDia(-3, {
+    dueAt: iso(new Date(2030, 4, 11, 18).getTime()),
+    status: "completado",
+  });
+  assert.equal(
+    mes.ratingEn(conMesa([doble, ...grupo(-2, 2, 0)]), "U", diaX(0), now),
+    33,
+  );
+});
+
+test("mesas: areaSugerida", () => {
+  for (const [nombre, area] of [
+    ["Universidad", "estudio"],
+    ["Tesis de magíster", "estudio"],
+    ["GYM", "salud"],
+    ["Mi depto", "hogar"],
+    ["Cumpleaños", "social"],
+    ["Pega", "trabajo"],
+    ["Viajes", "personal"],
+    ["Clase de yoga", "estudio"],
+  ])
+    assert.equal(mes.areaSugerida(nombre), area, nombre);
+  assert.deepEqual(
+    mes.AREAS.map((a) => a.id),
+    ["estudio", "trabajo", "salud", "hogar", "social", "personal"],
+  );
+});
+
+test("mesas: areaDe usa la guardada", () => {
+  assert.equal(
+    mes.areaDe({ id: "U", name: "Universidad", color: "#000000", area: "social" }),
+    "social",
+  );
+  assert.equal(mes.areaDe({ id: "U", name: "Universidad", color: "#000000" }), "estudio");
+});
+
+test("mesas: cuenta vacía", () => {
+  assert.deepEqual(mes.ratings(m.emptyData(), now), []);
+});

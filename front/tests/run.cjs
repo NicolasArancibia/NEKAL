@@ -31,6 +31,7 @@ const build = spawnSync(
     "src/utils/progreso/nivel.ts",
     "src/utils/progreso/desde.ts",
     "src/utils/progreso/dias.ts",
+    "src/utils/progreso/mesas.ts",
     "--outDir",
     ".test-build",
     "--module",

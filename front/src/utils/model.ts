@@ -49,7 +49,23 @@ export type Item = {
   y: number;
   deletedAt: string;
 };
-export type Workspace = { id: string; name: string; color: string };
+// Área de vida de una mesa (spec E §5). Sin el campo, se usa la sugerida por el nombre.
+export type Area =
+  | "estudio"
+  | "trabajo"
+  | "salud"
+  | "hogar"
+  | "social"
+  | "personal";
+export const AREA_IDS: Area[] = [
+  "estudio",
+  "trabajo",
+  "salud",
+  "hogar",
+  "social",
+  "personal",
+];
+export type Workspace = { id: string; name: string; color: string; area?: Area };
 // Mesa ⊃ grupos (anidables) ⊃ cosas. Un grupo con `repeat` es una rutina (spec B §2).
 export type Repeat = "" | "diario" | "semanal" | "dias";
 export const REPEATS: Repeat[] = ["", "diario", "semanal", "dias"];
