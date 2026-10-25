@@ -17,7 +17,39 @@ Brainstorming empezado el 25 de octubre de 2026, después de cerrar D. Parte del
 | Puntaje | **Ajuste fino.** Se mantiene 10 × dificultad × prioridad + dependencias, pero la dificultad sale de pasos y lugar (ya no de lo cerca que está la fecha, que premiaba dejar todo para el final o atrasarse) y terminar antes de la fecha límite da un bonus. Niveles con curva: cada nivel cuesta 100 más que el anterior (nivel 2 = 100, 3 = 300, 4 = 600, 5 = 1.000, 10 = 4.500 acumulados). Con ~33 pts al día: nivel 8 a los 3 meses y 16 al año (hoy serían 30 y 120). Los puntos ganados se mantienen; el nivel se recalcula una vez al lanzar E. |
 | Racha | **La mitad de tu día.** Un día cuenta si completaste al menos el 50% de lo que tenías ese día (la misma cuenta que pinta el heatmap). Un día sin nada agendado es descanso: no corta la racha ni suma; si ese día igual completas algo, suma. |
 
+## Diseño aprobado por secciones
+
+**1 · Puntaje y niveles** (aprobada el 25/10):
+- Puntos por cosa, congelados al completarla como hoy: 10 × dificultad × prioridad (baja 1 · media 1,5 · urgente 2) + 5 por cada cosa que depende de ella (máx. 15).
+- Dificultad de tareas, entregas y metas: pasos + lugar (cuenta como un paso). 0–1 = baja (1), 2–4 = media (2), 5+ = alta (3). La fecha ya no cuenta. Eventos, visitas y reuniones: la que elige el usuario, como hoy.
+- Bonus a tiempo: +20% (redondeado) si la cosa tiene fecha límite y se completa antes. Ejemplo: «Entregar informe», urgente, 3 pasos → 48 a tiempo, 40 atrasado (antes: 60 un día antes, 40 una semana antes).
+- Sin cambios: notas e ideas no dan puntos; metas pagan 80% por pasos y el resto al terminar; reabrir o editar no vuelve a pagar.
+- Niveles: llegar al nivel n cuesta 50·n·(n−1) puntos acumulados (2 = 100, 3 = 300, 4 = 600, 5 = 1.000, 10 = 4.500). Una sola función da nivel y avance; la usan el anillo del Resumen, la tarjeta Progreso y el Perfil.
+- Al lanzar E: el historial de puntos no se toca; la curva se aplica sola y el nivel baja una única vez.
+- Textos: el editor muestra el estimado con «+20% si lo terminas antes del …»; Ajustes actualiza «¿Cómo se ganan puntos?».
+- Pruebas: dificultad sin fecha; bonus antes / justo / atrasado; curva en 0, 99, 100, 299, 300 y 4.500.
+
+**2 · Tus días: heatmap y racha** (aprobada el 25/10; va en el Resumen):
+- Lo que tenías un día = misma regla que «Hoy»: cosas con hora o fecha límite ese día, sin notas, ideas ni borradas; cada repetición de rutina es su propia cosa. % = completadas / tenías.
+- 5 tonos: vacío (nada o 0%), 1 (algo, < 50%), 2 (50–74%), 3 (75–99%), 4 (100%). Desde el tono 2 el día suma a la racha. Día sin nada agendado pero con algo completado (fecha de sus puntos): **tono 2** y suma (cambia lo dicho antes de «pintarlo suave», para que la regla no tenga excepciones).
+- Racha: días seguidos que suman, contados desde ayer hacia atrás; hoy suma apenas llega al 50% y, si no llega todavía, no corta. Descanso (nada agendado ni hecho): no corta ni suma. Récord: la racha más larga desde el día 1.
+- Vista: 12 semanas lun–dom, hoy con borde; cuenta más nueva → empieza en su primera semana. Tocar un día: «jueves 23 de oct · 4 de 5 (80%)», «Descanso» o «Sin nada agendado · completaste 2»; VoiceOver lee lo mismo. Arriba racha y récord; al lado del título, puntos de la semana (lun–dom).
+- Costo aceptado: mover algo de día o completarlo atrasado cambia la historia de ese día.
+- Lógica pura en `utils/progreso.ts`; vista en `components/ui/progreso/`.
+- Pruebas: 0–4 de 4; día sin agenda con y sin algo hecho; racha con descanso al medio; hoy < 50% no corta; cambio de mes y año; cuenta de menos de 12 semanas.
+
+**3 · Tus mesas: rating y área** (aprobada el 25/10; va en el Perfil):
+- Rating 0–100 = «cómo vas ahora» en la mesa (con sus grupos y rutinas), últimas 4 semanas. Cada cosa con fecha que ya pasó cuenta: completada suma, no completada (vencida) pesa en contra; las cosas sin fecha completadas suman el día de sus puntos. Pesos por semana: esta ×4, anterior ×3, luego ×2 y ×1. Ejemplo: 5/5, 4/6, 3/4, 2/5 → (20+12+6+2)/(20+18+8+5) = 40/51 → 78.
+- Mesa quieta (nada en 4 semanas): conserva su último valor y baja 5 por semana sin movimiento. Mesa nueva: «Aún sin datos» hasta tener 3 cosas evaluadas.
+- Etiqueta contra hace 7 días: +5 o más «Sube», −5 o menos «Baja», si no «Igual». General no tiene rating (solo suma a puntos y nivel).
+- Área: Estudio (school), Trabajo (briefcase), Salud (barbell), Hogar (home), Social (people), Personal (heart), Ionicons de línea. Se sugiere por el nombre (Universidad/tesis/curso → Estudio, gym → Salud, casa → Hogar…; si no reconoce, Personal). Se elige con 6 chips en FormMesa (debajo de nombre y color); la sugerida va marcada mientras escribes hasta que tocas otra. Mesas existentes usan la sugerida hasta que el usuario elija; solo se guarda cuando la cambia.
+- Fila: anillo con el color de la mesa e ícono del área, nombre, área, número y Sube/Igual/Baja. Tocar abre ahí mismo el heatmap de esa mesa y «23 completadas · 3 vencidas en 4 semanas».
+- En F, un amigo ve tus áreas (ícono y número); si ve el nombre de la mesa se decide en F.
+- Pruebas: el ejemplo; mesa nueva < 3 cosas; mesa quieta 3 semanas (−15); flecha en +5 y −5; General sin rating; sugerencia de área con varios nombres.
+
 ## Pendiente
+
+- **Reparto Perfil / Resumen** (revisa la fila "Dónde vive"): pensando en F, el usuario eligió **Perfil = lo que muestras** (nombre, nivel, logros, tus mesas; en F se suman los amigos y un amigo ve lo mismo en corto) y **Resumen = tu día a día** (racha, tus días con el heatmap, desde el día 1; reemplaza la tarjeta "Progreso"; el anillo de nivel lleva al Perfil). Maqueta [03](E_MAQUETA/03-perfil-y-resumen.html) por aprobar.
 
 - Diseño por secciones (fórmula de puntaje revisada, rating, heatmap, rachas, catálogo de logros, modal de revelado, "desde el día 1", datos y reglas), spec `E_GAMIFICACION.md`, plan y ejecución.
 
