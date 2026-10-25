@@ -30,6 +30,7 @@ const build = spawnSync(
     "src/utils/agente/dia.ts",
     "src/utils/progreso/nivel.ts",
     "src/utils/progreso/desde.ts",
+    "src/utils/progreso/dias.ts",
     "--outDir",
     ".test-build",
     "--module",

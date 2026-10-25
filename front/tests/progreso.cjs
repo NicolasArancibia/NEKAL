@@ -151,3 +151,192 @@ test("desde: cosas listas sin notas ni borradas", () => {
   };
   assert.equal(des.cosasListas(d), 1);
 });
+
+// ---------- Task 2: tus días ----------
+const dias = require("../.test-build/progreso/dias.js");
+const alas = (y, mo, d, h = 10) => iso(new Date(y, mo, d, h).getTime());
+const conHora = (y, mo, d, fields = {}) =>
+  item({ scheduledAt: alas(y, mo, d), ...fields });
+const premioDe = (itemId, y, mo, d, h = 12, key = `${itemId}:r`) => ({
+  key,
+  itemId,
+  points: 10,
+  at: alas(y, mo, d, h),
+  reason: m.RAZON_COMPLETADO,
+});
+const conItems = (items, rewards = []) => ({
+  ...m.emptyData(),
+  items,
+  rewards,
+});
+const falso = (suma, descanso = false) => ({
+  dia: "x",
+  tenias: 1,
+  hechas: suma ? 1 : 0,
+  sinAgenda: 0,
+  tono: suma ? 4 : 0,
+  suma,
+  descanso,
+});
+
+test("dias: tonos de 0 a 4 de 4", () => {
+  const tonos = [],
+    sumas = [];
+  for (let k = 0; k <= 4; k++) {
+    const items = [0, 1, 2, 3].map((n) =>
+      conHora(2030, 4, 9, { status: n < k ? "completado" : "pendiente" }),
+    );
+    const x = dias.diaDe(conItems(items), "2030-05-09");
+    tonos.push(x.tono);
+    sumas.push(x.suma);
+  }
+  assert.deepEqual(tonos, [0, 1, 2, 3, 4]);
+  assert.deepEqual(sumas, [false, false, true, true, true]);
+});
+
+test("dias: sin agenda con algo hecho es tono 2 y suma", () => {
+  const sinFecha = item({ id: "s", status: "completado" });
+  const x = dias.diaDe(
+    conItems([sinFecha], [premioDe("s", 2030, 4, 9)]),
+    "2030-05-09",
+  );
+  assert.deepEqual([x.tenias, x.sinAgenda, x.tono, x.suma, x.descanso], [
+    0,
+    1,
+    2,
+    true,
+    false,
+  ]);
+});
+
+test("dias: nada agendado ni hecho es descanso", () => {
+  const x = dias.diaDe(conItems([]), "2030-05-09");
+  assert.deepEqual([x.tono, x.suma, x.descanso], [0, false, true]);
+});
+
+test("dias: notas, ideas y borradas no cuentan", () => {
+  const items = [
+    conHora(2030, 4, 9, { type: "Nota" }),
+    conHora(2030, 4, 9, { type: "Idea" }),
+    conHora(2030, 4, 9, { deletedAt: alas(2030, 4, 9) }),
+    conHora(2030, 4, 9, { status: "completado" }),
+  ];
+  const x = dias.diaDe(conItems(items), "2030-05-09");
+  assert.deepEqual([x.tenias, x.hechas, x.tono], [1, 1, 4]);
+});
+
+test("dias: hora y límite en días distintos", () => {
+  const d = conItems([
+    item({ scheduledAt: alas(2030, 4, 8), dueAt: alas(2030, 4, 10, 18) }),
+  ]);
+  assert.equal(dias.diaDe(d, "2030-05-08").tenias, 1);
+  assert.equal(dias.diaDe(d, "2030-05-10").tenias, 1);
+  assert.equal(dias.diaDe(d, "2030-05-09").tenias, 0);
+});
+
+test("rachas: descanso al medio no corta", () => {
+  assert.equal(
+    dias.rachas([falso(true), falso(false, true), falso(true), falso(true)])
+      .racha,
+    3,
+  );
+});
+
+test("rachas: hoy bajo el 50% no corta", () => {
+  const hoy = { ...falso(false), tenias: 4, hechas: 1, tono: 1 };
+  assert.deepEqual(dias.rachas([falso(true), falso(true), hoy]), {
+    racha: 2,
+    record: 2,
+    hoySuma: false,
+  });
+});
+
+test("rachas: día en 0% con algo sin fecha hecho corta", () => {
+  const d = conItems(
+    [conHora(2030, 4, 9), item({ id: "s", status: "completado" })],
+    [premioDe("s", 2030, 4, 9)],
+  );
+  const x = dias.diaDe(d, "2030-05-09");
+  assert.deepEqual([x.tono, x.suma, x.sinAgenda], [0, false, 1]);
+  assert.equal(dias.rachas([falso(true), x, falso(true)]).racha, 1);
+});
+
+test("rachas: récord", () => {
+  const r = dias.rachas([
+    falso(true),
+    falso(true),
+    falso(true),
+    falso(false),
+    falso(true),
+  ]);
+  assert.deepEqual([r.racha, r.record], [1, 3]);
+});
+
+test("historial: cruza mes, año y horario", () => {
+  const vacio = m.emptyData();
+  assert.deepEqual(
+    dias.historial(vacio, "2030-12-30", "2031-01-02").map((x) => x.dia),
+    ["2030-12-30", "2030-12-31", "2031-01-01", "2031-01-02"],
+  );
+  const sep = dias.historial(vacio, "2030-09-01", "2030-09-10").map((x) => x.dia);
+  assert.equal(sep.length, 10);
+  assert.equal(new Set(sep).size, 10);
+  assert.deepEqual([sep[0], sep[9]], ["2030-09-01", "2030-09-10"]);
+});
+
+test("semanas12: cuenta nueva empieza en su primera semana", () => {
+  const nueva = conItems([item({ createdAt: alas(2030, 4, 1) })]);
+  const s = dias.semanas12(nueva, now);
+  assert.deepEqual([s[0].dia, s[s.length - 1].dia], ["2030-04-29", "2030-05-12"]);
+  const vieja = conItems([item({ createdAt: alas(2029, 0, 15) })]);
+  const v = dias.semanas12(vieja, now);
+  assert.deepEqual([v[0].dia, v.length], ["2030-02-18", 84]);
+});
+
+test("puntosSemana", () => {
+  const d = conItems(
+    [],
+    [
+      { ...premioDe("a", 2030, 4, 5, 23), points: 7 },
+      { ...premioDe("b", 2030, 4, 6, 0), points: 10 },
+      { ...premioDe("c", 2030, 4, 10), points: 20 },
+      { ...premioDe("c", 2030, 4, 8, 12, "c:budget"), points: 999 },
+    ],
+  );
+  assert.equal(dias.puntosSemana(d, now), 30);
+});
+
+test("textoDia", () => {
+  const base = { sinAgenda: 0, tono: 4, suma: true, descanso: false };
+  assert.equal(
+    dias.textoDia({ ...base, dia: "2030-05-09", tenias: 5, hechas: 4 }, "2030-05-12"),
+    "jueves 9 de may · 4 de 5 (80%)",
+  );
+  assert.equal(
+    dias.textoDia(
+      { ...base, dia: "2030-05-09", tenias: 0, hechas: 0, descanso: true },
+      "2030-05-12",
+    ),
+    "Descanso",
+  );
+  assert.equal(
+    dias.textoDia(
+      { ...base, dia: "2030-05-09", tenias: 0, hechas: 0, sinAgenda: 2 },
+      "2030-05-12",
+    ),
+    "Sin nada agendado · completaste 2",
+  );
+  assert.equal(
+    dias.textoDia({ ...base, dia: "2030-05-12", tenias: 4, hechas: 3 }, "2030-05-12"),
+    "Hoy · 3 de 4 (75%)",
+  );
+});
+
+test("dias: cuenta vacía", () => {
+  const hoy = "2030-05-12";
+  assert.deepEqual(dias.rachas(dias.historial(m.emptyData(), hoy, hoy)), {
+    racha: 0,
+    record: 0,
+    hoySuma: false,
+  });
+});
