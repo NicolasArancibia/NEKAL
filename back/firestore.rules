@@ -18,13 +18,14 @@ function item(v) {return fields(v,["id","type","title","description","workspaceI
 function validValue(kind,id,v) {
 return (kind=='items' && item(v))
 || (kind=='attachments' && fields(v,['id','itemId','name','mime','data']) && ident(v.id) && ident(v.itemId) && str(v.name,1000) && str(v.mime,200) && str(v.data,500000) && v.data.matches('data:.*'))
-|| (kind=='workspaces' && fields(v,['id','name','color']) && ident(v.id) && str(v.name,500) && str(v.color,50))
+|| (kind=='workspaces' && ident(v.id) && str(v.name,500) && str(v.color,50) && (fields(v,['id','name','color']) || (fields(v,['id','name','color','area']) && v.area in ['estudio','trabajo','salud','hogar','social','personal'])))
 || (kind=='groups' && ident(v.id) && str(v.name,500) && ident(v.workspaceId) && (fields(v,['id','name','workspaceId']) || (fields(v,['id','name','workspaceId','parentId','repeat','repeatDays','repeatStart']) && str(v.parentId,200) && v.repeat in ['','diario','semanal','dias'] && v.repeatDays is list && v.repeatDays.size()<=7 && str(v.repeatStart,10))))
 || (kind=='messages' && ident(v.id) && str(v.text,100000) && v.isUser is bool && (fields(v,['id','text','isUser']) || (fields(v,['id','text','isUser','audio','plan','estado']) && v.audio is bool && str(v.plan,500) && v.estado in ['','pendiente','aceptado','descartado'])))
 || (kind=='rewards' && fields(v,['itemId']) && ident(v.itemId))
 || (kind=='steps' && fields(v,['itemId','order','id','title','done']) && ident(v.itemId) && ident(v.id) && str(v.title,1000) && v.done is bool && v.order is int && v.order>=0 && v.order<5000)
 || (kind=='dependencies' && fields(v,['itemId','targetId','order']) && ident(v.itemId) && ident(v.targetId) && v.order is int && v.order>=0 && v.order<5000)
 || (kind=='rewardEntries' && fields(v,['key','itemId','points','at','reason','order']) && ident(v.key) && ident(v.itemId) && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500) && v.order is int && v.order>=0 && v.order<10000)
+|| (kind=='logros' && fields(v,['id','at']) && v.id==id && v.id in ['racha-3','racha-7','racha-14','racha-30','racha-60','racha-100','semana-perfecta','listas-10','listas-50','listas-100','listas-250','listas-500','listas-1000','nivel-5','nivel-10','nivel-15','nivel-20','primera-cosa','primera-mesa','primera-rutina','primera-meta','primer-dia-100','primer-audio','primer-plan'] && str(v.at,40))
 || (kind=='settings' && id=='profile' && fields(v,['name','roles']) && str(v.name,500) && str(v.roles,2000))
 || (kind=='settings' && id=='preferences' && fields(v,['softAlerts','quiet','quietStart','quietEnd','dayStart','dayEnd']) && v.softAlerts is bool && v.quiet is bool && hour(v.quietStart) && hour(v.quietEnd) && hour(v.dayStart) && hour(v.dayEnd) && v.dayStart<v.dayEnd);
 }
@@ -36,10 +37,10 @@ let after=getAfter(/databases/$(database)/documents/users/$(uid)/sync/meta).data
 return before.phase=='ready' && after.phase=='ready' && after.revision==before.revision+1 && after.updatedAt==request.time;
 }
 match /users/{uid}/{kind}/{id} {
-allow read: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','rewards','settings','steps','dependencies','rewardEntries'];
+allow read: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','logros','rewards','settings','steps','dependencies','rewardEntries'];
 allow create: if owner(uid) && validRecord(kind,id) && (migrating(uid) || revisionWrite(uid));
 allow update: if owner(uid) && validRecord(kind,id) && revisionWrite(uid);
-allow delete: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','rewards','steps','dependencies','rewardEntries'] && revisionWrite(uid);
+allow delete: if owner(uid) && kind in ['items','attachments','workspaces','groups','messages','logros','rewards','steps','dependencies','rewardEntries'] && revisionWrite(uid);
 }
 match /users/{uid}/sync/meta {
 function validMeta() {let v=request.resource.data; return fields(v,['schema','phase','revision','legacyRevision','updatedAt']) && v.schema==2 && v.phase in ['migrating','ready'] && v.revision is int && v.revision>=0 && v.legacyRevision is int && v.legacyRevision>=0 && v.updatedAt==request.time;}

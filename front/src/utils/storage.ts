@@ -1,6 +1,8 @@
 import {
   AppData,
+  AREA_IDS,
   ESTADOS_PLAN,
+  LOGRO_IDS,
   Group,
   REPEATS,
   TYPES,
@@ -182,7 +184,8 @@ export function readBackup(text: string): AppData {
     if (
       typeof w.id !== "string" ||
       typeof w.name !== "string" ||
-      typeof w.color !== "string"
+      typeof w.color !== "string" ||
+      (w.area !== undefined && !AREA_IDS.includes(w.area))
     )
       throw new Error("Espacio inválido.");
   for (const g of d.groups) {
@@ -228,6 +231,22 @@ export function readBackup(text: string): AppData {
     )
       throw new Error("Conversación inválida.");
   }
+  // Logros vistos (spec E §8): respaldos viejos no los traen.
+  if (d.logros === undefined) d.logros = [];
+  if (
+    !Array.isArray(d.logros) ||
+    d.logros.length > LOGRO_IDS.length ||
+    new Set(d.logros.map((v: any) => v?.id)).size !== d.logros.length ||
+    d.logros.some(
+      (v: any) =>
+        !v ||
+        Object.keys(v).length !== 2 ||
+        !LOGRO_IDS.includes(v.id) ||
+        typeof v.at !== "string" ||
+        v.at.length > 40,
+    )
+  )
+    throw new Error("Logros inválidos.");
   for (const k of ["dayStart", "dayEnd", "quietStart", "quietEnd"])
     if (
       !Number.isInteger(d.preferences[k]) ||

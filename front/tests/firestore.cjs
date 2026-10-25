@@ -125,6 +125,32 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
     console.log(
       "OK Firestore: invalid creates/updates, unexpected fields and oversized lists blocked",
     );
+    // V2/E: área de mesa y logros vistos (spec E §8).
+    const at = new Date().toISOString();
+    await invalid("workspaces/u1", {
+      id: "u1",
+      name: "Universidad",
+      color: "#2E9E6B",
+      area: "deporte",
+    });
+    await invalid("logros/inventado", { id: "inventado", at });
+    await invalid("logros/racha-3", { id: "racha-7", at });
+    const conArea = {
+      ...dataOf(snap.records),
+      workspaces: [
+        ...dataOf(snap.records).workspaces,
+        { id: "u1", name: "Universidad", color: "#2E9E6B", area: "estudio" },
+      ],
+      logros: [{ id: "primera-mesa", at }],
+    };
+    await a.commit(snap, operation(dataOf(snap.records), conArea));
+    snap = await a.read();
+    assert.deepEqual(dataOf(snap.records).logros, conArea.logros);
+    assert.equal(
+      dataOf(snap.records).workspaces.find((w) => w.id === "u1").area,
+      "estudio",
+    );
+    console.log("OK Firestore: área de mesa y logros vistos");
     const db2 = env.authenticatedContext("alice").firestore();
     const b = firestoreRemote(db2, "alice");
     await b.initialize();

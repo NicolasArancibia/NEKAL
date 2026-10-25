@@ -20,6 +20,7 @@ export const COLLECTIONS = [
   "groups",
   "rewards",
   "messages",
+  "logros",
   "settings",
 ] as const;
 export const equal = (a: unknown, b: unknown): boolean => {
@@ -54,6 +55,7 @@ export function recordsOf(data: AppData): Records {
   for (const collection of ["workspaces", "groups", "messages"] as const)
     for (const value of data[collection])
       out[`${collection}/${key(value.id)}`] = value;
+  for (const visto of data.logros) out[`logros/${key(visto.id)}`] = visto;
   // A reward ledger per item provides a high-water mark across devices.
   for (const r of data.rewards) {
     const path = `rewards/${key(r.itemId)}`;
@@ -89,6 +91,7 @@ export function dataOf(records: Records, notifications = false): AppData {
     else if (collection === "workspaces") data.workspaces.push(value as any);
     else if (collection === "groups") data.groups.push(normalizeGroup(value));
     else if (collection === "messages") data.messages.push(value as any);
+    else if (collection === "logros") data.logros.push(value as any);
     else if (collection === "rewards") data.rewards.push(...value.entries);
     else if (path === "settings/profile") data.profile = value as any;
     else if (path === "settings/preferences")
@@ -311,6 +314,7 @@ export function validateRecords(records: Records): AppData {
       )
         throw new Error("Un grupo tiene días de repetición inválidos.");
     }
+    if (collection === "logros") bound(value.at, 40);
     if (collection === "messages") {
       bound(value.text, 100000);
       if (value.plan !== undefined) bound(value.plan, 500);
