@@ -47,6 +47,15 @@ Brainstorming empezado el 25 de octubre de 2026, después de cerrar D. Parte del
 - En F, un amigo ve tus áreas (ícono y número); si ve el nombre de la mesa se decide en F.
 - Pruebas: el ejemplo; mesa nueva < 3 cosas; mesa quieta 3 semanas (−15); flecha en +5 y −5; General sin rating; sugerencia de área con varios nombres.
 
+**4a · Catálogo de logros** (aprobada el 25/10): 24, iguales para todas las cuentas.
+- Constancia (7): racha de 3, 7, 14, 30, 60 y 100 días; Semana perfecta (7 días seguidos al 100%; los descansos no cortan). Íconos flame / sparkles.
+- Volumen y niveles (10): 10, 50, 100, 250, 500 y 1.000 cosas listas (accionables completadas, no borradas); nivel 5, 10, 15 y 20. Íconos checkmark-done / star.
+- Primeras veces (7): primera cosa completada, primera mesa, primera rutina, primera meta cumplida, primer día al 100%, primer audio a Neka, primer plan de Neka aceptado. Íconos checkmark-circle / layers / repeat / trophy / ribbon / mic / chatbubble-ellipses.
+- Todo se calcula de lo existente. Un logro nunca se pierde: al desbloquearlo se guarda la fecha en que se vio (protege casos como el primer audio, porque el chat guarda solo los últimos 100 mensajes). Los logros no dan puntos.
+- Perfil: 8 logros (los 4 más recientes y los 4 más cerca, con anillo de avance); «Ver los 24 logros» abre una hoja por familia. Los bloqueados de primeras veces dicen cómo conseguirlos.
+- Al lanzar E: un solo modal «Ya tenías 9 logros» en vez de uno por logro. En F se puede sumar «Primer amigo».
+- Pruebas: cada umbral justo antes y justo en el número; logro que se queda aunque se borre lo que lo dio; semana perfecta con descanso al medio; primera entrada sin fechas guardadas.
+
 ## Pendiente
 
 - **Reparto Perfil / Resumen** (revisa la fila "Dónde vive"): pensando en F, el usuario eligió **Perfil = lo que muestras** (nombre, nivel, logros, tus mesas; en F se suman los amigos y un amigo ve lo mismo en corto) y **Resumen = tu día a día** (racha, tus días con el heatmap, desde el día 1; reemplaza la tarjeta "Progreso"; el anillo de nivel lleva al Perfil). Maqueta [03](E_MAQUETA/03-perfil-y-resumen.html) por aprobar.
