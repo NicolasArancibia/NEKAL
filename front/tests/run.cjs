@@ -28,6 +28,8 @@ const build = spawnSync(
     "src/utils/agente/conversar.ts",
     "src/utils/agente/mensajes.ts",
     "src/utils/agente/dia.ts",
+    "src/utils/progreso/nivel.ts",
+    "src/utils/progreso/desde.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -72,4 +74,5 @@ require("./espacio.cjs");
 require("./rutinas.cjs");
 require("./demo.cjs");
 require("./agente.cjs");
+require("./progreso.cjs");
 require("./styles.cjs");

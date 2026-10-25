@@ -424,8 +424,12 @@ export default function Ajustes({
       <Section title="Sobre Nekal">
         <Disclosure title="¿Cómo se calculan los puntos?">
           <Txt>
-            Base = 10 × dificultad × prioridad. Dificultad: 1, 2 o 3. Prioridad:
-            baja ×1, media ×1,5, urgente ×2.
+            Base = 10 × dificultad × prioridad. La dificultad sale de los pasos
+            (el lugar cuenta como uno más): 0 o 1 es baja, de 2 a 4 media y 5 o
+            más alta. Prioridad: baja ×1, media ×1,5, urgente ×2.
+          </Txt>
+          <Txt>
+            Si la cosa tiene fecha límite y la completas antes, suma un 20% más.
           </Txt>
           <Txt>
             Desbloquear dependencias suma 5 puntos por ítem, hasta 15 extra.
@@ -433,9 +437,12 @@ export default function Ajustes({
             lo activas.
           </Txt>
           <Txt>
-            Los goals entregan hasta el 80% con sus hitos y el resto al
-            completarlos. Reabrir o marcar otra vez no duplica puntos. Cada 100
-            puntos subes un nivel.
+            Las metas entregan hasta el 80% con sus hitos y el resto al
+            completarlas. Reabrir o marcar otra vez no duplica puntos.
+          </Txt>
+          <Txt>
+            Cada nivel cuesta 100 puntos más que el anterior: el 2 llega a los
+            100, el 3 a los 300, el 4 a los 600 y el 5 a los 1.000.
           </Txt>
         </Disclosure>
         <Disclosure title="Privacidad">

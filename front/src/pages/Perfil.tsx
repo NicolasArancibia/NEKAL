@@ -7,6 +7,7 @@ import type { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
 import { auth } from "../utils/firebase";
 import { totalPoints } from "../utils/model";
+import { nivelDe } from "../utils/progreso/nivel";
 import { mergeValue, recordsOf } from "../utils/syncModel";
 import { color, radius, size, space } from "../styles/theme";
 import {
@@ -92,7 +93,7 @@ export default function Perfil() {
           </Txt>
         )}
         <View style={{ flexDirection: "row", gap: space.sm }}>
-          <Tag text={`Nivel ${Math.floor(points / 100) + 1}`} tone="primary" />
+          <Tag text={`Nivel ${nivelDe(points).nivel}`} tone="primary" />
           <Tag text={`${points} pts`} tone="primary" />
         </View>
       </Card>

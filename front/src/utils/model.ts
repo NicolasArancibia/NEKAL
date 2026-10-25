@@ -300,18 +300,16 @@ export function validateGroup(group: Group, data: AppData): string | null {
     return "Elige al menos un día.";
   return null;
 }
-export function difficultyOf(item: Item, now = Date.now()): 1 | 2 | 3 {
+// Spec E §3: la dificultad sale de pasos y lugar; la fecha ya no cuenta.
+export function difficultyOf(item: Item): 1 | 2 | 3 {
   if (["Evento", "Visita", "Meeting"].includes(item.type))
     return item.difficulty;
-  const days = item.dueAt
-    ? (Date.parse(item.dueAt) - now) / 86400000
-    : Infinity;
-  const load =
-    item.steps.length +
-    (item.location ? 1 : 0) +
-    (days <= 2 ? 3 : days <= 7 ? 1 : 0);
-  return load >= 6 ? 3 : load >= 3 ? 2 : 1;
+  const load = item.steps.length + (item.location ? 1 : 0);
+  return load >= 5 ? 3 : load >= 2 ? 2 : 1;
 }
+// Terminar antes de la fecha límite paga un 20% más (spec E §3).
+export const BONUS_A_TIEMPO = 1.2;
+export const RAZON_COMPLETADO = "Ítem completado";
 export function pointsFor(item: Item, all: Item[], now = Date.now()) {
   if (
     passive(item) ||
@@ -319,11 +317,13 @@ export function pointsFor(item: Item, all: Item[], now = Date.now()) {
       !item.countsForScore)
   )
     return 0;
+  const aTiempo = item.dueAt && now <= Date.parse(item.dueAt);
   return (
     Math.round(
       10 *
-        difficultyOf(item, now) *
-        { baja: 1, media: 1.5, urgente: 2 }[item.priority],
+        difficultyOf(item) *
+        { baja: 1, media: 1.5, urgente: 2 }[item.priority] *
+        (aTiempo ? BONUS_A_TIEMPO : 1),
     ) +
     Math.min(
       15,
@@ -393,7 +393,7 @@ export function saveItem(
       points: target - paid,
       at: item.updatedAt,
       reason:
-        item.status === "completado" ? "Ítem completado" : "Hitos alcanzados",
+        item.status === "completado" ? RAZON_COMPLETADO : "Hitos alcanzados",
     });
   return { ...data, items, rewards };
 }

@@ -47,6 +47,24 @@ function Section({
   );
 }
 
+// «antes de las 18:00» (hoy), «antes del viernes» (esta semana) o «antes del 12 de noviembre».
+function antesDe(iso: string) {
+  const fecha = new Date(iso),
+    hoy = new Date();
+  const dias = Math.round(
+    (new Date(
+      fecha.getFullYear(),
+      fecha.getMonth(),
+      fecha.getDate(),
+    ).getTime() -
+      new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime()) /
+      86400000,
+  );
+  if (dias === 0)
+    return `antes de las ${fecha.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+  return `antes del ${fecha.toLocaleDateString("es-CL", dias <= 6 ? { weekday: "long" } : { day: "numeric", month: "long" })}`;
+}
+
 // `acciones` va bajo el tipo (la hoja del Espacio agrega "Conectar con…" y
 // "Ver dónde está"). `sinCompletar`: el modelo de una rutina no se completa,
 // se completa cada día que toca (spec B §2.1).
@@ -88,6 +106,13 @@ export default function ItemEditor({
   const frozenPoints = data.rewards.find(
     (r) => r.key === `${draft.id}:budget`,
   )?.points;
+  // Spec E §3: el estimado ya trae el +20% si la fecha límite aún no pasa.
+  const bonusHasta =
+    frozenPoints === undefined &&
+    estimatedItem.dueAt &&
+    Date.parse(estimatedItem.dueAt) > Date.now()
+      ? antesDe(estimatedItem.dueAt)
+      : "";
   const save = () => {
     try {
       const result = {
@@ -478,8 +503,8 @@ export default function ItemEditor({
           </View>
           <Txt variant="caption" tone="secondary">
             {frozenPoints ?? pointsFor(estimatedItem, data.items)} pts{" "}
-            {frozenPoints === undefined ? "estimados" : "asignados"} ·
-            dificultad{" "}
+            {frozenPoints === undefined ? "estimados" : "asignados"}
+            {bonusHasta && ` (+20% si lo terminas ${bonusHasta})`} · dificultad{" "}
             {["baja", "media", "alta"][difficultyOf(estimatedItem) - 1]}
           </Txt>
         </Section>

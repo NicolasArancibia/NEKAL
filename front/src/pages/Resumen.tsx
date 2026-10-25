@@ -5,6 +5,7 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
 import { Item, newItem, totalPoints } from "../utils/model";
+import { nivelDe } from "../utils/progreso/nivel";
 import { findConflicts } from "../utils/planner";
 import {
   NekaAction,
@@ -63,7 +64,8 @@ export default function Resumen() {
   const now = useNow();
   const asistente = useNeka();
   const points = totalPoints(data),
-    level = Math.floor(points / 100) + 1;
+    nivel = nivelDe(points),
+    level = nivel.nivel;
   const neka = nekaState(data, now),
     next = nextItem(data, now),
     today = todayItems(data, now),
@@ -118,7 +120,7 @@ export default function Resumen() {
       <ScreenHeader
         showDate
         title={name ? `Hola, ${name}` : "Hola"}
-        right={<LevelRing level={level} progress={(points % 100) / 100} />}
+        right={<LevelRing level={level} progress={nivel.avance} />}
       />
       <NekaCard
         state={neka}
@@ -209,11 +211,11 @@ export default function Resumen() {
           </Txt>
         </View>
         <ProgressBar
-          value={(points % 100) / 100}
+          value={nivel.avance}
           accessibilityLabel={`Avance al nivel ${level + 1}`}
         />
         <Txt variant="caption" tone="secondary">
-          {100 - (points % 100)} pts para el nivel {level + 1} · {weekPoints}{" "}
+          {nivel.hasta - points} pts para el nivel {level + 1} · {weekPoints}{" "}
           esta semana
         </Txt>
       </Card>
