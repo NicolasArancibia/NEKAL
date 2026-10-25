@@ -23,7 +23,13 @@
       "shortName": "Nekal"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Nekal usa el micrófono para que le hables a Neka."
+        }
+      ]
     ]
   }
 }

@@ -1,5 +1,5 @@
 import { timedItems } from "./espacio";
-import { AppData, Item, activeItems, passive } from "./model";
+import { AppData, Item, activeItems, localDay, passive } from "./model";
 export type Conflict = {
   id: string;
   itemIds: string[];
@@ -114,9 +114,30 @@ export function proposeSlot(
       .filter((i) => i.dependencies.includes(item.id) && i.scheduledAt)
       .map((i) => Date.parse(i.scheduledAt)),
   );
-  for (; candidate + item.duration * 60000 <= latest; candidate += 900000) {
+  const next = primerHueco(data, others, candidate, latest, item.duration);
+  return next
+    ? {
+        itemId: id,
+        previous: item.scheduledAt,
+        next,
+        updatedAt: item.updatedAt,
+        reason:
+          "Primer hueco disponible dentro de tu jornada, respetando duración, dependencias y plazo.",
+      }
+    : null;
+}
+// Primer inicio libre en la grilla de 15 minutos desde `candidate` (ya alineado):
+// dentro de la jornada, sin cruzar de día y sin chocar con lo agendado.
+function primerHueco(
+  data: AppData,
+  others: Item[],
+  candidate: number,
+  latest: number,
+  duration: number,
+): string | null {
+  for (; candidate + duration * 60000 <= latest; candidate += 900000) {
     const start = new Date(candidate),
-      finish = new Date(candidate + item.duration * 60000);
+      finish = new Date(candidate + duration * 60000);
     const startHour = start.getHours() + start.getMinutes() / 60,
       finishHour = finish.getHours() + finish.getMinutes() / 60;
     if (
@@ -134,16 +155,84 @@ export function proposeSlot(
       )
     )
       continue;
-    return {
-      itemId: id,
-      previous: item.scheduledAt,
-      next: start.toISOString(),
-      updatedAt: item.updatedAt,
-      reason:
-        "Primer hueco disponible dentro de tu jornada, respetando duración, dependencias y plazo.",
-    };
+    return start.toISOString();
   }
   return null;
+}
+// Hueco para algo de `duracion` minutos (spec D §4.1), desde `desde` (o ahora)
+// hasta `hasta` o 30 días. `ignorar`: la cosa que se está moviendo.
+export function buscarHueco(
+  data: AppData,
+  o: { duracion: number; desde?: number; hasta?: number; ignorar?: string },
+  now = Date.now(),
+): string | null {
+  const others = timedItems(data).filter(
+    (i) => i.id !== o.ignorar && !passive(i) && i.status !== "completado",
+  );
+  const desde = Math.max(o.desde ?? now, now);
+  return primerHueco(
+    data,
+    others,
+    Math.ceil(desde / 900000) * 900000,
+    Math.min(o.hasta ?? Infinity, now + 30 * 86400000),
+    o.duracion,
+  );
+}
+export type Corrimiento = {
+  itemId: string;
+  antes: string;
+  despues: string;
+  noCabe: boolean;
+};
+// "Voy atrasado" (spec D §4.3): la primera flexible que aún no termina se corre
+// `minutos`; las siguientes empiezan cuando termina la anterior, saltando lo
+// fijo (que no se mueve). Lo que pasaría de la jornada o a otro día queda
+// marcado `noCabe` y en su hora. Solo vuelve lo que cambia.
+export function correrDesde(
+  data: AppData,
+  minutos: number,
+  desde: number,
+): Corrimiento[] {
+  if (!(minutos > 0)) throw new Error("Indica cuántos minutos.");
+  const dia = localDay(new Date(desde));
+  const lista = timedItems(data)
+    .filter(
+      (i) =>
+        !passive(i) &&
+        i.status !== "completado" &&
+        !!i.scheduledAt &&
+        localDay(new Date(i.scheduledAt)) === dia &&
+        end(i) > desde,
+    )
+    .sort((a, b) => Date.parse(a.scheduledAt) - Date.parse(b.scheduledAt));
+  const fijas = lista.filter((i) => !i.flexible);
+  const finJornada = new Date(desde);
+  finJornada.setHours(data.preferences.dayEnd, 0, 0, 0);
+  const out: Corrimiento[] = [];
+  let cursor = -Infinity;
+  for (const i of lista) {
+    if (!i.flexible) continue;
+    const inicio = Date.parse(i.scheduledAt),
+      dur = i.duration * 60000;
+    const choca = (s: number) =>
+      fijas.find((x) => s < end(x) && Date.parse(x.scheduledAt) < s + dur);
+    let s =
+      cursor === -Infinity
+        ? inicio + minutos * 60000
+        : Math.max(inicio, cursor);
+    for (let f = choca(s); f; f = choca(s)) s = end(f);
+    cursor = s + dur;
+    if (s === inicio) continue;
+    const noCabe =
+      s + dur > finJornada.getTime() || localDay(new Date(s + dur - 1)) !== dia;
+    out.push({
+      itemId: i.id,
+      antes: i.scheduledAt,
+      despues: noCabe ? i.scheduledAt : new Date(s).toISOString(),
+      noCabe,
+    });
+  }
+  return out;
 }
 export function applyProposal(data: AppData, proposal: Proposal): AppData {
   const item = activeItems(data).find((i) => i.id === proposal.itemId);

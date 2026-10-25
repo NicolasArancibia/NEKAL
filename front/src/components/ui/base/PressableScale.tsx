@@ -27,6 +27,9 @@ export default function PressableScale({
   accessibilityRole = "button",
   accessibilityLabel,
   accessibilityState,
+  accessibilityHint,
+  onLongPress,
+  onPressOut,
 }: {
   onPress?: () => void;
   disabled?: boolean;
@@ -36,6 +39,10 @@ export default function PressableScale({
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
   accessibilityState?: AccessibilityState;
+  accessibilityHint?: string;
+  // Mantener apretado (p. ej., la pestaña Neka graba) y soltar.
+  onLongPress?: () => void;
+  onPressOut?: () => void;
 }) {
   const reduced = useReducedMotion();
   const pressed = useSharedValue(0);
@@ -57,6 +64,7 @@ export default function PressableScale({
     <AnimatedPressable
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled, ...accessibilityState }}
       // aria-* además de accessibilityState: react-native-web solo expone estas.
       aria-checked={
@@ -70,11 +78,14 @@ export default function PressableScale({
       disabled={disabled}
       hitSlop={hitSlop}
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={onLongPress ? 300 : undefined}
       onPressIn={() => {
         pressed.value = 1;
       }}
       onPressOut={() => {
         pressed.value = 0;
+        onPressOut?.();
       }}
       style={[style, animated]}
     >

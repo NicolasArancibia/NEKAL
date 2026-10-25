@@ -1,13 +1,20 @@
 import React, { useState } from "react";
-import { View, TextInput } from "react-native";
+import { Pressable, View, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { color, font, radius, size, space, type } from "../../../styles/theme";
 import { PressableScale } from "../base";
 
+// Sin texto, el botón es el micrófono: mantener para grabar, soltar para enviar.
 export default function ChatInput({
   onSend,
+  onMicIn,
+  onMicOut,
+  grabando = false,
 }: {
   onSend: (text: string) => void;
+  onMicIn?: () => void;
+  onMicOut?: () => void;
+  grabando?: boolean;
 }) {
   const [value, setValue] = useState("");
   const ready = !!value.trim();
@@ -50,26 +57,51 @@ export default function ChatInput({
         returnKeyType="send"
         onSubmitEditing={submit}
       />
-      <PressableScale
-        accessibilityLabel="Enviar"
-        onPress={submit}
-        disabled={!ready}
-        style={{
-          width: size.minTouch,
-          height: size.minTouch,
-          borderRadius: radius.pill,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: color.primary,
-          opacity: ready ? 1 : 0.4,
-        }}
-      >
-        <Ionicons
-          name="arrow-up-outline"
-          size={size.icon}
-          color={color.onPrimary}
-        />
-      </PressableScale>
+      {onMicIn && !ready ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            grabando ? "Suelta para enviar" : "Mantén para hablarle a Neka"
+          }
+          onPressIn={onMicIn}
+          onPressOut={onMicOut}
+          style={{
+            width: size.minTouch,
+            height: size.minTouch,
+            borderRadius: radius.pill,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: grabando ? color.danger : color.primary,
+          }}
+        >
+          <Ionicons
+            name="mic-outline"
+            size={size.icon}
+            color={color.onPrimary}
+          />
+        </Pressable>
+      ) : (
+        <PressableScale
+          accessibilityLabel="Enviar"
+          onPress={submit}
+          disabled={!ready}
+          style={{
+            width: size.minTouch,
+            height: size.minTouch,
+            borderRadius: radius.pill,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: color.primary,
+            opacity: ready ? 1 : 0.4,
+          }}
+        >
+          <Ionicons
+            name="arrow-up-outline"
+            size={size.icon}
+            color={color.onPrimary}
+          />
+        </PressableScale>
+      )}
     </View>
   );
 }

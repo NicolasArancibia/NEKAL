@@ -18,6 +18,7 @@ import {
 } from "../utils/neka";
 import { useToggleDone } from "../utils/useToggleDone";
 import { useNow } from "../utils/useNow";
+import { useNeka } from "../utils/NekaContext";
 import { color, size, space } from "../styles/theme";
 import {
   Button,
@@ -60,6 +61,7 @@ export default function Resumen() {
   const [editor, setEditor] = useState<Item | null>(null);
   const { toggle, error } = useToggleDone();
   const now = useNow();
+  const asistente = useNeka();
   const points = totalPoints(data),
     level = Math.floor(points / 100) + 1;
   const neka = nekaState(data, now),
@@ -118,7 +120,13 @@ export default function Resumen() {
         title={name ? `Hola, ${name}` : "Hola"}
         right={<LevelRing level={level} progress={(points % 100) / 100} />}
       />
-      <NekaCard state={neka} onAction={onNeka} />
+      <NekaCard
+        state={neka}
+        onAction={onNeka}
+        onMicIn={() => void asistente.empezarGrabar("rapido")}
+        onMicOut={() => void asistente.soltar()}
+        grabando={asistente.grabando}
+      />
 
       {next && (
         <>

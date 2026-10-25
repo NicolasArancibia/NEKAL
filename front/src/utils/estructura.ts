@@ -35,13 +35,14 @@ function grupoDe(d: AppData, id: string): Group {
   return g;
 }
 
+// `id` opcional: el plan de Neka lo fija para que otros pasos lo usen.
 export function crearMesa(
   d: AppData,
   name: string,
   color: string,
+  id = uid(),
 ): { data: AppData; id: string } {
   if (!name.trim()) throw new Error("La mesa necesita un nombre.");
-  const id = uid();
   return {
     data: {
       ...d,
@@ -71,8 +72,9 @@ export function borrarMesa(d: AppData, id: string): AppData {
 export function crearGrupo(
   d: AppData,
   g: Omit<Group, "id">,
+  id = uid(),
 ): { data: AppData; id: string } {
-  const grupo = { ...g, id: uid(), name: g.name.trim() };
+  const grupo = { ...g, id, name: g.name.trim() };
   const error = validateGroup(grupo, d);
   if (error) throw new Error(error);
   return { data: { ...d, groups: [...d.groups, grupo] }, id: grupo.id };

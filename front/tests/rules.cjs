@@ -368,3 +368,114 @@ test("migración: contenedor ya ordenado no cambia", () => {
     ],
   );
 });
+// V2/D: mensajes con audio y plan (3 claves o las 6, como exigen las reglas).
+const sm = require("../.test-build/syncModel.js");
+const cr = require("../.test-build/cloudRecords.js");
+const conMensajes = (messages) => ({ ...m.emptyData(), messages });
+test("mensajes: audio y plan pasan readBackup", () => {
+  const d = conMensajes([
+    { id: "a", text: "hola", isUser: true },
+    { id: "b", text: "voy atrasado", isUser: true, audio: true, plan: "", estado: "" },
+    { id: "c", text: "", isUser: false, audio: false, plan: "2 cambios", estado: "pendiente" },
+  ]);
+  assert.deepEqual(readBackup(JSON.stringify(d)), d);
+});
+test("mensajes: estado desconocido se rechaza", () => {
+  const d = conMensajes([
+    { id: "c", text: "", isUser: false, audio: false, plan: "x", estado: "hecho" },
+  ]);
+  assert.throws(() => readBackup(JSON.stringify(d)), /Conversación inválida/);
+});
+test("mensajes: mitad de campos se rechaza", () => {
+  const d = conMensajes([{ id: "c", text: "hola", isUser: true, audio: true }]);
+  assert.throws(() => readBackup(JSON.stringify(d)), /Conversación inválida/);
+});
+test("sync: mensaje con plan va y vuelve", () => {
+  const d = conMensajes([
+    { id: "a", text: "hola", isUser: true },
+    { id: "c", text: "", isUser: false, audio: false, plan: "2 cambios", estado: "aceptado" },
+  ]);
+  const vuelta = sm.dataOf(cr.fromCloud(cr.toCloud(sm.recordsOf(d))));
+  assert.deepEqual(vuelta.messages, d.messages);
+  assert.doesNotThrow(() => sm.validateRecords(sm.recordsOf(d)));
+});
+// V2/D: correr desde (voy atrasado) y buscar hueco. Lunes 6 de mayo de 2030.
+const t = (h, min = 0, dia = 6) => new Date(2030, 4, dia, h, min).getTime();
+const ti = (h, min = 0, dia = 6) => new Date(t(h, min, dia)).toISOString();
+const cosa = (id, h, min, duration, fields = {}) => ({
+  ...m.newItem(),
+  id,
+  title: id,
+  startDate: "2030-05-01",
+  scheduledAt: ti(h, min),
+  duration,
+  ...fields,
+});
+const manana = () => ({
+  ...m.emptyData(),
+  items: [
+    cosa("gym", 9, 30, 60),
+    cosa("est", 10, 30, 90),
+    cosa("reu", 12, 30, 60, { type: "Meeting", flexible: false }),
+    cosa("alm", 13, 30, 60),
+  ],
+});
+const corridas = (lista) =>
+  lista.map((c) => [c.itemId, new Date(c.despues).getHours() * 60 + new Date(c.despues).getMinutes(), c.noCabe]);
+test("correrDesde: ejemplo de la spec", () => {
+  const r = p.correrDesde(manana(), 20, t(9, 10));
+  assert.deepEqual(corridas(r), [
+    ["gym", 9 * 60 + 50, false],
+    ["est", 10 * 60 + 50, false],
+  ]);
+  assert.equal(r[0].antes, ti(9, 30));
+});
+test("correrDesde: salta lo fijo", () => {
+  assert.deepEqual(corridas(p.correrDesde(manana(), 80, t(9, 10))), [
+    ["gym", 10 * 60 + 50, false],
+    ["est", 13 * 60 + 30, false],
+    ["alm", 15 * 60, false],
+  ]);
+});
+test("correrDesde: lo que está en curso se corre", () => {
+  const d = { ...m.emptyData(), items: [cosa("gym", 9, 0, 60)] };
+  assert.deepEqual(corridas(p.correrDesde(d, 20, t(9, 10))), [["gym", 9 * 60 + 20, false]]);
+});
+test("correrDesde: no cabe hoy", () => {
+  const d = { ...m.emptyData(), items: [cosa("tarde", 20, 0, 60)] };
+  const [c] = p.correrDesde(d, 30, t(19, 0));
+  assert.equal(c.noCabe, true);
+  assert.equal(c.despues, c.antes);
+});
+test("correrDesde: nada cruza la medianoche", () => {
+  const d = {
+    ...m.emptyData(),
+    preferences: { ...m.emptyData().preferences, dayEnd: 23 },
+    items: [cosa("noche", 23, 0, 50)],
+  };
+  const [c] = p.correrDesde(d, 30, t(22, 50));
+  assert.equal(c.noCabe, true);
+  assert.equal(c.despues, ti(23, 0));
+});
+test("correrDesde: ignora completadas, pasivas y otros días", () => {
+  const d = {
+    ...m.emptyData(),
+    items: [
+      cosa("hecha", 10, 0, 30, { status: "completado" }),
+      cosa("nota", 10, 0, 30, { type: "Nota" }),
+      { ...cosa("otro", 10, 0, 30), scheduledAt: ti(10, 0, 7) },
+    ],
+  };
+  assert.deepEqual(p.correrDesde(d, 20, t(9, 0)), []);
+  assert.throws(() => p.correrDesde(d, 0, t(9, 0)), { message: "Indica cuántos minutos." });
+});
+test("buscarHueco: salta lo ocupado y respeta la jornada", () => {
+  const d = { ...m.emptyData(), items: [cosa("ocupado", 9, 0, 60)] };
+  assert.equal(p.buscarHueco(d, { duracion: 90, desde: t(8, 0) }, t(8, 0)), ti(10, 0));
+  assert.equal(p.buscarHueco(d, { duracion: 90, desde: t(20, 0) }, t(8, 0)), ti(8, 0, 7));
+  assert.equal(
+    p.buscarHueco(d, { duracion: 60, desde: t(9, 0), ignorar: "ocupado" }, t(8, 0)),
+    ti(9, 0),
+  );
+  assert.equal(p.buscarHueco(d, { duracion: 90, desde: t(8, 0), hasta: t(9, 0) }, t(8, 0)), null);
+});

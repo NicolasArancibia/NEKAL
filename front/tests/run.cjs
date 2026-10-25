@@ -22,6 +22,12 @@ const build = spawnSync(
     "src/utils/acomodo/plano.ts",
     "src/utils/acomodo/mesas.ts",
     "src/utils/demo.ts",
+    "src/utils/agente/plan.ts",
+    "src/utils/agente/contexto.ts",
+    "src/utils/agente/herramientas.ts",
+    "src/utils/agente/conversar.ts",
+    "src/utils/agente/mensajes.ts",
+    "src/utils/agente/dia.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -65,4 +71,5 @@ require("./estructura.cjs");
 require("./espacio.cjs");
 require("./rutinas.cjs");
 require("./demo.cjs");
+require("./agente.cjs");
 require("./styles.cjs");

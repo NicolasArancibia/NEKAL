@@ -1,5 +1,6 @@
 import {
   AppData,
+  ESTADOS_PLAN,
   Group,
   REPEATS,
   TYPES,
@@ -212,13 +213,21 @@ export function readBackup(text: string): AppData {
       throw new Error("Historial inválido.");
   if (new Set(d.rewards.map((r: any) => r.key)).size !== d.rewards.length)
     throw new Error("Historial duplicado.");
-  for (const m of d.messages)
+  for (const m of d.messages) {
+    const claves = Object.keys(m).length;
     if (
       typeof m.id !== "string" ||
       typeof m.text !== "string" ||
-      typeof m.isUser !== "boolean"
+      typeof m.isUser !== "boolean" ||
+      (claves !== 3 &&
+        (claves !== 6 ||
+          typeof m.audio !== "boolean" ||
+          typeof m.plan !== "string" ||
+          m.plan.length > 500 ||
+          !ESTADOS_PLAN.includes(m.estado)))
     )
       throw new Error("Conversación inválida.");
+  }
   for (const k of ["dayStart", "dayEnd", "quietStart", "quietEnd"])
     if (
       !Number.isInteger(d.preferences[k]) ||

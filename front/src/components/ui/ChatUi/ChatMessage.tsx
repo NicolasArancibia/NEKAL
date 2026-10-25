@@ -1,15 +1,22 @@
 // front/src/components/ui/ChatUi/ChatMessage.tsx
 import React from "react";
 import { View } from "react-native";
-import { color, radius, space } from "../../../styles/theme";
-import { Txt } from "../base";
+import { Ionicons } from "@expo/vector-icons";
+import { color, radius, size, space } from "../../../styles/theme";
+import { PressableScale, Txt } from "../base";
 
+// audio: el texto es lo que entendió Neka de tu grabación. onLeer: botón de
+// parlante para volver a escuchar una respuesta de Neka.
 export default function ChatMessage({
   message,
   isUser,
+  audio = false,
+  onLeer,
 }: {
   message?: string;
   isUser: boolean;
+  audio?: boolean;
+  onLeer?: () => void;
 }) {
   return (
     <View
@@ -29,7 +36,38 @@ export default function ChatMessage({
         borderColor: color.line,
       }}
     >
-      <Txt tone={isUser ? "onPrimary" : "ink"}>{message}</Txt>
+      <View
+        style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}
+      >
+        {audio && (
+          <Ionicons
+            name="mic-outline"
+            size={size.icon - 4}
+            color={isUser ? color.onPrimary : color.inkSecondary}
+          />
+        )}
+        <Txt
+          tone={isUser ? "onPrimary" : "ink"}
+          style={
+            audio ? { flexShrink: 1, fontStyle: "italic" } : { flexShrink: 1 }
+          }
+        >
+          {audio ? `«${message}»` : message}
+        </Txt>
+        {onLeer && (
+          <PressableScale
+            accessibilityLabel="Leer en voz alta"
+            onPress={onLeer}
+            hitSlop={space.sm}
+          >
+            <Ionicons
+              name="volume-medium-outline"
+              size={size.icon - 4}
+              color={color.primary}
+            />
+          </PressableScale>
+        )}
+      </View>
     </View>
   );
 }
