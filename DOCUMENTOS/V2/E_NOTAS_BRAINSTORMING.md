@@ -12,11 +12,11 @@ Brainstorming empezado el 25 de octubre de 2026, después de cerrar D. Parte del
 | Heatmap | **Cuánto cumpliste de tu día:** color según el % de lo que tenías ese día que completaste. Un día sin nada agendado pero con cosas completadas se pinta suave. |
 | Logros | Tres familias: **constancia (rachas), volumen y niveles, primeras veces**. Fuera: logros por área. El **catálogo es el mismo para todas las cuentas** (no depende de las mesas ni de lo que haga cada uno). Los números que propuse (3/7/30 días, 10/50/100 cosas, nivel 5/10…) eran ejemplos: se ajustan en el diseño. |
 | Motor | **Calcular todo de lo que ya hay** (historial de puntos con fecha + cosas con su día y estado). Solo se guarda el área de cada mesa y qué logros ya se vieron (para que el modal de revelado no se repita en otro dispositivo). Costo aceptado: si mueves algo de día, la historia de ese día cambia. |
+| Dónde vive | **El Perfil es tu progreso** ([maqueta 02](E_MAQUETA/02-donde-vive-el-progreso.html), opción A). Arriba tu nombre (tocar = editar perfil) y el engranaje de Ajustes; abajo nivel, tus días, tus mesas, logros y "desde el día 1". Cuenta y sincronización se mudan a Ajustes. La tarjeta "Progreso" del Resumen lleva a la pestaña Perfil (no hay pantalla aparte). Al usuario le gustó cómo quedó el contenido de la maqueta. |
 
 ## Pendiente
 
-- **Dónde vive el progreso:** A) el Perfil pasa a ser "tú y cómo vas", o B) una pantalla "Progreso" aparte. La primera maqueta ([E_MAQUETA/01-progreso.html](E_MAQUETA/01-progreso.html)) quedó genérica; el usuario pidió rehacerla bien, sin apuro, siguiendo el flujo completo.
-- Después: diseño por secciones (fórmula de puntaje revisada, rating, heatmap, rachas, catálogo de logros, modal de revelado, "desde el día 1", datos y reglas), spec `E_GAMIFICACION.md`, plan y ejecución.
+- Diseño por secciones (fórmula de puntaje revisada, rating, heatmap, rachas, catálogo de logros, modal de revelado, "desde el día 1", datos y reglas), spec `E_GAMIFICACION.md`, plan y ejecución.
 
 ## Contexto que existe hoy
 
