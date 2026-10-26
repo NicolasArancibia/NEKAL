@@ -36,6 +36,8 @@ const build = spawnSync(
     "src/utils/estadosNube.ts",
     "src/utils/amigos/codigo.ts",
     "src/utils/amigos/tarjeta.ts",
+    "src/utils/amigos/amistades.ts",
+    "src/utils/amigos/ejemplo.ts",
     "--outDir",
     ".test-build",
     "--module",

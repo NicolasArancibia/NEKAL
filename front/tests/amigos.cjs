@@ -142,3 +142,95 @@ test("amigos: listo para publicar", () => {
   assert.equal(tar.listoParaPublicar({ ...ok, conCuenta: false }), false);
   assert.equal(tar.listoParaPublicar({ ...ok, nombre: "  " }), false);
 });
+
+const ami = require("../.test-build/amigos/amistades.js");
+const ej = require("../.test-build/amigos/ejemplo.js");
+const amistad = (otro, nombre, { mia = false, estado = "pendiente" } = {}) => ({
+  id: ami.idPar("yo", otro),
+  de: mia ? "yo" : otro,
+  para: mia ? otro : "yo",
+  estado,
+  nombreDe: mia ? "Sofía Rojas" : nombre,
+  nombrePara: mia ? nombre : "Sofía Rojas",
+  codigo: "7KQ2PX",
+});
+
+test("amigos: id de pareja", () => {
+  assert.equal(ami.idPar("b", "a"), "a_b");
+  assert.equal(ami.idPar("a", "b"), "a_b");
+});
+
+test("amigos: listas", () => {
+  const todas = [
+    amistad("u-bruno", "Bruno"),
+    amistad("u-angela", "Ángela"),
+    amistad("u-diego", "Diego", { mia: true }),
+    amistad("u-tomas", "Tomás", { estado: "aceptada" }),
+    amistad("u-javiera", "Javiera", { mia: true, estado: "aceptada" }),
+  ];
+  const l = ami.listas(todas, "yo");
+  const nombres = (xs) => xs.map((a) => ami.otroDe(a, "yo").nombre);
+  assert.deepEqual(nombres(l.recibidas), ["Ángela", "Bruno"]);
+  assert.deepEqual(nombres(l.enviadas), ["Diego"]);
+  assert.deepEqual(nombres(l.amigos), ["Javiera", "Tomás"]);
+});
+
+test("amigos: revisar envío", () => {
+  const todas = [
+    amistad("u-tomas", "Tomás", { estado: "aceptada" }),
+    amistad("u-diego", "Diego", { mia: true }),
+    amistad("u-camila", "Camila"),
+  ];
+  const revisar = (uid) => ami.revisarEnvio({ uid, nombre: "X" }, "yo", todas);
+  assert.deepEqual(revisar("yo"), { tipo: "propio" });
+  assert.deepEqual(revisar("u-tomas"), { tipo: "ya-amigos" });
+  assert.deepEqual(revisar("u-diego"), { tipo: "ya-enviada" });
+  assert.deepEqual(revisar("u-camila"), {
+    tipo: "te-envio",
+    id: ami.idPar("yo", "u-camila"),
+  });
+  assert.deepEqual(revisar("u-nueva"), { tipo: "ok" });
+  assert.equal(ami.AVISOS["te-envio"], "Esa persona ya te envió una solicitud.");
+  assert.equal(ami.AVISOS["sin-conexion"], "Sin conexión. Revisa tu internet y reintenta.");
+});
+
+test("amigos: filas de amigos", () => {
+  const amigos = [
+    amistad("u-tomas", "Tomás Reyes", { estado: "aceptada" }),
+    amistad("u-javiera", "Javiera", { mia: true, estado: "aceptada" }),
+  ];
+  const javiera = {
+    ...tar.tarjetaDe(conPerfil(), now, 0, "ABCDEF"),
+    nombre: "Javiera Muñoz",
+    nivel: 11,
+    logros: ["racha-3", "racha-7"],
+  };
+  const filas = ami.filasAmigos(amigos, "yo", { "u-javiera": javiera, "u-tomas": null });
+  assert.deepEqual(
+    filas.map((f) => [f.nombre, f.nivel, f.logros]),
+    [
+      ["Javiera Muñoz", 11, 2],
+      ["Tomás Reyes", null, null],
+    ],
+  );
+  assert.equal(filas[1].tarjeta, null);
+});
+
+test("amigos: datos de ejemplo", () => {
+  const e = ej.amigosDeEjemplo();
+  const l = ami.listas(e.amistades, ej.YO_EJEMPLO);
+  assert.equal(l.recibidas.length, 1);
+  assert.equal(l.enviadas.length, 1);
+  assert.equal(l.amigos.length, 3);
+  const filas = ami.filasAmigos(l.amigos, ej.YO_EJEMPLO, e.tarjetas);
+  assert.deepEqual(
+    filas.map((f) => [f.nombre, f.nivel]),
+    [
+      ["Javiera Muñoz", 11],
+      ["Martín Pérez", 6],
+      ["Tomás Reyes", null],
+    ],
+  );
+  assert.equal(filas[0].logros, 17);
+  assert.equal(e.codigo, "7KQ2PX");
+});
