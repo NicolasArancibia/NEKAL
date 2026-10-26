@@ -243,6 +243,8 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
     );
     console.log("OK Firestore: F aceptar y leer");
     await assertSucceeds(codigoYTarjeta(db, "alice", "AAA567", "Alice", "AAA234"));
+    // Un código nuevo sin borrar el viejo no se puede: el viejo deja de funcionar.
+    await assertFails(codigoYTarjeta(db, "alice", "AAA777", "Alice"));
     assert.equal((await getDoc(doc(other, "codigos/AAA234"))).exists(), false);
     await assertSucceeds(updateDoc(doc(db, "codigos/AAA567"), { nombre: "Alicia" }));
     await assertFails(updateDoc(doc(db, "codigos/AAA567"), { uid: "bob" }));

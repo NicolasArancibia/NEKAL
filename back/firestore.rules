@@ -72,9 +72,11 @@ function solicitudOk(id) {let v=request.resource.data; let c=get(/databases/$(da
 && v.de==request.auth.uid && v.para is string && v.para!=v.de && id==par(v.de, v.para) && v.miembros==[v.de, v.para] && v.estado=='pendiente' && v.creada==request.time && v.aceptada==null
 && codigoOk(v.codigo) && c.uid==v.para && v.nombrePara==c.nombre && v.nombreDe==get(/databases/$(database)/documents/perfiles/$(v.de)).data.nombre;}
 match /codigos/{codigo} {
+// Un código por cuenta: el nuevo se crea junto a la tarjeta y en el mismo lote se borra el anterior.
 allow get: if request.auth != null;
 allow create: if request.auth != null && codigoOk(codigo) && fields(request.resource.data,['uid','nombre']) && request.resource.data.uid==request.auth.uid && nombreOk(request.resource.data.nombre)
-&& getAfter(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.codigo==codigo;
+&& getAfter(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.codigo==codigo
+&& (!exists(/databases/$(database)/documents/perfiles/$(request.auth.uid)) || !existsAfter(/databases/$(database)/documents/codigos/$(get(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.codigo)));
 allow update: if request.auth != null && resource.data.uid==request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']) && nombreOk(request.resource.data.nombre);
 allow delete: if request.auth != null && resource.data.uid==request.auth.uid;
 }
