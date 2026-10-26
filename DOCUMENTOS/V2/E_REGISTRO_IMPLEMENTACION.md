@@ -62,3 +62,7 @@ Final review: self-review (sin subagentes, por preferencia del usuario).
 - Final: minor (deferred): una cuenta que al lanzar E tiene 1–3 logros ve tarjetas sueltas sin la línea de la baja de nivel (la spec la pone solo en la tarjeta resumen).
 - Final: minor (deferred): cosasDelDia quedó exportada sin uso (diaDe usa historial).
 - Final: Ruling: «reducir movimiento» no se puede activar desde el navegador integrado; se verifica en la prueba del iPhone (paso 7) — costo: si falla, se arregla tras esa prueba.
+- Task 9 Step 2: reglas publicadas con permiso del usuario (npm run deploy:rules → «Deploy complete!»; la CLI dijo «already up to date», como en D). Falta confirmar con PruebaClaude.
+- Task 9 Step 3: el usuario inició sesión con PruebaClaude tras publicar las reglas y confirmó «quedó todo bien» (26/10). El registro del servidor no muestra errores de permisos.
+- Task 9 Step 6: la prueba completa en iPhone (7 pasos) queda en manos del usuario; si encuentra algo, se arregla en el próximo chat.
+Task 9: complete (reglas publicadas, verificación con cuenta real confirmada por el usuario, documentación al día).
