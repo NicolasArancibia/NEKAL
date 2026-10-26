@@ -48,6 +48,7 @@ export type Busqueda =
   | { tipo: "aviso"; aviso: Aviso; id?: string };
 export type Amigos = {
   activo: boolean; // con cuenta o con el ejemplo de desarrollo
+  yo: string | null; // tu uid (o el del ejemplo)
   estado: "invitado" | "cargando" | "listo" | "sin-conexion";
   miCodigo: string | null;
   recibidas: Amistad[];
@@ -245,6 +246,7 @@ export function AmigosProvider({ children }: { children: ReactNode }) {
 
   const valor: Amigos = {
     activo,
+    yo,
     estado: !activo
       ? "invitado"
       : ejemplo

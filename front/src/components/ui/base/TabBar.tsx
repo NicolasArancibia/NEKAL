@@ -11,6 +11,8 @@ import { color, motion, size } from "../../../styles/theme";
 import { haptic } from "../../../utils/haptics";
 import PressableScale from "./PressableScale";
 import { useNeka } from "../../../utils/NekaContext";
+import { useAmigos } from "../../../utils/AmigosContext";
+import Contador from "./Contador";
 
 const tabs: Record<
   string,
@@ -55,6 +57,7 @@ function TabIcon({
 export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const neka = useNeka();
+  const { solicitudes } = useAmigos();
   return (
     <View
       accessibilityRole="tablist"
@@ -86,11 +89,17 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
         };
         // Mantener apretada la pestaña Neka graba desde cualquier pantalla (spec D §5.3).
         const esNeka = route.name === "Chat";
+        // Las solicitudes de amistad se ven en la pestaña Perfil (spec F §6.4).
+        const n = route.name === "Perfil" ? solicitudes : 0;
         return (
           <PressableScale
             key={route.key}
             accessibilityRole="tab"
-            accessibilityLabel={tab.label}
+            accessibilityLabel={
+              n
+                ? `${tab.label}, ${n} ${n === 1 ? "solicitud" : "solicitudes"}`
+                : tab.label
+            }
             accessibilityHint={
               esNeka ? "Mantén apretado para hablarle a Neka" : undefined
             }
@@ -107,7 +116,15 @@ export default function TabBar({ state, navigation }: BottomTabBarProps) {
               justifyContent: "center",
             }}
           >
-            <TabIcon name={tab.icon} active={active} />
+            <View>
+              <TabIcon name={tab.icon} active={active} />
+              {n > 0 && (
+                <Contador
+                  n={n}
+                  style={{ position: "absolute", top: -4, right: -10 }}
+                />
+              )}
+            </View>
           </PressableScale>
         );
       })}
