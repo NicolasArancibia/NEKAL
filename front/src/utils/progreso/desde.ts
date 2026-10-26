@@ -17,6 +17,28 @@ export const cosasListas = (d: AppData) =>
     (i) => !passive(i) && !i.deletedAt && i.status === "completado",
   ).length;
 
+const MESES_LARGOS = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+export const mesLargo = (dia: string) =>
+  MESES_LARGOS[Number(dia.slice(5, 7)) - 1];
+// «3 de agosto» y «agosto de 2026».
+export const fechaLarga = (dia: string) =>
+  `${Number(dia.slice(8, 10))} de ${mesLargo(dia)}`;
+export const mesYAnio = (dia: string) =>
+  `${mesLargo(dia)} de ${dia.slice(0, 4)}`;
+
 // Días de calendario, no milisegundos: el cambio de horario no corre la cuenta.
 export const sumarDias = (dia: string, n: number) => {
   const [y, m, d] = dia.split("-").map(Number);

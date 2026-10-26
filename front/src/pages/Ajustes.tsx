@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Platform, Share, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
+import { signOut } from "firebase/auth";
 import { useApp } from "../utils/AppContext";
+import { auth } from "../utils/firebase";
 import { AppData, localDay, restoreItem } from "../utils/model";
 import { readBackup } from "../utils/storage";
 import { requestReminders } from "../utils/notifications";
@@ -35,13 +37,18 @@ function Section({
 }
 
 // Ajustes en un panel; las ventanas internas de V1 pasaron a desplegables para
-// no anidar paneles.
+// no anidar paneles. Por eso «Conectar mi cuenta» y «Revisar cambios en
+// conflicto» cierran Ajustes y abren su hoja desde el Perfil (spec E §7.1).
 export default function Ajustes({
   visible,
   onClose,
+  onConectar,
+  onRevisar,
 }: {
   visible: boolean;
   onClose: () => void;
+  onConectar: () => void;
+  onRevisar: () => void;
 }) {
   const {
     data,
@@ -52,7 +59,16 @@ export default function Ajustes({
     hasRecovery,
     replaceData,
     restorePrevious,
+    user,
+    storageStatus,
+    cloud,
+    cloudBusy,
+    cloudStatus,
+    exitGuest,
+    pendingChanges,
+    conflict,
   } = useApp();
+  const [cuentaError, setCuentaError] = useState("");
   const [json, setJson] = useState(""),
     [showJson, setShowJson] = useState(false),
     [confirmRecovery, setConfirmRecovery] = useState(false);
@@ -152,6 +168,67 @@ export default function Ajustes({
           />
         </Card>
       )}
+      <Section title="Cuenta">
+        <Txt weight={600}>
+          {user ? (user.email ?? "Cuenta") : "Modo invitado"}
+        </Txt>
+        <Txt variant="callout" tone="secondary">
+          {user
+            ? `${cloudStatus} · ${pendingChanges} ${pendingChanges === 1 ? "cambio pendiente" : "cambios pendientes"}`
+            : "Tus datos quedan solo en este dispositivo."}
+        </Txt>
+        {!!storageStatus && (
+          <Txt variant="caption" tone="secondary">
+            {storageStatus}
+          </Txt>
+        )}
+        {user ? (
+          <>
+            <Button
+              title="Reintentar conexión"
+              variant="secondary"
+              onPress={() => void cloud()}
+            />
+            {!!conflict && (
+              <Button
+                title="Revisar cambios en conflicto"
+                onPress={onRevisar}
+              />
+            )}
+            <Button
+              title="Cerrar sesión"
+              variant="plain"
+              disabled={cloudBusy}
+              onPress={() => {
+                if (auth)
+                  void signOut(auth).catch(() =>
+                    setCuentaError(
+                      "No se pudo cerrar la sesión. Revisa tu conexión y reintenta.",
+                    ),
+                  );
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              title="Conectar mi cuenta"
+              variant="secondary"
+              onPress={onConectar}
+            />
+            <Button
+              title="Volver al inicio"
+              variant="plain"
+              onPress={exitGuest}
+            />
+          </>
+        )}
+        {!!cuentaError && (
+          <Txt tone="danger" accessibilityRole="alert">
+            {cuentaError}
+          </Txt>
+        )}
+      </Section>
       <Section title="Neka">
         <Toggle
           label="Avisos suaves"

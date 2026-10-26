@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { signOut } from "firebase/auth";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { TabParamList } from "../navigation/TabNavigator";
 import { useApp } from "../utils/AppContext";
-import { auth } from "../utils/firebase";
-import { totalPoints } from "../utils/model";
-import { nivelDe } from "../utils/progreso/nivel";
+import { mesYAnio } from "../utils/progreso/desde";
+import { desbloqueados, paraPerfil } from "../utils/progreso/logros";
+import { useProgreso } from "../utils/useProgreso";
 import { mergeValue, recordsOf } from "../utils/syncModel";
 import { color, radius, size, space } from "../styles/theme";
 import {
@@ -16,35 +15,27 @@ import {
   Field,
   PressableScale,
   ScreenHeader,
+  SectionTitle,
   Sheet,
-  Tag,
   Txt,
 } from "../components/ui/base";
+import TarjetaNivel from "../components/ui/progreso/TarjetaNivel";
+import GrillaLogros from "../components/ui/progreso/GrillaLogros";
+import HojaLogros from "../components/ui/progreso/HojaLogros";
+import FilaMesa from "../components/ui/progreso/FilaMesa";
 import Login from "./Login";
 import Ajustes from "./Ajustes";
 
 export default function Perfil() {
-  const {
-    data,
-    change,
-    user,
-    storageStatus,
-    cloud,
-    cloudBusy,
-    cloudStatus,
-    exitGuest,
-    pendingChanges,
-    conflict,
-    remoteData,
-    resolveConflict,
-  } = useApp();
+  const { data, change, conflict, remoteData, resolveConflict } = useApp();
   const [settings, setSettings] = useState(false),
     [edit, setEdit] = useState(false),
     [account, setAccount] = useState(false),
     [name, setName] = useState(""),
     [roles, setRoles] = useState(""),
     [error, setError] = useState(""),
-    [review, setReview] = useState(false);
+    [review, setReview] = useState(false),
+    [verLogros, setVerLogros] = useState(false);
   const [profileBase, setProfileBase] = useState(data.profile);
   const route = useRoute<RouteProp<TabParamList, "Perfil">>();
   const navigation = useNavigation();
@@ -55,7 +46,14 @@ export default function Perfil() {
       navigation.setParams({ settings: undefined } as never);
     }
   }, [route.params?.settings]);
-  const points = totalPoints(data);
+  const progreso = useProgreso();
+  const logrados = desbloqueados(data, progreso.hechos);
+  const abrirEditar = () => {
+    setName(data.profile.name);
+    setProfileBase(data.profile);
+    setRoles(data.profile.roles);
+    setEdit(true);
+  };
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: color.background }}
@@ -68,8 +66,49 @@ export default function Perfil() {
         alignSelf: "center",
       }}
     >
-      <ScreenHeader title="Perfil" />
+      <ScreenHeader
+        title="Perfil"
+        right={
+          <PressableScale
+            onPress={() => setSettings(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Ajustes"
+            style={{
+              width: size.minTouch,
+              height: size.minTouch,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={size.icon + 2}
+              color={color.primary}
+            />
+          </PressableScale>
+        }
+      />
       <Card style={{ alignItems: "center", paddingVertical: space.xxl }}>
+        <PressableScale
+          onPress={abrirEditar}
+          accessibilityRole="button"
+          accessibilityLabel="Editar perfil"
+          style={{
+            position: "absolute",
+            top: space.xs,
+            right: space.xs,
+            width: size.minTouch,
+            height: size.minTouch,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons
+            name="create-outline"
+            size={size.icon}
+            color={color.primary}
+          />
+        </PressableScale>
         <View
           style={{
             backgroundColor: color.primary,
@@ -92,108 +131,57 @@ export default function Perfil() {
             {data.profile.roles}
           </Txt>
         )}
-        <View style={{ flexDirection: "row", gap: space.sm }}>
-          <Tag text={`Nivel ${nivelDe(points).nivel}`} tone="primary" />
-          <Tag text={`${points} pts`} tone="primary" />
-        </View>
-      </Card>
-      <Button
-        title="Editar perfil"
-        variant="secondary"
-        onPress={() => {
-          setName(data.profile.name);
-          setProfileBase(data.profile);
-          setRoles(data.profile.roles);
-          setEdit(true);
-        }}
-      />
-      <Card
-        onPress={() => setSettings(true)}
-        accessibilityLabel="Abrir ajustes"
-      >
-        <View
-          style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
-        >
-          <Ionicons
-            name="settings-outline"
-            size={size.icon}
-            color={color.primary}
-          />
-          <Txt weight={600} style={{ flex: 1 }}>
-            Ajustes
-          </Txt>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={size.icon}
-            color={color.inkSecondary}
-          />
-        </View>
-      </Card>
-      <View style={{ gap: space.sm }}>
-        <Txt variant="headline">Cuenta</Txt>
-        <Card>
-          <Txt weight={600}>
-            {user ? (user.email ?? "Cuenta") : "Modo invitado"}
-          </Txt>
-          <Txt variant="callout" tone="secondary">
-            {user
-              ? `${cloudStatus} · ${pendingChanges} ${pendingChanges === 1 ? "cambio pendiente" : "cambios pendientes"}`
-              : "Tus datos quedan solo en este dispositivo."}
-          </Txt>
-          {!!storageStatus && (
-            <Txt variant="caption" tone="secondary">
-              {storageStatus}
-            </Txt>
-          )}
-          {user ? (
-            <>
-              <Button
-                title="Reintentar conexión"
-                variant="secondary"
-                onPress={() => void cloud()}
-              />
-              {!!conflict && (
-                <Button
-                  title="Revisar cambios en conflicto"
-                  onPress={() => setReview(true)}
-                />
-              )}
-              <Button
-                title="Cerrar sesión"
-                variant="plain"
-                disabled={cloudBusy}
-                onPress={() => {
-                  if (auth)
-                    void signOut(auth).catch(() =>
-                      setError(
-                        "No se pudo cerrar la sesión. Revisa tu conexión y reintenta.",
-                      ),
-                    );
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <Button
-                title="Conectar mi cuenta"
-                variant="secondary"
-                onPress={() => setAccount(true)}
-              />
-              <Button
-                title="Volver al inicio"
-                variant="plain"
-                onPress={exitGuest}
-              />
-            </>
-          )}
-        </Card>
-      </View>
-      {!!error && (
-        <Txt tone="danger" accessibilityRole="alert">
-          {error}
+        <Txt variant="caption" tone="secondary">
+          En Nekal desde {mesYAnio(progreso.desde.dia1)}
         </Txt>
+      </Card>
+      <TarjetaNivel nivel={progreso.nivel} puntos={progreso.puntos} />
+      <SectionTitle title="Logros" detail={`${logrados.length} de 24`} />
+      <GrillaLogros
+        logros={paraPerfil(data, progreso.hechos, Date.now())}
+        hechos={progreso.hechos}
+        onVerTodos={() => setVerLogros(true)}
+      />
+      <SectionTitle title="Tus mesas" detail="cómo vas en cada una" />
+      <Card style={{ gap: space.sm }}>
+        {progreso.mesas.length ? (
+          progreso.mesas.map((r, k) => {
+            const mesa = data.workspaces.find((w) => w.id === r.mesaId)!;
+            return (
+              <View key={r.mesaId} style={{ gap: space.sm }}>
+                {k > 0 && (
+                  <View style={{ height: 1, backgroundColor: color.line }} />
+                )}
+                <FilaMesa mesa={mesa} rating={r} hoy={progreso.hoy} />
+              </View>
+            );
+          })
+        ) : (
+          <Txt variant="callout" tone="secondary">
+            Crea una mesa en el Espacio para ver cómo vas en cada una.
+          </Txt>
+        )}
+      </Card>
+      <HojaLogros
+        visible={verLogros}
+        onClose={() => setVerLogros(false)}
+        desbloqueados={logrados}
+        hechos={progreso.hechos}
+      />
+      {settings && (
+        <Ajustes
+          visible
+          onClose={() => setSettings(false)}
+          onConectar={() => {
+            setSettings(false);
+            setAccount(true);
+          }}
+          onRevisar={() => {
+            setSettings(false);
+            setReview(true);
+          }}
+        />
       )}
-      {settings && <Ajustes visible onClose={() => setSettings(false)} />}
       <Sheet
         visible={edit}
         title="Editar perfil"

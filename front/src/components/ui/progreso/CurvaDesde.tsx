@@ -2,31 +2,20 @@ import { useState } from "react";
 import { View } from "react-native";
 import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
 import { color, font, type } from "../../../styles/theme";
-import { Desde, diasEntre } from "../../../utils/progreso/desde";
+import {
+  Desde,
+  diasEntre,
+  fechaLarga,
+  mesLargo,
+} from "../../../utils/progreso/desde";
 import { puntosParaNivel } from "../../../utils/progreso/nivel";
 import { miles } from "../../../utils/progreso/logros";
 import { Card, Txt } from "../base";
 
-const MESES = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
 const ALTO = 112,
   ARRIBA = 24,
   BASE = 86;
 
-export const fechaLarga = (dia: string) =>
-  `${Number(dia.slice(8, 10))} de ${MESES[Number(dia.slice(5, 7)) - 1]}`;
 const plural = (n: number, uno: string, varios: string) =>
   `${miles(n)} ${n === 1 ? uno : varios}`;
 
@@ -127,7 +116,7 @@ export default function CurvaDesde({
                   fontFamily={font[500]}
                   fill={color.inkSecondary}
                 >
-                  {MESES[Number(dia.slice(5, 7)) - 1].slice(0, 3)}
+                  {mesLargo(dia).slice(0, 3)}
                 </SvgText>
               ))}
             </Svg>
