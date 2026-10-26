@@ -14,7 +14,9 @@ export default function FilaAmigo({
   onPress: () => void;
 }) {
   const detalle =
-    fila.nivel === null ? "" : `Nivel ${fila.nivel} · ${fila.logros} logros`;
+    fila.nivel === null
+      ? ""
+      : `Nivel ${fila.nivel} · ${fila.logros} ${fila.logros === 1 ? "logro" : "logros"}`;
   return (
     <PressableScale
       onPress={onPress}
