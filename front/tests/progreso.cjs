@@ -690,3 +690,30 @@ test("dias: la historia empieza en la primera cosa con fecha, aunque se creara h
   assert.equal(dias.semanas12(d, now)[0].dia, "2030-05-06");
   assert.equal(lg.hechosDe(d, now).record, 3);
 });
+
+test("logros: el modal espera la primera sincronización y las hojas", () => {
+  const nube = require("../.test-build/estadosNube.js");
+  const base = {
+    hojas: 0,
+    grabando: false,
+    planAbierto: false,
+    conCuenta: true,
+    estadoNube: "Sincronizado automáticamente",
+  };
+  assert.equal(lg.listoParaLogro(base), true);
+  assert.equal(
+    lg.listoParaLogro({ ...base, estadoNube: nube.CONECTANDO }),
+    false,
+  );
+  assert.equal(
+    lg.listoParaLogro({ ...base, estadoNube: nube.SINCRONIZANDO }),
+    false,
+  );
+  assert.equal(
+    lg.listoParaLogro({ ...base, conCuenta: false, estadoNube: "Modo local" }),
+    true,
+  );
+  assert.equal(lg.listoParaLogro({ ...base, hojas: 1 }), false);
+  assert.equal(lg.listoParaLogro({ ...base, grabando: true }), false);
+  assert.equal(lg.listoParaLogro({ ...base, planAbierto: true }), false);
+});

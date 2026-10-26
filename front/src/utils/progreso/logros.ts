@@ -1,5 +1,6 @@
 import { AppData, LOGRO_IDS, LogroId, localDay, totalPoints } from "../model";
 import { GENERAL } from "../estructura";
+import { CONECTANDO, SINCRONIZANDO } from "../estadosNube";
 import { cosasListas } from "./desde";
 import { historial, inicioHistoria, rachas } from "./dias";
 import { nivelDe, puntosParaNivel } from "./nivel";
@@ -251,4 +252,19 @@ export function paraPerfil(
     ...logrados.slice(0, nL).map((id) => ({ id, logrado: true })),
     ...bloqueados.slice(0, nB).map((id) => ({ id, logrado: false })),
   ];
+}
+
+// El modal de logro sale solo si no hay hojas abiertas, grabación ni plan de
+// Neka, y (con cuenta) después de la primera sincronización (spec E §6.3).
+export function listoParaLogro(e: {
+  hojas: number;
+  grabando: boolean;
+  planAbierto: boolean;
+  conCuenta: boolean;
+  estadoNube: string;
+}): boolean {
+  const sincronizando =
+    e.conCuenta &&
+    (e.estadoNube === CONECTANDO || e.estadoNube === SINCRONIZANDO);
+  return !e.hojas && !e.grabando && !e.planAbierto && !sincronizando;
 }

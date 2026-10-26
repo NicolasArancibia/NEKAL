@@ -29,6 +29,7 @@ import {
   CATALOGO,
   Cola,
   hechosDe,
+  listoParaLogro,
   siguiente,
   verLogros,
 } from "../../../utils/progreso/logros";
@@ -146,7 +147,7 @@ export default function LogroNuevo({
 }: {
   onVerLogros: () => void;
 }) {
-  const { data, change, cloudBusy } = useApp();
+  const { data, change, user, cloudStatus } = useApp();
   const neka = useNeka();
   const hojas = useHojasAbiertas();
   const reducido = useReducedMotion();
@@ -155,7 +156,13 @@ export default function LogroNuevo({
     [data],
   );
   const [mostrando, setMostrando] = useState<Cola>(null);
-  const libre = hojas === 0 && !neka.grabando && !neka.hoja && !cloudBusy;
+  const libre = listoParaLogro({
+    hojas,
+    grabando: neka.grabando,
+    planAbierto: neka.hoja,
+    conCuenta: !!user,
+    estadoNube: cloudStatus,
+  });
   // Medio segundo de margen: en el iPhone un Modal no se presenta mientras otro
   // (la hoja que se acaba de cerrar) todavía se está yendo.
   useEffect(() => {
