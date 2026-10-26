@@ -4,7 +4,9 @@ Copia del registro de avance de la ejecución del [plan](F_PLAN_IMPLEMENTACION.m
 
 Rama: v2/f-amigos (desde main 9779245) · Ejecución nativa; revisión final = autorrevisión (preferencia del usuario). Reglas publicadas el 26/10 con permiso del usuario.
 
-## Prueba en el iPhone (pendiente del usuario)
+## Prueba en el iPhone (aprobada el 26/10)
+
+El usuario probó los 7 pasos en su iPhone con Expo Go el 26/10/2026 y funcionó todo, incluido el aviso sin internet (paso 6).
 
 Con la versión de F abierta en Expo Go y dos cuentas (por ejemplo, la tuya en el iPhone y PruebaClaude en el navegador):
 
@@ -20,7 +22,7 @@ Con la versión de F abierta en Expo Go y dos cuentas (por ejemplo, la tuya en e
 
 - Al abrir la app con cuenta, la sección Amigos puede mostrar un instante «sin amigos» mientras carga.
 - Si el otro rechaza o cancela justo cuando tú cancelas o rechazas, sale «No se pudo completar…» aunque la lista se actualiza sola.
-- `conPlazo` (el plazo de 10 s) se prueba solo a mano (paso 6 de arriba).
+- `conPlazo` (el plazo de 10 s) no tiene prueba automática; se probó a mano en el iPhone (paso 6, aprobado).
 - Quien fue rechazado puede volver a enviar (no hay bloqueo); cada uno elige el nombre de su tarjeta; la tarjeta la escribe el propio teléfono (aceptado en la spec).
 
 ## Registro
