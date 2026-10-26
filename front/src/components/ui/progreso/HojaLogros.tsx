@@ -16,7 +16,7 @@ const FAMILIAS: { id: Familia; nombre: string }[] = [
   { id: "primeras", nombre: "Primeras veces" },
 ];
 
-// Los 24 logros por familia (spec E §6.2). Los bloqueados de primeras veces
+// Los 25 logros por familia (spec E §6.2 y F). Los bloqueados de primeras veces
 // dicen cómo conseguirlos.
 export default function HojaLogros({
   visible,

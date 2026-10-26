@@ -8,6 +8,7 @@ import { mesYAnio } from "../utils/progreso/desde";
 import { desbloqueados, paraPerfil } from "../utils/progreso/logros";
 import { useProgreso } from "../utils/useProgreso";
 import { mergeValue, recordsOf } from "../utils/syncModel";
+import { LOGRO_IDS } from "../utils/model";
 import { color, radius, size, space } from "../styles/theme";
 import {
   Button,
@@ -136,7 +137,7 @@ export default function Perfil() {
         </Txt>
       </Card>
       <TarjetaNivel nivel={progreso.nivel} puntos={progreso.puntos} />
-      <SectionTitle title="Logros" detail={`${logrados.length} de 24`} />
+      <SectionTitle title="Logros" detail={`${logrados.length} de ${LOGRO_IDS.length}`} />
       <GrillaLogros
         logros={paraPerfil(data, progreso.hechos, Date.now())}
         hechos={progreso.hechos}
