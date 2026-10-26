@@ -5,7 +5,7 @@ import { cosasListas } from "./desde";
 import { historial, inicioHistoria, rachas } from "./dias";
 import { nivelDe, puntosParaNivel } from "./nivel";
 
-// Logros (spec E §6): 24 iguales para todas las cuentas. Nunca se pierden.
+// Logros (spec E §6 y F): 25 iguales para todas las cuentas. Nunca se pierden.
 export type Familia = "constancia" | "volumen" | "primeras";
 export type Logro = {
   id: LogroId;
@@ -28,6 +28,7 @@ export type Hechos = {
   metas: number;
   audio: boolean;
   plan: boolean;
+  amigos: number;
 };
 export type Cola =
   | { tipo: "uno"; id: LogroId }
@@ -141,9 +142,18 @@ export const CATALOGO: Logro[] = [
     "Aceptaste tu primer plan de Neka.",
     "Acepta un plan que te proponga Neka.",
   ),
+  primera(
+    "primer-amigo",
+    "Primer amigo",
+    "Primer amigo",
+    "people-outline",
+    "Te hiciste amigo de alguien en Nekal.",
+    "Agrega a alguien con su código.",
+  ),
 ];
 
-export function hechosDe(d: AppData, now: number): Hechos {
+// `amigos`: amistades aceptadas (subproyecto F); no vive en AppData.
+export function hechosDe(d: AppData, now: number, amigos = 0): Hechos {
   const hoy = localDay(new Date(now));
   const dias = historial(d, inicioHistoria(d, now), hoy);
   let corrida = 0,
@@ -168,6 +178,7 @@ export function hechosDe(d: AppData, now: number): Hechos {
     ).length,
     audio: d.messages.some((x) => x.isUser && !!x.audio),
     plan: d.messages.some((x) => x.estado === "aceptado"),
+    amigos,
   };
 }
 
@@ -184,6 +195,7 @@ export function cumple(id: LogroId, h: Hechos): boolean {
     "primer-dia-100": h.dia100,
     "primer-audio": h.audio,
     "primer-plan": h.plan,
+    "primer-amigo": h.amigos >= 1,
   }[id as string]!;
 }
 

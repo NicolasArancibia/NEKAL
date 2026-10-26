@@ -516,7 +516,7 @@ test("datos: logros vistos, ida y vuelta y respaldo", () => {
   assert.deepEqual(sync.validateRecords(r).logros, d.logros);
 });
 
-test("datos: logro desconocido, duplicado o más de 24 se rechaza", () => {
+test("datos: logro desconocido, duplicado o más de 25 se rechaza", () => {
   const con = (logros) => JSON.stringify(conMesas({ logros }));
   assert.throws(() => readBackup(con([vistoLogro("inventado")])), /Logros inválidos/);
   assert.throws(
@@ -531,6 +531,7 @@ test("datos: logro desconocido, duplicado o más de 24 se rechaza", () => {
     () => readBackup(con([{ ...vistoLogro("racha-3"), extra: 1 }])),
     /Logros inválidos/,
   );
+  assert.equal(readBackup(con(m.LOGRO_IDS.map(vistoLogro))).logros.length, 25);
   const largo = sync.recordsOf(conMesas({ logros: [vistoLogro("racha-3")] }));
   largo["logros/racha-3"] = { id: "racha-3", at: "x".repeat(41) };
   assert.throws(() => sync.validateRecords(largo));

@@ -34,6 +34,10 @@ const build = spawnSync(
     "src/utils/progreso/mesas.ts",
     "src/utils/progreso/logros.ts",
     "src/utils/estadosNube.ts",
+    "src/utils/amigos/codigo.ts",
+    "src/utils/amigos/tarjeta.ts",
+    "src/utils/amigos/amistades.ts",
+    "src/utils/amigos/ejemplo.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -79,4 +83,5 @@ require("./rutinas.cjs");
 require("./demo.cjs");
 require("./agente.cjs");
 require("./progreso.cjs");
+require("./amigos.cjs");
 require("./styles.cjs");

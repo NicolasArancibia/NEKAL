@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -45,12 +45,15 @@ export default function Sheet({
   onClose,
   children,
   size: variant = "large",
+  pagina,
 }: {
   visible: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
   size?: "auto" | "large";
+  // Hojas con varias páginas: al cambiar, el contenido vuelve arriba.
+  pagina?: string;
 }) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -60,6 +63,10 @@ export default function Sheet({
 
   // Cuenta como hoja abierta mientras está visible (el modal de logro espera).
   useEffect(() => (visible ? abrirHoja() : undefined), [visible]);
+  const contenido = useRef<ScrollView>(null);
+  useEffect(() => {
+    contenido.current?.scrollTo({ y: 0, animated: false });
+  }, [pagina]);
 
   useEffect(() => {
     if (!visible) return;
@@ -188,6 +195,7 @@ export default function Sheet({
               </View>
             </GestureDetector>
             <ScrollView
+              ref={contenido}
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{
                 padding: space.xl,

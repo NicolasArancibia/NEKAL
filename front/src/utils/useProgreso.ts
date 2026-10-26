@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useApp } from "./AppContext";
+import { useAmigos } from "./AmigosContext";
 import { localDay, totalPoints } from "./model";
 import { useNow } from "./useNow";
 import { Desde, desdeElDia1 } from "./progreso/desde";
@@ -31,6 +32,7 @@ export type Progreso = {
 // Todo el progreso (spec E §9). Se recalcula cuando cambian los datos o el día.
 export function useProgreso(): Progreso {
   const { data } = useApp();
+  const { cuantos } = useAmigos();
   const now = useNow();
   const hoy = localDay(new Date(now));
   return useMemo(() => {
@@ -45,7 +47,7 @@ export function useProgreso(): Progreso {
       puntosSemana: puntosSemana(data, now),
       desde,
       mesas: ratings(data, now),
-      hechos: hechosDe(data, now),
+      hechos: hechosDe(data, now, cuantos),
     };
-  }, [data, hoy]);
+  }, [data, hoy, cuantos]);
 }

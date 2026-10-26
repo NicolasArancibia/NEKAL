@@ -486,6 +486,7 @@ const hechosBase = (fields = {}) => ({
   metas: 0,
   audio: false,
   plan: false,
+  amigos: 0,
   ...fields,
 });
 const visto = (id, y = 2030, mo = 4, d = 1) => ({
@@ -493,10 +494,10 @@ const visto = (id, y = 2030, mo = 4, d = 1) => ({
   at: iso(new Date(y, mo, d, 12).getTime()),
 });
 
-test("logros: catálogo de 24 con ids únicos", () => {
+test("logros: catálogo de 25 con ids únicos", () => {
   const ids = lg.CATALOGO.map((l) => l.id);
-  assert.equal(ids.length, 24);
-  assert.equal(new Set(ids).size, 24);
+  assert.equal(ids.length, 25);
+  assert.equal(new Set(ids).size, 25);
   assert.deepEqual(ids, [...m.LOGRO_IDS]);
 });
 
@@ -671,6 +672,25 @@ test("logros: verLogros no duplica", () => {
     ["primera-mesa", "racha-3"],
   );
   assert.equal(d.logros[0].at, iso(now));
+});
+
+test("logros: primer amigo", () => {
+  const d = m.emptyData();
+  assert.equal(lg.cumple("primer-amigo", lg.hechosDe(d, now, 0)), false);
+  assert.equal(lg.cumple("primer-amigo", lg.hechosDe(d, now, 1)), true);
+  assert.equal(lg.avance("primer-amigo", lg.hechosDe(d, now, 0)).texto, "Pendiente");
+  const logro = lg.CATALOGO.find((l) => l.id === "primer-amigo");
+  assert.equal(logro.familia, "primeras");
+  assert.equal(logro.icono, "people-outline");
+  assert.equal(logro.frase, "Te hiciste amigo de alguien en Nekal.");
+  assert.equal(logro.pista, "Agrega a alguien con su código.");
+});
+
+test("logros: primer amigo visto se queda sin amigos", () => {
+  const d = { ...m.emptyData(), logros: [visto("primer-amigo")] };
+  const h = lg.hechosDe(d, now, 0);
+  assert.ok(lg.desbloqueados(d, h).includes("primer-amigo"));
+  assert.ok(!lg.porVer(d, h).includes("primer-amigo"));
 });
 
 test("logros: cuenta vacía", () => {

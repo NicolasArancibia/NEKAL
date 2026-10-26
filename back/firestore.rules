@@ -9,6 +9,7 @@ service cloud.firestore {
  function ident(v) {return str(v,200) && v.size()>0;}
  function fields(v,ks) {return v is map && v.keys().hasAll(ks) && v.keys().hasOnly(ks);}
  function hour(v) {return v is int && v>=0 && v<=23;}
+ function logroIds() {return ['racha-3','racha-7','racha-14','racha-30','racha-60','racha-100','semana-perfecta','listas-10','listas-50','listas-100','listas-250','listas-500','listas-1000','nivel-5','nivel-10','nivel-15','nivel-20','primera-cosa','primera-mesa','primera-rutina','primera-meta','primer-dia-100','primer-audio','primer-plan','primer-amigo'];}
  function step(v) {return fields(v,['id','title','done']) && ident(v.id) && str(v.title,1000) && v.done is bool;}
  function reward(v,id) {return fields(v,['key','itemId','points','at','reason']) && ident(v.key) && v.itemId==id && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500);}
 function item(v) {return fields(v,["id","type","title","description","workspaceId","createdAt","startDate","updatedAt","dueAt","scheduledAt","duration","flexible","status","priority","location","content","category","visitReason","participants","agenda","countsForScore","difficulty","attachments","groupId","x","y","deletedAt"]) && ident(v.id) && ident(v.workspaceId) && str(v.groupId,200) && v.type in ['Nota','Idea','Evento','Visita','Meeting','Deadline','Goal','Tarea'] && str(v.title,160) && v.title.size()>0
@@ -25,7 +26,7 @@ return (kind=='items' && item(v))
 || (kind=='steps' && fields(v,['itemId','order','id','title','done']) && ident(v.itemId) && ident(v.id) && str(v.title,1000) && v.done is bool && v.order is int && v.order>=0 && v.order<5000)
 || (kind=='dependencies' && fields(v,['itemId','targetId','order']) && ident(v.itemId) && ident(v.targetId) && v.order is int && v.order>=0 && v.order<5000)
 || (kind=='rewardEntries' && fields(v,['key','itemId','points','at','reason','order']) && ident(v.key) && ident(v.itemId) && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500) && v.order is int && v.order>=0 && v.order<10000)
-|| (kind=='logros' && fields(v,['id','at']) && v.id==id && v.id in ['racha-3','racha-7','racha-14','racha-30','racha-60','racha-100','semana-perfecta','listas-10','listas-50','listas-100','listas-250','listas-500','listas-1000','nivel-5','nivel-10','nivel-15','nivel-20','primera-cosa','primera-mesa','primera-rutina','primera-meta','primer-dia-100','primer-audio','primer-plan'] && str(v.at,40))
+|| (kind=='logros' && fields(v,['id','at']) && v.id==id && v.id in logroIds() && str(v.at,40))
 || (kind=='settings' && id=='profile' && fields(v,['name','roles']) && str(v.name,500) && str(v.roles,2000))
 || (kind=='settings' && id=='preferences' && fields(v,['softAlerts','quiet','quietStart','quietEnd','dayStart','dayEnd']) && v.softAlerts is bool && v.quiet is bool && hour(v.quietStart) && hour(v.quietEnd) && hour(v.dayStart) && hour(v.dayEnd) && v.dayStart<v.dayEnd);
 }
@@ -55,6 +56,40 @@ allow create: if owner(uid) && ident(id) && fields(request.resource.data,['at'])
 match /users/{uid}/nekal/state {
 allow read: if owner(uid);
 // Read-only legacy backup. Old clients must reload to use schema 2.
+}
+// V2/F: amigos (spec F §5). Códigos, amistades y tarjetas fuera de la caja privada.
+function codigoOk(c) {return c is string && c.matches('^[2-9A-HJKMNP-Z]{6}$');}
+function nombreOk(v) {return v is string && v.size()>0 && v.size()<=80;}
+function par(a,b) {return a < b ? a + '_' + b : b + '_' + a;}
+function amigoDe(uid) {let p=/databases/$(database)/documents/amistades/$(par(uid, request.auth.uid)); return exists(p) && get(p).data.estado=='aceptada';}
+function areaOk(a,k) {return !(k in a) || (fields(a[k],['valor','mesas']) && a[k].valor is int && a[k].valor>=0 && a[k].valor<=100 && a[k].mesas is int && a[k].mesas>=1 && a[k].mesas<=100);}
+function tarjetaOk(uid) {let v=request.resource.data; return fields(v,['nombre','roles','desde','nivel','puntos','logros','areas','codigo','actualizado']) && nombreOk(v.nombre) && str(v.roles,200) && str(v.desde,10)
+&& v.nivel is int && v.nivel>=1 && v.nivel<=200 && v.puntos is int && v.puntos>=0 && v.puntos<=10000000 && v.logros is list && v.logros.size()<=25 && v.logros.hasOnly(logroIds())
+&& v.areas is map && v.areas.keys().hasOnly(['estudio','trabajo','salud','hogar','social','personal']) && areaOk(v.areas,'estudio') && areaOk(v.areas,'trabajo') && areaOk(v.areas,'salud') && areaOk(v.areas,'hogar') && areaOk(v.areas,'social') && areaOk(v.areas,'personal')
+&& codigoOk(v.codigo) && getAfter(/databases/$(database)/documents/codigos/$(v.codigo)).data.uid==uid && v.actualizado==request.time;}
+// Se envía solo con el código real de `para`; los nombres salen del código y de la tarjeta de quien envía.
+function solicitudOk(id) {let v=request.resource.data; let c=get(/databases/$(database)/documents/codigos/$(v.codigo)).data; return fields(v,['de','para','miembros','estado','nombreDe','nombrePara','codigo','creada','aceptada'])
+&& v.de==request.auth.uid && v.para is string && v.para!=v.de && id==par(v.de, v.para) && v.miembros==[v.de, v.para] && v.estado=='pendiente' && v.creada==request.time && v.aceptada==null
+&& codigoOk(v.codigo) && c.uid==v.para && v.nombrePara==c.nombre && v.nombreDe==get(/databases/$(database)/documents/perfiles/$(v.de)).data.nombre;}
+match /codigos/{codigo} {
+// Un código por cuenta: el nuevo se crea junto a la tarjeta y en el mismo lote se borra el anterior.
+allow get: if request.auth != null;
+allow create: if request.auth != null && codigoOk(codigo) && fields(request.resource.data,['uid','nombre']) && request.resource.data.uid==request.auth.uid && nombreOk(request.resource.data.nombre)
+&& getAfter(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.codigo==codigo
+&& (!exists(/databases/$(database)/documents/perfiles/$(request.auth.uid)) || !existsAfter(/databases/$(database)/documents/codigos/$(get(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.codigo)));
+allow update: if request.auth != null && resource.data.uid==request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']) && nombreOk(request.resource.data.nombre);
+allow delete: if request.auth != null && resource.data.uid==request.auth.uid;
+}
+match /amistades/{id} {
+allow read, delete: if request.auth != null && request.auth.uid in resource.data.miembros;
+allow create: if request.auth != null && solicitudOk(id);
+allow update: if request.auth != null && resource.data.para==request.auth.uid && resource.data.estado=='pendiente' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado','aceptada'])
+&& request.resource.data.estado=='aceptada' && request.resource.data.aceptada==request.time;
+}
+match /perfiles/{uid} {
+allow read: if request.auth != null && (request.auth.uid==uid || amigoDe(uid));
+allow create, update: if owner(uid) && tarjetaOk(uid);
+allow delete: if owner(uid);
 }
  }
 }

@@ -7,11 +7,14 @@ import { useApp } from "../utils/AppContext";
 import { mesYAnio } from "../utils/progreso/desde";
 import { desbloqueados, paraPerfil } from "../utils/progreso/logros";
 import { useProgreso } from "../utils/useProgreso";
+import { useAmigos } from "../utils/AmigosContext";
 import { mergeValue, recordsOf } from "../utils/syncModel";
+import { LOGRO_IDS } from "../utils/model";
 import { color, radius, size, space } from "../styles/theme";
 import {
   Button,
   Card,
+  Contador,
   Field,
   PressableScale,
   ScreenHeader,
@@ -23,6 +26,8 @@ import TarjetaNivel from "../components/ui/progreso/TarjetaNivel";
 import GrillaLogros from "../components/ui/progreso/GrillaLogros";
 import HojaLogros from "../components/ui/progreso/HojaLogros";
 import FilaMesa from "../components/ui/progreso/FilaMesa";
+import SeccionAmigos from "../components/ui/amigos/SeccionAmigos";
+import HojaAmigos, { Pagina } from "../components/ui/amigos/HojaAmigos";
 import Login from "./Login";
 import Ajustes from "./Ajustes";
 
@@ -35,7 +40,9 @@ export default function Perfil() {
     [roles, setRoles] = useState(""),
     [error, setError] = useState(""),
     [review, setReview] = useState(false),
-    [verLogros, setVerLogros] = useState(false);
+    [verLogros, setVerLogros] = useState(false),
+    [hoja, setHoja] = useState<Pagina | null>(null);
+  const amigos = useAmigos();
   const [profileBase, setProfileBase] = useState(data.profile);
   const route = useRoute<RouteProp<TabParamList, "Perfil">>();
   const navigation = useNavigation();
@@ -69,23 +76,50 @@ export default function Perfil() {
       <ScreenHeader
         title="Perfil"
         right={
-          <PressableScale
-            onPress={() => setSettings(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Ajustes"
-            style={{
-              width: size.minTouch,
-              height: size.minTouch,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={size.icon + 2}
-              color={color.primary}
-            />
-          </PressableScale>
+          <View style={{ flexDirection: "row" }}>
+            {amigos.activo && (
+              <PressableScale
+                onPress={() => setHoja({ tipo: "amigos" })}
+                accessibilityRole="button"
+                accessibilityLabel="Amigos"
+                style={{
+                  width: size.minTouch,
+                  height: size.minTouch,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Ionicons
+                  name="people-outline"
+                  size={size.icon + 2}
+                  color={color.primary}
+                />
+                {amigos.solicitudes > 0 && (
+                  <Contador
+                    n={amigos.solicitudes}
+                    style={{ position: "absolute", top: 2, right: 0 }}
+                  />
+                )}
+              </PressableScale>
+            )}
+            <PressableScale
+              onPress={() => setSettings(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Ajustes"
+              style={{
+                width: size.minTouch,
+                height: size.minTouch,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={size.icon + 2}
+                color={color.primary}
+              />
+            </PressableScale>
+          </View>
         }
       />
       <Card style={{ alignItems: "center", paddingVertical: space.xxl }}>
@@ -135,8 +169,12 @@ export default function Perfil() {
           En Nekal desde {mesYAnio(progreso.desde.dia1)}
         </Txt>
       </Card>
+      <SeccionAmigos onAbrir={setHoja} onCrearCuenta={() => setAccount(true)} />
       <TarjetaNivel nivel={progreso.nivel} puntos={progreso.puntos} />
-      <SectionTitle title="Logros" detail={`${logrados.length} de 24`} />
+      <SectionTitle
+        title="Logros"
+        detail={`${logrados.length} de ${LOGRO_IDS.length}`}
+      />
       <GrillaLogros
         logros={paraPerfil(data, progreso.hechos, Date.now())}
         hechos={progreso.hechos}
@@ -162,6 +200,16 @@ export default function Perfil() {
           </Txt>
         )}
       </Card>
+      <HojaAmigos
+        pagina={hoja}
+        onPagina={setHoja}
+        onClose={() => setHoja(null)}
+        onEditarPerfil={() => {
+          setHoja(null);
+          // En el iPhone un Modal no se presenta mientras otro se está yendo.
+          setTimeout(abrirEditar, 500);
+        }}
+      />
       <HojaLogros
         visible={verLogros}
         onClose={() => setVerLogros(false)}

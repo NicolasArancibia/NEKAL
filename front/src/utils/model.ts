@@ -136,6 +136,7 @@ export const LOGRO_IDS = [
   "primer-dia-100",
   "primer-audio",
   "primer-plan",
+  "primer-amigo",
 ] as const;
 export type LogroId = (typeof LOGRO_IDS)[number];
 export type LogroVisto = { id: LogroId; at: string };

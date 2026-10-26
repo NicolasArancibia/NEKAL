@@ -6,7 +6,7 @@ import { CATALOGO, Hechos, avance } from "../../../utils/progreso/logros";
 import { Card, PressableScale, Txt } from "../base";
 import Medalla from "./Medalla";
 
-// Los 8 logros del Perfil en 4 columnas (spec E §6.2) y «Ver los 24 logros».
+// Los 8 logros del Perfil en 4 columnas (spec E §6.2) y «Ver los 25 logros».
 export default function GrillaLogros({
   logros,
   hechos,
@@ -51,7 +51,7 @@ export default function GrillaLogros({
       <PressableScale
         onPress={onVerTodos}
         accessibilityRole="button"
-        accessibilityLabel="Ver los 24 logros"
+        accessibilityLabel={`Ver los ${CATALOGO.length} logros`}
         style={{
           minHeight: size.minTouch,
           flexDirection: "row",
@@ -62,7 +62,7 @@ export default function GrillaLogros({
         }}
       >
         <Txt variant="callout" weight={700} tone="primary">
-          Ver los 24 logros
+          Ver los {CATALOGO.length} logros
         </Txt>
         <Ionicons
           name="chevron-forward-outline"
