@@ -54,7 +54,7 @@ export function estadoDe(i: Item, d: AppData, v: Ventana, now: number): Estado {
 // Spec §4.2: dificultad × horas (entre 0,25 y 4); 0 si no es trabajo pendiente.
 export function cargaDe(i: Item, now: number): number {
   if (passive(i) || i.status === "completado" || i.deletedAt) return 0;
-  return difficultyOf(i, now) * Math.min(4, Math.max(0.25, i.duration / 60));
+  return difficultyOf(i) * Math.min(4, Math.max(0.25, i.duration / 60));
 }
 
 // El grupo y todos los que tiene adentro; groupId "" = la mesa entera.

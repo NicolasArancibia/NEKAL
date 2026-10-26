@@ -49,7 +49,23 @@ export type Item = {
   y: number;
   deletedAt: string;
 };
-export type Workspace = { id: string; name: string; color: string };
+// Área de vida de una mesa (spec E §5). Sin el campo, se usa la sugerida por el nombre.
+export type Area =
+  | "estudio"
+  | "trabajo"
+  | "salud"
+  | "hogar"
+  | "social"
+  | "personal";
+export const AREA_IDS: Area[] = [
+  "estudio",
+  "trabajo",
+  "salud",
+  "hogar",
+  "social",
+  "personal",
+];
+export type Workspace = { id: string; name: string; color: string; area?: Area };
 // Mesa ⊃ grupos (anidables) ⊃ cosas. Un grupo con `repeat` es una rutina (spec B §2).
 export type Repeat = "" | "diario" | "semanal" | "dias";
 export const REPEATS: Repeat[] = ["", "diario", "semanal", "dias"];
@@ -94,6 +110,35 @@ export type Message = {
   plan?: string;
   estado?: EstadoPlan;
 };
+// Logros vistos (spec E §6): un documento por logro, con la fecha en que se vio.
+export const LOGRO_IDS = [
+  "racha-3",
+  "racha-7",
+  "racha-14",
+  "racha-30",
+  "racha-60",
+  "racha-100",
+  "semana-perfecta",
+  "listas-10",
+  "listas-50",
+  "listas-100",
+  "listas-250",
+  "listas-500",
+  "listas-1000",
+  "nivel-5",
+  "nivel-10",
+  "nivel-15",
+  "nivel-20",
+  "primera-cosa",
+  "primera-mesa",
+  "primera-rutina",
+  "primera-meta",
+  "primer-dia-100",
+  "primer-audio",
+  "primer-plan",
+] as const;
+export type LogroId = (typeof LOGRO_IDS)[number];
+export type LogroVisto = { id: LogroId; at: string };
 export type AppData = {
   version: 2;
   items: Item[];
@@ -101,6 +146,7 @@ export type AppData = {
   groups: Group[];
   rewards: Reward[];
   messages: Message[];
+  logros: LogroVisto[];
   profile: { name: string; roles: string };
   preferences: {
     softAlerts: boolean;
@@ -125,6 +171,7 @@ export const emptyData = (): AppData => ({
   groups: [],
   rewards: [],
   messages: [],
+  logros: [],
   workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
   profile: { name: "", roles: "" },
   preferences: {
@@ -300,18 +347,16 @@ export function validateGroup(group: Group, data: AppData): string | null {
     return "Elige al menos un día.";
   return null;
 }
-export function difficultyOf(item: Item, now = Date.now()): 1 | 2 | 3 {
+// Spec E §3: la dificultad sale de pasos y lugar; la fecha ya no cuenta.
+export function difficultyOf(item: Item): 1 | 2 | 3 {
   if (["Evento", "Visita", "Meeting"].includes(item.type))
     return item.difficulty;
-  const days = item.dueAt
-    ? (Date.parse(item.dueAt) - now) / 86400000
-    : Infinity;
-  const load =
-    item.steps.length +
-    (item.location ? 1 : 0) +
-    (days <= 2 ? 3 : days <= 7 ? 1 : 0);
-  return load >= 6 ? 3 : load >= 3 ? 2 : 1;
+  const load = item.steps.length + (item.location ? 1 : 0);
+  return load >= 5 ? 3 : load >= 2 ? 2 : 1;
 }
+// Terminar antes de la fecha límite paga un 20% más (spec E §3).
+export const BONUS_A_TIEMPO = 1.2;
+export const RAZON_COMPLETADO = "Ítem completado";
 export function pointsFor(item: Item, all: Item[], now = Date.now()) {
   if (
     passive(item) ||
@@ -319,11 +364,13 @@ export function pointsFor(item: Item, all: Item[], now = Date.now()) {
       !item.countsForScore)
   )
     return 0;
+  const aTiempo = item.dueAt && now <= Date.parse(item.dueAt);
   return (
     Math.round(
       10 *
-        difficultyOf(item, now) *
-        { baja: 1, media: 1.5, urgente: 2 }[item.priority],
+        difficultyOf(item) *
+        { baja: 1, media: 1.5, urgente: 2 }[item.priority] *
+        (aTiempo ? BONUS_A_TIEMPO : 1),
     ) +
     Math.min(
       15,
@@ -393,7 +440,7 @@ export function saveItem(
       points: target - paid,
       at: item.updatedAt,
       reason:
-        item.status === "completado" ? "Ítem completado" : "Hitos alcanzados",
+        item.status === "completado" ? RAZON_COMPLETADO : "Hitos alcanzados",
     });
   return { ...data, items, rewards };
 }

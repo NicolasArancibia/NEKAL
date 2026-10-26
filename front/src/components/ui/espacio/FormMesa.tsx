@@ -5,12 +5,14 @@ import { useApp } from "../../../utils/AppContext";
 import { COLORES_MESA } from "../../../utils/colores";
 import { borrarMesa, crearMesa, GENERAL } from "../../../utils/estructura";
 import { haptic } from "../../../utils/haptics";
-import { Workspace } from "../../../utils/model";
-import { Button, Field, PressableScale, Sheet, Txt } from "../base";
+import { Area, Workspace } from "../../../utils/model";
+import { AREAS, areaSugerida } from "../../../utils/progreso/mesas";
+import { Button, Chip, Field, PressableScale, Sheet, Txt } from "../base";
 
 const NOMBRES_COLOR = ["Violeta", "Verde", "Naranjo", "Tranquila"];
 
-// Crear o editar una mesa: nombre y color. Las mesas viven en General.
+// Crear o editar una mesa: nombre, color y área. Las mesas viven en General.
+// El área se guarda solo si la eliges; si no, se sugiere por el nombre (spec E §5).
 export default function FormMesa({
   visible,
   inicial,
@@ -23,6 +25,7 @@ export default function FormMesa({
   const { change } = useApp();
   const [nombre, setNombre] = useState(inicial?.name ?? "");
   const [tono, setTono] = useState(inicial?.color ?? COLORES_MESA[0]);
+  const [area, setArea] = useState<Area | undefined>(inicial?.area);
   const [error, setError] = useState("");
   const hacer = (fn: () => void) => {
     try {
@@ -34,12 +37,20 @@ export default function FormMesa({
   };
   const guardar = () =>
     hacer(() => {
-      if (!inicial) return change((d) => crearMesa(d, nombre, tono).data);
+      if (!inicial)
+        return change((d) => crearMesa(d, nombre, tono, undefined, area).data);
       if (!nombre.trim()) throw new Error("La mesa necesita un nombre.");
       change((d) => ({
         ...d,
         workspaces: d.workspaces.map((w) =>
-          w.id === inicial.id ? { ...w, name: nombre.trim(), color: tono } : w,
+          w.id === inicial.id
+            ? {
+                ...w,
+                name: nombre.trim(),
+                color: tono,
+                ...(area ? { area } : {}),
+              }
+            : w,
         ),
       }));
     });
@@ -94,6 +105,28 @@ export default function FormMesa({
           );
         })}
       </View>
+      {inicial?.id !== GENERAL && (
+        <>
+          <Txt variant="callout" weight={600}>
+            Área
+          </Txt>
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
+          >
+            {AREAS.map((a) => (
+              <Chip
+                key={a.id}
+                title={a.nombre}
+                selected={(area ?? areaSugerida(nombre)) === a.id}
+                onPress={() => {
+                  haptic.selection();
+                  setArea(a.id);
+                }}
+              />
+            ))}
+          </View>
+        </>
+      )}
       {!!error && (
         <Txt variant="callout" tone="danger">
           {error}

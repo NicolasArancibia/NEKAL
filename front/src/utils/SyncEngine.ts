@@ -13,6 +13,7 @@ import {
 } from "./syncModel";
 import { SyncRemote, SyncConflict } from "./cloudSync";
 import { toCloud } from "./cloudRecords";
+import { CONECTANDO, SINCRONIZANDO } from "./estadosNube";
 
 export type SyncView = {
   data: AppData;
@@ -32,7 +33,7 @@ export class SyncEngine {
   private unsubscribe: (() => void) | undefined;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private failures = 0;
-  private status = "Conectando con Firebase…";
+  private status = CONECTANDO;
   private error = "";
   constructor(
     public state: Envelope,
@@ -136,7 +137,7 @@ export class SyncEngine {
     try {
       await this.persistence;
       if (this.closed || !this.durable) return;
-      this.status = "Sincronizando…";
+      this.status = SINCRONIZANDO;
       this.notify();
       if (!this.initialized) {
         await this.remote.initialize();

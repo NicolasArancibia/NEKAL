@@ -13,6 +13,7 @@ import { useRutinas } from "../utils/useRutinas";
 import { NekaProvider } from "../utils/NekaContext";
 import HojaPlan from "../components/ui/neka/HojaPlan";
 import CapaGrabando from "../components/ui/neka/CapaGrabando";
+import LogroNuevo from "../components/ui/progreso/LogroNuevo";
 
 export type TabParamList = {
   Resumen: undefined;
@@ -65,6 +66,9 @@ export default function TabNavigator() {
             <>
               <TabBar {...props} />
               <HojaPlan onAbrirChat={() => props.navigation.navigate("Chat")} />
+              <LogroNuevo
+                onVerLogros={() => props.navigation.navigate("Perfil")}
+              />
             </>
           )}
         >

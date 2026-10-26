@@ -1,4 +1,12 @@
-import { activeItems, AppData, Group, Item, uid, validateGroup } from "./model";
+import {
+  activeItems,
+  AppData,
+  Area,
+  Group,
+  Item,
+  uid,
+  validateGroup,
+} from "./model";
 
 // Mesas, grupos y movimientos (spec B §2). Todas puras; lanzan Error con el
 // mensaje para la persona si algo no se puede.
@@ -41,12 +49,16 @@ export function crearMesa(
   name: string,
   color: string,
   id = uid(),
+  area?: Area,
 ): { data: AppData; id: string } {
   if (!name.trim()) throw new Error("La mesa necesita un nombre.");
   return {
     data: {
       ...d,
-      workspaces: [...d.workspaces, { id, name: name.trim(), color }],
+      workspaces: [
+        ...d.workspaces,
+        { id, name: name.trim(), color, ...(area ? { area } : {}) },
+      ],
     },
     id,
   };

@@ -3,7 +3,7 @@ import { AppData, Item, localDay, passive } from "./model";
 import { findConflicts } from "./planner";
 
 // Neka según el contexto: qué pose y qué mensaje mostrar (spec A, sección 7).
-export type NekaPose = 1 | 3 | 7 | 14 | 15;
+export type NekaPose = 1 | 3 | 5 | 7 | 14 | 15;
 export type NekaAction = {
   label: string;
   target: "chat" | "crear" | "item";

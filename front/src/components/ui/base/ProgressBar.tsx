@@ -9,13 +9,15 @@ import Animated, {
 import { color, motion, radius } from "../../../styles/theme";
 
 // Barra gruesa y redondeada; el relleno se anima en píxeles para conservar las
-// puntas redondas.
+// puntas redondas. `riel="blanco"` es para usarla sobre la tarjeta lavanda.
 export default function ProgressBar({
   value,
   accessibilityLabel,
+  riel = "suave",
 }: {
   value: number;
   accessibilityLabel: string;
+  riel?: "suave" | "blanco";
 }) {
   const reduced = useReducedMotion();
   const [track, setTrack] = useState(0);
@@ -36,7 +38,7 @@ export default function ProgressBar({
       style={{
         height: 10,
         borderRadius: radius.pill,
-        backgroundColor: color.primarySoft,
+        backgroundColor: riel === "blanco" ? color.surface : color.primarySoft,
         overflow: "hidden",
       }}
     >

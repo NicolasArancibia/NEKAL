@@ -26,7 +26,17 @@ export const color = {
   vidrio: "rgba(255, 255, 255, 0.18)",
   vidrioBorde: "#D3C6F5",
   sombraPiso: "rgba(70, 40, 140, 0.20)",
+  // Gamificación (subproyecto E): medalla bloqueada.
+  medallaApagada: "#F6F3FC",
 } as const;
+// Tonos del heatmap de tus días, de 0 (nada) a 4 (todo listo). Spec E §4.
+export const heat = [
+  "#EEE9F6",
+  "#DCCFFB",
+  "#BBA3F6",
+  "#9773F0",
+  "#7546EC",
+] as const;
 export const space = {
   xs: 4,
   sm: 8,

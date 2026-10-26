@@ -479,3 +479,76 @@ test("buscarHueco: salta lo ocupado y respeta la jornada", () => {
   );
   assert.equal(p.buscarHueco(d, { duracion: 90, desde: t(8, 0), hasta: t(9, 0) }, t(8, 0)), null);
 });
+
+// ---------- V2/E: área de mesa y logros vistos en los datos ----------
+const est = require("../.test-build/estructura.js");
+const sync = require("../.test-build/syncModel.js");
+const conMesas = (extra = {}) => ({
+  ...m.emptyData(),
+  workspaces: [
+    ...m.emptyData().workspaces,
+    // Ids en orden: dataOf rearma las mesas ordenadas por id.
+    { id: "m1", name: "Universidad", color: "#2E9E6B" },
+    { id: "m2", name: "Casa", color: "#948BA6", area: "hogar" },
+  ],
+  ...extra,
+});
+const vistoLogro = (id) => ({ id, at: "2030-05-01T12:00:00.000Z" });
+
+test("datos: mesa con y sin área, ida y vuelta", () => {
+  const d = conMesas();
+  assert.deepEqual(readBackup(JSON.stringify(d)), d);
+  assert.deepEqual(sync.dataOf(sync.recordsOf(d)), d);
+});
+
+test("datos: área inválida se rechaza", () => {
+  const d = conMesas();
+  d.workspaces[1] = { ...d.workspaces[1], area: "deporte" };
+  assert.throws(() => readBackup(JSON.stringify(d)), /Espacio inválido/);
+});
+
+test("datos: logros vistos, ida y vuelta y respaldo", () => {
+  const d = conMesas({ logros: [vistoLogro("primera-mesa")] });
+  assert.deepEqual(readBackup(JSON.stringify(d)), d);
+  const r = sync.recordsOf(d);
+  assert.deepEqual(r["logros/primera-mesa"], vistoLogro("primera-mesa"));
+  assert.deepEqual(sync.dataOf(r), d);
+  assert.deepEqual(sync.validateRecords(r).logros, d.logros);
+});
+
+test("datos: logro desconocido, duplicado o más de 24 se rechaza", () => {
+  const con = (logros) => JSON.stringify(conMesas({ logros }));
+  assert.throws(() => readBackup(con([vistoLogro("inventado")])), /Logros inválidos/);
+  assert.throws(
+    () => readBackup(con([vistoLogro("racha-3"), vistoLogro("racha-3")])),
+    /Logros inválidos/,
+  );
+  assert.throws(
+    () => readBackup(con(Array.from({ length: 25 }, () => vistoLogro("racha-3")))),
+    /Logros inválidos/,
+  );
+  assert.throws(
+    () => readBackup(con([{ ...vistoLogro("racha-3"), extra: 1 }])),
+    /Logros inválidos/,
+  );
+  const largo = sync.recordsOf(conMesas({ logros: [vistoLogro("racha-3")] }));
+  largo["logros/racha-3"] = { id: "racha-3", at: "x".repeat(41) };
+  assert.throws(() => sync.validateRecords(largo));
+});
+
+test("datos: respaldo sin logros carga con []", () => {
+  const { logros, ...viejo } = conMesas();
+  assert.deepEqual(readBackup(JSON.stringify(viejo)).logros, []);
+});
+
+test("datos: crearMesa con área", () => {
+  const con = est.crearMesa(m.emptyData(), "Casa", "#948BA6", "C", "hogar");
+  assert.deepEqual(con.data.workspaces[1], {
+    id: "C",
+    name: "Casa",
+    color: "#948BA6",
+    area: "hogar",
+  });
+  const sin = est.crearMesa(m.emptyData(), "Casa", "#948BA6", "C");
+  assert.deepEqual(Object.keys(sin.data.workspaces[1]), ["id", "name", "color"]);
+});

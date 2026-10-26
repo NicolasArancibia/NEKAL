@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Platform, Share, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
+import { signOut } from "firebase/auth";
 import { useApp } from "../utils/AppContext";
+import { auth } from "../utils/firebase";
 import { AppData, localDay, restoreItem } from "../utils/model";
 import { readBackup } from "../utils/storage";
 import { requestReminders } from "../utils/notifications";
@@ -35,13 +37,18 @@ function Section({
 }
 
 // Ajustes en un panel; las ventanas internas de V1 pasaron a desplegables para
-// no anidar paneles.
+// no anidar paneles. Por eso «Conectar mi cuenta» y «Revisar cambios en
+// conflicto» cierran Ajustes y abren su hoja desde el Perfil (spec E §7.1).
 export default function Ajustes({
   visible,
   onClose,
+  onConectar,
+  onRevisar,
 }: {
   visible: boolean;
   onClose: () => void;
+  onConectar: () => void;
+  onRevisar: () => void;
 }) {
   const {
     data,
@@ -52,7 +59,16 @@ export default function Ajustes({
     hasRecovery,
     replaceData,
     restorePrevious,
+    user,
+    storageStatus,
+    cloud,
+    cloudBusy,
+    cloudStatus,
+    exitGuest,
+    pendingChanges,
+    conflict,
   } = useApp();
+  const [cuentaError, setCuentaError] = useState("");
   const [json, setJson] = useState(""),
     [showJson, setShowJson] = useState(false),
     [confirmRecovery, setConfirmRecovery] = useState(false);
@@ -152,6 +168,67 @@ export default function Ajustes({
           />
         </Card>
       )}
+      <Section title="Cuenta">
+        <Txt weight={600}>
+          {user ? (user.email ?? "Cuenta") : "Modo invitado"}
+        </Txt>
+        <Txt variant="callout" tone="secondary">
+          {user
+            ? `${cloudStatus} · ${pendingChanges} ${pendingChanges === 1 ? "cambio pendiente" : "cambios pendientes"}`
+            : "Tus datos quedan solo en este dispositivo."}
+        </Txt>
+        {!!storageStatus && (
+          <Txt variant="caption" tone="secondary">
+            {storageStatus}
+          </Txt>
+        )}
+        {user ? (
+          <>
+            <Button
+              title="Reintentar conexión"
+              variant="secondary"
+              onPress={() => void cloud()}
+            />
+            {!!conflict && (
+              <Button
+                title="Revisar cambios en conflicto"
+                onPress={onRevisar}
+              />
+            )}
+            <Button
+              title="Cerrar sesión"
+              variant="plain"
+              disabled={cloudBusy}
+              onPress={() => {
+                if (auth)
+                  void signOut(auth).catch(() =>
+                    setCuentaError(
+                      "No se pudo cerrar la sesión. Revisa tu conexión y reintenta.",
+                    ),
+                  );
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              title="Conectar mi cuenta"
+              variant="secondary"
+              onPress={onConectar}
+            />
+            <Button
+              title="Volver al inicio"
+              variant="plain"
+              onPress={exitGuest}
+            />
+          </>
+        )}
+        {!!cuentaError && (
+          <Txt tone="danger" accessibilityRole="alert">
+            {cuentaError}
+          </Txt>
+        )}
+      </Section>
       <Section title="Neka">
         <Toggle
           label="Avisos suaves"
@@ -424,8 +501,12 @@ export default function Ajustes({
       <Section title="Sobre Nekal">
         <Disclosure title="¿Cómo se calculan los puntos?">
           <Txt>
-            Base = 10 × dificultad × prioridad. Dificultad: 1, 2 o 3. Prioridad:
-            baja ×1, media ×1,5, urgente ×2.
+            Base = 10 × dificultad × prioridad. La dificultad sale de los pasos
+            (el lugar cuenta como uno más): 0 o 1 es baja, de 2 a 4 media y 5 o
+            más alta. Prioridad: baja ×1, media ×1,5, urgente ×2.
+          </Txt>
+          <Txt>
+            Si la cosa tiene fecha límite y la completas antes, suma un 20% más.
           </Txt>
           <Txt>
             Desbloquear dependencias suma 5 puntos por ítem, hasta 15 extra.
@@ -433,9 +514,12 @@ export default function Ajustes({
             lo activas.
           </Txt>
           <Txt>
-            Los goals entregan hasta el 80% con sus hitos y el resto al
-            completarlos. Reabrir o marcar otra vez no duplica puntos. Cada 100
-            puntos subes un nivel.
+            Las metas entregan hasta el 80% con sus hitos y el resto al
+            completarlas. Reabrir o marcar otra vez no duplica puntos.
+          </Txt>
+          <Txt>
+            Cada nivel cuesta 100 puntos más que el anterior: el 2 llega a los
+            100, el 3 a los 300, el 4 a los 600 y el 5 a los 1.000.
           </Txt>
         </Disclosure>
         <Disclosure title="Privacidad">
