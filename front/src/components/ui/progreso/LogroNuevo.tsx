@@ -25,6 +25,7 @@ import { haptic } from "../../../utils/haptics";
 import { useHojasAbiertas } from "../../../utils/hojasAbiertas";
 import { LogroId } from "../../../utils/model";
 import { useNeka } from "../../../utils/NekaContext";
+import { useAmigos } from "../../../utils/AmigosContext";
 import {
   CATALOGO,
   Cola,
@@ -151,9 +152,10 @@ export default function LogroNuevo({
   const neka = useNeka();
   const hojas = useHojasAbiertas();
   const reducido = useReducedMotion();
+  const { cuantos } = useAmigos();
   const cola = useMemo(
-    () => siguiente(data, hechosDe(data, Date.now())),
-    [data],
+    () => siguiente(data, hechosDe(data, Date.now(), cuantos)),
+    [data, cuantos],
   );
   const [mostrando, setMostrando] = useState<Cola>(null);
   const libre = listoParaLogro({

@@ -3,8 +3,10 @@ import { Amistad, idPar } from "./amistades";
 import { Tarjeta } from "./tarjeta";
 
 // Amigos de ejemplo para `nekalAmigos()` (solo en desarrollo), con los datos
-// de las maquetas F/02–04. Tomás no tiene tarjeta todavía.
+// de las maquetas F/02–04. Tomás no tiene tarjeta todavía. Buscar cualquier
+// código válido encuentra a Diego Lagos (`PERSONA_EJEMPLO`), como en la maqueta 04.
 export const YO_EJEMPLO = "ejemplo-yo";
+export const PERSONA_EJEMPLO = { uid: "ejemplo-diego", nombre: "Diego Lagos" };
 
 const amistad = (
   otro: string,
@@ -61,7 +63,13 @@ export function amigosDeEjemplo(): {
     codigo: "7KQ2PX",
     amistades: [
       amistad("ejemplo-camila", "Camila Soto", "7KQ2PX", "pendiente"),
-      amistad("ejemplo-diego", "Diego Lagos", "4M8PQR", "pendiente", true),
+      amistad(
+        "ejemplo-valentina",
+        "Valentina Ríos",
+        "4M8PQR",
+        "pendiente",
+        true,
+      ),
       amistad("ejemplo-javiera", "Javiera Muñoz", "7KQ2PX", "aceptada"),
       amistad("ejemplo-martin", "Martín Pérez", "H3TW9C", "aceptada", true),
       amistad("ejemplo-tomas", "Tomás Reyes", "7KQ2PX", "aceptada"),
