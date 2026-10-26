@@ -9,7 +9,7 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 - `npm run web` — app web local (puerto 8081)
 - `npm test` — pruebas de dominio, sync, Neka, tema y estilos (runner propio en Node, no jest)
 - `npm run typecheck` · `npm --prefix front run build:web`
-- `npm run test:firestore` — reglas en emulador; requiere Java 21 (no instalado)
+- `npm run test:firestore` — reglas en emulador; requiere Java 21 (Temurin, instalado el 26/10; en PowerShell refrescar el PATH antes)
 - `npm run deploy` — publica reglas + web. **Solo si se pide explícitamente.**
 
 ## Reglas
@@ -18,7 +18,8 @@ Stack: Expo 57 + React Native 0.86 + React 19 + TypeScript (`front/`), Firebase 
 - Lógica en `front/src/utils` (`model.ts`, `planner.ts`, sync, `neka.ts`). Pantallas en `front/src/pages`.
 - Espacio (V2/B): `utils/estructura.ts` (mesas, grupos, mover), `utils/espacio.ts` (estados, carga, árbol), `utils/rutinas.ts` y `utils/acomodo/` (Tiempo, Plano, Mesas y proyección 3D), todos puros y con pruebas. Vistas en `components/ui/espacio/`. Mesas dibuja con **Skia** (`@shopify/react-native-skia`); en web carga CanvasKit con `WithSkiaWeb` (`front/public/canvaskit.wasm`, lo copia `postinstall`).
 - Neka con IA (V2/D): `utils/agente/` (contexto, herramientas, plan, conversación, mensajes, día dibujado), puro y con pruebas con un cerebro falso. Solo `agente/cerebro.ts` importa `firebase/ai` (Gemini Flash-Lite por Firebase AI Logic, plan gratis); App Check se inicia en `utils/firebase.ts` (reCAPTCHA v3 en la web publicada; token de depuración en `front/.env.development.local`, que nunca se commitea ni entra en la build). `utils/NekaContext.tsx` une chat, audio (`expo-audio`) y voz (`expo-speech`).
-- Gamificación (V2/E): `utils/progreso/` (nivel con curva, días y racha, rating por mesa con área, 24 logros, «desde el día 1»), puro y con pruebas; `utils/useProgreso.ts` lo junta para las pantallas y la UI vive en `components/ui/progreso/`. El puntaje (bonus a tiempo, dificultad sin fecha) está en `model.ts`. Solo se guardan el área de la mesa y los logros vistos (`logros`). El modal de logro (`LogroNuevo`) espera a que no haya hojas abiertas (`utils/hojasAbiertas.ts`) ni sincronización en curso.
+- Gamificación (V2/E): `utils/progreso/` (nivel con curva, días y racha, rating por mesa con área, 25 logros, «desde el día 1»), puro y con pruebas; `utils/useProgreso.ts` lo junta para las pantallas y la UI vive en `components/ui/progreso/`. El puntaje (bonus a tiempo, dificultad sin fecha) está en `model.ts`. Solo se guardan el área de la mesa y los logros vistos (`logros`). El modal de logro (`LogroNuevo`) espera a que no haya hojas abiertas (`utils/hojasAbiertas.ts`) ni sincronización en curso.
+- Amigos (V2/F): `utils/amigos/` (código de 6 caracteres, tarjeta y áreas, amistades y avisos, datos de ejemplo) puro y con pruebas; solo `amigos/nube.ts` habla con Firestore y `utils/AmigosContext.tsx` lo junta (escucha amistades y tarjetas, publica la tuya solo después de la primera sincronización). Colecciones fuera de la caja privada: `codigos`, `amistades` (`uidMenor_uidMayor`) y `perfiles` (tarjeta: nivel, logros conseguidos y áreas, nunca nombres de mesas). UI en `components/ui/amigos/`; `nekalAmigos()` en la consola carga amigos de ejemplo en modo invitado (solo desarrollo).
 - UI: usar `front/src/styles/theme.ts` y `front/src/components/ui/base/`; sin colores ni tamaños sueltos (lo verifica `tests/styles.cjs`). Texto siempre con `Txt`; íconos Ionicons de línea.
 - `DOCUMENTOS/V0`, `DOCUMENTOS/V1` e `IDEAS_ESPACIODETRABAJO` son históricos: no sobrescribir. Documentar la V2 en `DOCUMENTOS/V2/`.
 - Las maquetas de `IDEAS_ESPACIODETRABAJO` son propuestas, no funciones implementadas.
