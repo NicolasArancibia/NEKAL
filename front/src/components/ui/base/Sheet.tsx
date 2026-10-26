@@ -31,6 +31,7 @@ import {
   size,
   space,
 } from "../../../styles/theme";
+import { abrirHoja } from "../../../utils/hojasAbiertas";
 import Button from "./Button";
 import Txt from "./Txt";
 
@@ -56,6 +57,9 @@ export default function Sheet({
   const reduced = useReducedMotion();
   const y = useSharedValue(height);
   const fade = useSharedValue(0);
+
+  // Cuenta como hoja abierta mientras está visible (el modal de logro espera).
+  useEffect(() => (visible ? abrirHoja() : undefined), [visible]);
 
   useEffect(() => {
     if (!visible) return;
