@@ -17,6 +17,8 @@ const {
   writeBatch,
   disableNetwork,
   enableNetwork,
+  query,
+  where,
 } = require("firebase/firestore");
 const { firestoreRemote, SyncConflict } = require("../.test-build/cloudSync");
 const { recordsOf, dataOf, operation } = require("../.test-build/syncModel");
@@ -151,6 +153,115 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
       "estudio",
     );
     console.log("OK Firestore: área de mesa y logros vistos");
+    // V2/F: códigos, amistades y tarjetas (spec F §5).
+    const carol = env.authenticatedContext("carol").firestore();
+    const par = (x, y) => (x < y ? `${x}_${y}` : `${y}_${x}`);
+    const tarjeta = (codigo, nombre, extra = {}) => ({
+      nombre,
+      roles: "",
+      desde: "2030-05-01",
+      nivel: 3,
+      puntos: 400,
+      logros: ["primera-cosa"],
+      areas: { estudio: { valor: 66, mesas: 2 } },
+      codigo,
+      actualizado: serverTimestamp(),
+      ...extra,
+    });
+    const codigoYTarjeta = (fs, uid, codigo, nombre, viejo) => {
+      const lote = writeBatch(fs);
+      lote.set(doc(fs, "codigos/" + codigo), { uid, nombre });
+      lote.set(doc(fs, "perfiles/" + uid), tarjeta(codigo, nombre));
+      if (viejo) lote.delete(doc(fs, "codigos/" + viejo));
+      return lote.commit();
+    };
+    const solicitud = (de, para, codigo, nombreDe, nombrePara, extra = {}) => ({
+      de,
+      para,
+      miembros: [de, para],
+      estado: "pendiente",
+      nombreDe,
+      nombrePara,
+      codigo,
+      creada: serverTimestamp(),
+      aceptada: null,
+      ...extra,
+    });
+    const enviar = (fs, ...args) =>
+      setDoc(doc(fs, "amistades/" + par(args[0], args[1])), solicitud(...args));
+    await assertSucceeds(codigoYTarjeta(db, "alice", "AAA234", "Alice"));
+    await assertFails(setDoc(doc(other, "codigos/BBB999"), { uid: "bob", nombre: "Bob" }));
+    await assertFails(codigoYTarjeta(other, "bob", "AAA234", "Bob"));
+    await assertFails(getDocs(collection(other, "codigos")));
+    await assertSucceeds(codigoYTarjeta(other, "bob", "BBB234", "Bob"));
+    await assertSucceeds(codigoYTarjeta(carol, "carol", "CCC234", "Carol"));
+    await assertSucceeds(getDoc(doc(other, "codigos/AAA234")));
+    await assertFails(setDoc(doc(db, "perfiles/bob"), tarjeta("BBB234", "Bob")));
+    for (const malo of [
+      { nivel: 999 },
+      { logros: ["inventado"] },
+      { areas: { deporte: { valor: 50, mesas: 1 } } },
+      { areas: { estudio: { valor: 101, mesas: 1 } } },
+      { codigo: "BBB234" },
+      { admin: true },
+    ])
+      await assertFails(setDoc(doc(db, "perfiles/alice"), tarjeta("AAA234", "Alice", malo)));
+    console.log("OK Firestore: F código y tarjeta");
+    await assertSucceeds(enviar(other, "bob", "alice", "AAA234", "Bob", "Alice"));
+    await assertFails(enviar(carol, "carol", "alice", "BBB234", "Carol", "Alice"));
+    await assertFails(enviar(other, "bob", "bob", "BBB234", "Bob", "Bob"));
+    await assertFails(
+      enviar(other, "bob", "carol", "CCC234", "Bob", "Carol", { estado: "aceptada" }),
+    );
+    console.log("OK Firestore: F solicitud");
+    await assertFails(enviar(db, "alice", "bob", "BBB234", "Alice", "Bob"));
+    console.log("OK Firestore: F segundo envío a la misma pareja falla");
+    await assertFails(enviar(carol, "carol", "bob", "BBB234", "Alice", "Bob"));
+    await assertFails(enviar(carol, "carol", "bob", "BBB234", "Carol", "Robert"));
+    console.log("OK Firestore: F nombre falso en la solicitud falla");
+    const ab = "amistades/" + par("alice", "bob");
+    await assertFails(getDoc(doc(other, "perfiles/alice")));
+    await assertFails(
+      updateDoc(doc(other, ab), { estado: "aceptada", aceptada: serverTimestamp() }),
+    );
+    await assertFails(
+      updateDoc(doc(db, ab), {
+        estado: "aceptada",
+        aceptada: serverTimestamp(),
+        codigo: "BBB234",
+      }),
+    );
+    await assertSucceeds(
+      updateDoc(doc(db, ab), { estado: "aceptada", aceptada: serverTimestamp() }),
+    );
+    await assertSucceeds(getDoc(doc(other, "perfiles/alice")));
+    await assertSucceeds(getDoc(doc(db, "perfiles/bob")));
+    await assertFails(getDoc(doc(carol, ab)));
+    await assertFails(getDoc(doc(carol, "perfiles/alice")));
+    await assertSucceeds(
+      getDocs(query(collection(other, "amistades"), where("miembros", "array-contains", "bob"))),
+    );
+    console.log("OK Firestore: F aceptar y leer");
+    await assertSucceeds(codigoYTarjeta(db, "alice", "AAA567", "Alice", "AAA234"));
+    assert.equal((await getDoc(doc(other, "codigos/AAA234"))).exists(), false);
+    await assertSucceeds(updateDoc(doc(db, "codigos/AAA567"), { nombre: "Alicia" }));
+    await assertFails(updateDoc(doc(db, "codigos/AAA567"), { uid: "bob" }));
+    await assertFails(deleteDoc(doc(other, "codigos/AAA567")));
+    console.log("OK Firestore: F cambiar código y nombre");
+    await assertFails(deleteDoc(doc(carol, ab)));
+    await assertSucceeds(deleteDoc(doc(other, ab)));
+    await assertFails(getDoc(doc(other, "perfiles/alice")));
+    console.log("OK Firestore: F eliminar");
+    await a.commit(
+      snap,
+      operation(dataOf(snap.records), {
+        ...dataOf(snap.records),
+        logros: [...dataOf(snap.records).logros, { id: "primer-amigo", at }],
+      }),
+    );
+    snap = await a.read();
+    assert.ok(dataOf(snap.records).logros.some((v) => v.id === "primer-amigo"));
+    console.log("OK Firestore: F logro primer-amigo");
     const db2 = env.authenticatedContext("alice").firestore();
     const b = firestoreRemote(db2, "alice");
     await b.initialize();
