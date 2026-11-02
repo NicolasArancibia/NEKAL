@@ -90,6 +90,46 @@
       "titulo": "Agenda",
       "explicacion": "El Calendario con modo Mes | Agenda, choques marcados y «Arreglar con Neka».",
       "estado": "mostrada, pendiente de aprobación"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 10,
+      "cuadro": "E",
+      "titulo": "Espacio solo con el círculo",
+      "explicacion": "Sin selector ni 3D; mismo selector de tiempo, burbujas +N y píldora de atrasadas.",
+      "estado": "mostrada, pendiente de aprobación"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Calendario",
+      "orden": 11,
+      "cuadro": "F",
+      "titulo": "Calendario con Plano",
+      "explicacion": "El Calendario pasa a Mes | Agenda | Plano; el Plano se muda aquí.",
+      "estado": "mostrada, pendiente de aprobación"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 12,
+      "cuadro": "G",
+      "titulo": "Neka pregunta por lo importante",
+      "explicacion": "Tarjeta del Resumen: reprogramar, ya la hice o soltarla, una a la vez.",
+      "estado": "mostrada, pendiente de aprobación"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 13,
+      "cuadro": "H",
+      "titulo": "Atrasadas, lo importante primero",
+      "explicacion": "Hoja con Importantes arriba (con entrega, urgente) y las demás debajo.",
+      "estado": "mostrada, pendiente de aprobación"
     }
   ]
 }
