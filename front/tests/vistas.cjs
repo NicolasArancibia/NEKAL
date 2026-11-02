@@ -162,3 +162,43 @@ test("contexto: cuenta las importantes atrasadas y no lista las atrasadas", () =
   const sin = ctx.contexto(con(cosa("hoy", { scheduledAt: dia(0, 12) })), now);
   assert.doesNotMatch(sin, /Atrasadas importantes/);
 });
+
+// Tarea 3: burbujas «+N» del círculo.
+const nodo = (id, ws, anillo, x, y) => ({ id, workspaceId: ws, x, y, estado: "on", anillo });
+const fila = (ws, anillo, n, desde = 0) =>
+  Array.from({ length: n }, (_, k) => nodo(`${ws}${anillo}${desde + k}`, ws, anillo, 10 * (k + 1), 20 * (k + 1)));
+
+test("agruparNodos: hasta 6 por sector y anillo no se agrupan", () => {
+  const r = tiempo.agruparNodos(fila("u", "hoy", 6));
+  assert.equal(r.puntos.length, 6);
+  assert.deepEqual(r.burbujas, []);
+});
+test("agruparNodos: con 7 quedan 3 puntos y una burbuja con 4", () => {
+  const nodos = fila("u", "hoy", 7);
+  const r = tiempo.agruparNodos(nodos);
+  assert.equal(r.puntos.length, 3);
+  assert.equal(r.burbujas.length, 1);
+  assert.equal(r.burbujas[0].ids.length, 4);
+  assert.equal(r.burbujas[0].workspaceId, "u");
+  assert.equal(r.burbujas[0].anillo, "hoy");
+});
+test("agruparNodos: no se pierde ningún punto", () => {
+  const nodos = [...fila("u", "hoy", 9), ...fila("t", "ventana", 3), ...fila("u", "manana", 12)];
+  const r = tiempo.agruparNodos(nodos);
+  const ids = [...r.puntos.map((n) => n.id), ...r.burbujas.flatMap((b) => b.ids)];
+  assert.deepEqual(ids.sort(), nodos.map((n) => n.id).sort());
+});
+test("agruparNodos: la burbuja queda en el centro de lo que agrupa", () => {
+  const nodos = fila("u", "hoy", 7); // x = 10..70, y = 20..140
+  const b = tiempo.agruparNodos(nodos).burbujas[0]; // agrupa los últimos 4: x 40..70, y 80..140
+  assert.equal(b.x, 55);
+  assert.equal(b.y, 110);
+});
+test("agruparNodos: sectores y anillos distintos no se mezclan", () => {
+  const nodos = [...fila("u", "hoy", 4), ...fila("t", "hoy", 4), ...fila("u", "ventana", 4)];
+  assert.deepEqual(tiempo.agruparNodos(nodos).burbujas, []);
+});
+test("agruparNodos: el máximo se puede cambiar", () => {
+  assert.equal(tiempo.agruparNodos(fila("u", "hoy", 7), 10).burbujas.length, 0);
+  assert.equal(tiempo.agruparNodos(fila("u", "hoy", 7), 4).burbujas.length, 1);
+});

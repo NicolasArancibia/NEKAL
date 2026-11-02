@@ -144,6 +144,46 @@ export function acomodoTiempo(
   return { nodos, sectores: lista, radios };
 }
 
+// Burbujas «+N» (spec H2 §4): si un sector y anillo juntan más de `max` puntos,
+// se dibujan los 3 primeros y el resto va en una burbuja en su centro; tocarla
+// abre la lista. No se pierde ninguno.
+export type Burbuja = {
+  workspaceId: string;
+  anillo: NodoTiempo["anillo"];
+  x: number;
+  y: number;
+  ids: string[];
+};
+const PUNTOS_A_LA_VISTA = 3;
+export function agruparNodos(
+  nodos: NodoTiempo[],
+  max = 6,
+): { puntos: NodoTiempo[]; burbujas: Burbuja[] } {
+  const grupos = new Map<string, NodoTiempo[]>();
+  for (const n of nodos) {
+    const k = `${n.workspaceId}|${n.anillo}`;
+    grupos.set(k, [...(grupos.get(k) ?? []), n]);
+  }
+  const puntos: NodoTiempo[] = [];
+  const burbujas: Burbuja[] = [];
+  for (const g of grupos.values()) {
+    if (g.length <= max) {
+      puntos.push(...g);
+      continue;
+    }
+    const resto = g.slice(PUNTOS_A_LA_VISTA);
+    puntos.push(...g.slice(0, PUNTOS_A_LA_VISTA));
+    burbujas.push({
+      workspaceId: g[0].workspaceId,
+      anillo: g[0].anillo,
+      x: resto.reduce((s, n) => s + n.x, 0) / resto.length,
+      y: resto.reduce((s, n) => s + n.y, 0) / resto.length,
+      ids: resto.map((n) => n.id),
+    });
+  }
+  return { puntos, burbujas };
+}
+
 // Al soltar: a qué día corresponde la distancia al centro. "" = sin fecha.
 export function diaDesdeRadio(
   r: number,
