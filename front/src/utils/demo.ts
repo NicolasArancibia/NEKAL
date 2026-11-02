@@ -492,6 +492,48 @@ export function sembrarDemo(d: AppData, now: number): AppData {
     },
   ];
 
+  // Lo que se quedó sin hacer (spec H2): pendientes que se pasaron hace 3–40
+  // días, para ver el círculo, la hoja y la pregunta de Neka con datos reales.
+  const pasadas = [
+    "Devolver el libro",
+    "Llamar al banco",
+    "Cambiar la ampolleta",
+    "Pedir hora al doctor",
+    "Responder a Camila",
+    "Ordenar el escritorio",
+    "Renovar el seguro",
+    "Comprar un regalo",
+    "Revisar el correo viejo",
+    "Actualizar el currículum",
+  ];
+  const atrasadas: Cosa[] = [
+    {
+      id: "demo-atr-pasaporte",
+      workspaceId: G,
+      type: "Deadline",
+      title: "Renovar el pasaporte",
+      dueAt: en(-5, 18),
+      priority: "urgente",
+    },
+    {
+      id: "demo-atr-formulario",
+      workspaceId: U,
+      type: "Tarea",
+      title: "Entregar el formulario de beca",
+      dueAt: en(-4, 17),
+      duration: 30,
+    },
+    ...Array.from({ length: 32 }, (_, k) => ({
+      id: `demo-atr-${k}`,
+      workspaceId: [P, C, T, U][k % 4],
+      type: "Tarea" as ItemType,
+      title: `${pasadas[k % pasadas.length]}${k >= pasadas.length ? ` (${Math.floor(k / pasadas.length) + 1})` : ""}`,
+      scheduledAt: en(-(3 + ((k * 7) % 38)), 10 + (k % 6)),
+      duration: 20,
+    })),
+  ];
+  cosas.push(...atrasadas);
+
   let out = d;
   const faltan = <T extends { id: string }>(
     lista: T[],

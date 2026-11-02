@@ -63,3 +63,17 @@ test("demo: cabe en una sola sincronización", () => {
     diff(toCloud(recordsOf(vacia)), toCloud(recordsOf(d))).length < 400,
   );
 });
+test("demo: trae atrasadas, con importantes, y sigue siendo idempotente", () => {
+  const { atrasadas, esImportante } = require("../.test-build/espacio.js");
+  const d = demo.sembrarDemo(m.emptyData(), now);
+  const lista = atrasadas(d, now);
+  assert.ok(lista.length >= 30, `${lista.length} atrasadas`);
+  const hace = lista.map((i) =>
+    Math.round((now - Date.parse(i.scheduledAt || i.dueAt)) / 86400000),
+  );
+  assert.ok(Math.min(...hace) >= 3 && Math.max(...hace) <= 40);
+  const importantes = lista.filter(esImportante);
+  assert.ok(importantes.some((i) => i.priority === "urgente"));
+  assert.ok(importantes.some((i) => i.dueAt));
+  assert.equal(demo.sembrarDemo(d, now), d);
+});
