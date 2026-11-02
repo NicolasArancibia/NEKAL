@@ -59,7 +59,7 @@
       "cuadro": "A",
       "titulo": "Hoy, así se ve",
       "explicacion": "El círculo con todo lo atrasado amontonado en «Hoy» y tres vistas (con Mesas 3D).",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "02-vistas-circulo-agenda.html",
@@ -69,7 +69,7 @@
       "cuadro": "B",
       "titulo": "Después",
       "explicacion": "Círculo sin lo atrasado hace más de 2 días, selector de dos vistas, burbujas «+N» y nombre al tocar un punto.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "02-vistas-circulo-agenda.html",
@@ -79,7 +79,7 @@
       "cuadro": "C",
       "titulo": "Atrasadas",
       "explicacion": "Hoja con la lista de lo atrasado: «A hoy», completar o mandar a la papelera.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "02-vistas-circulo-agenda.html",
@@ -89,7 +89,7 @@
       "cuadro": "D",
       "titulo": "Agenda",
       "explicacion": "El Calendario con modo Mes | Agenda, choques marcados y «Arreglar con Neka».",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "03-espacio-calendario-neka.html",
@@ -99,7 +99,7 @@
       "cuadro": "E",
       "titulo": "Espacio solo con el círculo",
       "explicacion": "Sin selector ni 3D; mismo selector de tiempo, burbujas +N y píldora de atrasadas.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "03-espacio-calendario-neka.html",
@@ -109,7 +109,7 @@
       "cuadro": "F",
       "titulo": "Calendario con Plano",
       "explicacion": "El Calendario pasa a Mes | Agenda | Plano; el Plano se muda aquí.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "03-espacio-calendario-neka.html",
@@ -119,7 +119,7 @@
       "cuadro": "G",
       "titulo": "Neka pregunta por lo importante",
       "explicacion": "Tarjeta del Resumen: reprogramar, ya la hice o soltarla, una a la vez.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     },
     {
       "archivo": "03-espacio-calendario-neka.html",
@@ -129,7 +129,7 @@
       "cuadro": "H",
       "titulo": "Atrasadas, lo importante primero",
       "explicacion": "Hoja con Importantes arriba (con entrega, urgente) y las demás debajo.",
-      "estado": "mostrada, pendiente de aprobación"
+      "estado": "aprobada (2/11/2026)"
     }
   ]
 }
