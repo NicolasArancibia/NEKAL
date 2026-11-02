@@ -349,3 +349,68 @@ test("aPapelera: lo que otra cosa necesita se omite sin fallar", () => {
   assert.ok(!r.data.items.find((i) => i.id === "base").deletedAt);
   assert.ok(r.data.items.find((i) => i.id === "suelta").deletedAt);
 });
+
+// Tarea 9: Neka pregunta por lo importante que se pasó.
+const hoyDia = "2026-11-02";
+const imp = (id, n, extra = {}) =>
+  cosa(id, { scheduledAt: dia(-n), priority: "urgente", ...extra });
+
+test("siguientePregunta: una importante atrasada", () => {
+  const d = con(imp("a", 5), cosa("comun", { scheduledAt: dia(-5) }));
+  assert.equal(atr.siguientePregunta(d, now, {}).id, "a");
+});
+test("siguientePregunta: urgente antes que con entrega; entre iguales, la más reciente", () => {
+  const d = con(
+    cosa("entrega", { scheduledAt: "", dueAt: dia(-3) }),
+    imp("viejaUrgente", 20),
+    imp("recienteUrgente", 4),
+  );
+  assert.equal(atr.siguientePregunta(d, now, {}).id, "recienteUrgente");
+  const sin = con(
+    cosa("entregaVieja", { scheduledAt: "", dueAt: dia(-9) }),
+    cosa("entregaReciente", { scheduledAt: "", dueAt: dia(-4) }),
+  );
+  assert.equal(atr.siguientePregunta(sin, now, {}).id, "entregaReciente");
+});
+test("siguientePregunta: lo preguntado hoy se salta; lo de ayer se pregunta otra vez", () => {
+  const d = con(imp("a", 4), imp("b", 6));
+  assert.equal(atr.siguientePregunta(d, now, { a: hoyDia }).id, "b");
+  assert.equal(atr.siguientePregunta(d, now, { a: "2026-11-01" }).id, "a");
+  assert.equal(atr.siguientePregunta(d, now, { a: hoyDia, b: hoyDia }), null);
+});
+test("siguientePregunta: sin importantes, completadas o borradas es null", () => {
+  assert.equal(atr.siguientePregunta(con(), now, {}), null);
+  assert.equal(
+    atr.siguientePregunta(con(cosa("c", { scheduledAt: dia(-5) })), now, {}),
+    null,
+  );
+  const d = con(imp("h", 5, { status: "completado" }), imp("x", 5, { deletedAt: "2026-10-01T00:00:00.000Z" }));
+  assert.equal(atr.siguientePregunta(d, now, {}), null);
+});
+test("nekaState: con una pregunta, Neka pregunta con tres respuestas", () => {
+  const i = imp("informe", 5, { title: "Entregar informe" });
+  const d = con(i, imp("otra", 8), cosa("c1", { scheduledAt: dia(-6) }), cosa("c2", { scheduledAt: dia(-7) }));
+  const s = neka.nekaState(d, now, i);
+  assert.equal(s.kind, "pregunta");
+  assert.match(s.message, /«Entregar informe» era importante y se pasó hace 5 días\. ¿Qué hago con ella\?/);
+  assert.deepEqual(s.acciones.map((a) => [a.label, a.target, a.itemId]), [
+    ["Reprogramar", "reprogramar", "informe"],
+    ["Ya la hice", "hecha", "informe"],
+    ["Soltarla", "soltar", "informe"],
+  ]);
+  assert.equal(s.pie, "Tienes 1 importante más y 2 atrasadas.");
+});
+test("nekaState: la pregunta va sobre «vencido» y bajo «conflicto»", () => {
+  const i = imp("informe", 5);
+  const conAyer = con(i, cosa("ayer", { dueAt: dia(-1) }));
+  assert.equal(neka.nekaState(conAyer, now, i).kind, "pregunta");
+  const choque = con(
+    i,
+    cosa("a", { scheduledAt: dia(0, 11), duration: 60 }),
+    cosa("b", { scheduledAt: dia(0, 11, 30), duration: 60 }),
+  );
+  assert.equal(neka.nekaState(choque, now, i).kind, "conflicto");
+});
+test("nekaState: sin pregunta, el estado de siempre", () => {
+  assert.notEqual(neka.nekaState(con(imp("a", 5)), now).kind, "pregunta");
+});

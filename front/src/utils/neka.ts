@@ -1,4 +1,11 @@
-import { estaAtrasada, timedItems } from "./espacio";
+import {
+  atrasadas,
+  diasHasta,
+  esImportante,
+  estaAtrasada,
+  fechaDe,
+  timedItems,
+} from "./espacio";
 import { AppData, Item, localDay, passive } from "./model";
 import { findConflicts } from "./planner";
 
@@ -6,15 +13,31 @@ import { findConflicts } from "./planner";
 export type NekaPose = 1 | 3 | 5 | 7 | 14 | 15;
 export type NekaAction = {
   label: string;
-  target: "chat" | "crear" | "item";
+  target:
+    | "chat"
+    | "crear"
+    | "item"
+    | "reprogramar"
+    | "hecha"
+    | "soltar"
+    | "atrasadas";
   itemId?: string;
 };
 export type NekaState = {
   kind:
-    "conflicto" | "vencido" | "revisar" | "nuevo" | "listo" | "dia" | "libre";
+    | "conflicto"
+    | "pregunta"
+    | "vencido"
+    | "revisar"
+    | "nuevo"
+    | "listo"
+    | "dia"
+    | "libre";
   pose: NekaPose;
   message: string;
   action?: NekaAction;
+  acciones?: NekaAction[]; // varias respuestas (la pregunta por lo importante)
+  pie?: string; // línea bajo los botones (cuántas más hay)
 };
 
 const plural = (n: number, one: string, many: string) =>
@@ -79,7 +102,11 @@ export const pointsToday = (data: AppData, now = Date.now()) => {
     .reduce((sum, r) => sum + r.points, 0);
 };
 
-export function nekaState(data: AppData, now = Date.now()): NekaState {
+export function nekaState(
+  data: AppData,
+  now = Date.now(),
+  pregunta: Item | null = null,
+): NekaState {
   const items = timedItems(data),
     conflicts = findConflicts(data, now),
     byId = (id: string) => items.find((i) => i.id === id);
@@ -106,6 +133,35 @@ export function nekaState(data: AppData, now = Date.now()): NekaState {
       pose: 14,
       message: `A las ${hhmm(first.scheduledAt)} se te juntan «${first.title}» y «${second.title}».`,
       action: { label: "Resolver", target: "chat" },
+    };
+  }
+
+  if (pregunta) {
+    const todas = atrasadas(data, now);
+    const masImp = todas.filter(
+      (i) => esImportante(i) && i.id !== pregunta.id,
+    ).length;
+    const resto = todas.filter((i) => !esImportante(i)).length;
+    const partes = [
+      masImp ? `${plural(masImp, "importante", "importantes")} más` : "",
+      resto ? `${resto} atrasada${resto === 1 ? "" : "s"}` : "",
+    ].filter(Boolean);
+    const hace = -diasHasta(fechaDe(pregunta), now);
+    const accion = (label: string, target: NekaAction["target"]) => ({
+      label,
+      target,
+      itemId: pregunta.id,
+    });
+    return {
+      kind: "pregunta",
+      pose: 14,
+      message: `«${pregunta.title}» era importante y se pasó hace ${hace} días. ¿Qué hago con ella?`,
+      acciones: [
+        accion("Reprogramar", "reprogramar"),
+        accion("Ya la hice", "hecha"),
+        accion("Soltarla", "soltar"),
+      ],
+      pie: partes.length ? `Tienes ${partes.join(" y ")}.` : "",
     };
   }
 

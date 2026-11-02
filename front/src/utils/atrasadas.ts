@@ -1,9 +1,27 @@
-import { AppData, deleteItem, saveItem } from "./model";
+import { atrasadas, esImportante } from "./espacio";
+import { AppData, Item, deleteItem, localDay, saveItem } from "./model";
 import { buscarHueco } from "./planner";
 
 // Acciones sobre lo atrasado (spec H2 §4). Puras: la interfaz las llama dentro
 // de `change`.
 export const MAX_PAPELERA = 200;
+
+// La próxima cosa importante atrasada por la que Neka pregunta (spec H2 §4): la
+// más importante primero (urgente, luego con entrega) y, entre iguales, la más
+// reciente. Salta lo que ya se preguntó hoy (`preguntadas`: id → día).
+export function siguientePregunta(
+  d: AppData,
+  now: number,
+  preguntadas: Record<string, string>,
+): Item | null {
+  const hoy = localDay(new Date(now));
+  const rango = (i: Item) => (i.priority === "urgente" ? 0 : 1);
+  return (
+    atrasadas(d, now)
+      .filter((i) => esImportante(i) && preguntadas[i.id] !== hoy)
+      .sort((a, b) => rango(a) - rango(b))[0] ?? null
+  );
+}
 
 // «A hoy»: el primer hueco libre de hoy desde ahora, dentro de la jornada y sin
 // pisar lo fijo. Si hoy no cabe, no cambia nada.

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -8,6 +8,9 @@ import { Item, newItem } from "../utils/model";
 import { miles } from "../utils/progreso/logros";
 import { useProgreso } from "../utils/useProgreso";
 import { findConflicts } from "../utils/planner";
+import { aPapelera, siguientePregunta } from "../utils/atrasadas";
+import { esImportante, estaAtrasada } from "../utils/espacio";
+import { usePreguntadas } from "../utils/usePreguntadas";
 import {
   NekaAction,
   hhmm,
@@ -36,11 +39,12 @@ import {
 } from "../components/ui/base";
 import { typeIcons } from "../components/ui/ItemCard";
 import ItemEditor from "../components/ui/ItemEditor";
+import HojaAtrasadas from "../components/ui/espacio/HojaAtrasadas";
 import TusDias from "../components/ui/progreso/TusDias";
 import CurvaDesde from "../components/ui/progreso/CurvaDesde";
 
 export default function Resumen() {
-  const { data } = useApp();
+  const { data, change } = useApp();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [editor, setEditor] = useState<Item | null>(null);
   const { toggle, error } = useToggleDone();
@@ -48,7 +52,25 @@ export default function Resumen() {
   const asistente = useNeka();
   const progreso = useProgreso(),
     level = progreso.nivel.nivel;
-  const neka = nekaState(data, now),
+  // Neka pregunta por una cosa importante que se pasó: una a la vez, y no
+  // vuelve a preguntar por ella el mismo día (spec H2 §4). Se queda en pantalla
+  // mientras no la resuelvas.
+  const { preguntadas, marcar, listo } = usePreguntadas();
+  const [enPantalla, setEnPantalla] = useState<string | null>(null);
+  const [verAtrasadas, setVerAtrasadas] = useState(false);
+  const actual =
+    data.items.find(
+      (i) => i.id === enPantalla && estaAtrasada(i, now) && esImportante(i),
+    ) ?? null;
+  useEffect(() => {
+    if (!listo || actual) return;
+    const s = siguientePregunta(data, now, preguntadas);
+    if (s) {
+      setEnPantalla(s.id);
+      marcar(s.id);
+    } else if (enPantalla) setEnPantalla(null);
+  }, [listo, actual?.id, data, now, preguntadas]);
+  const neka = nekaState(data, now, actual),
     next = nextItem(data, now),
     today = todayItems(data, now),
     done = today.filter((i) => i.status === "completado").length;
@@ -63,9 +85,19 @@ export default function Resumen() {
   const onNeka = (a: NekaAction) => {
     if (a.target === "chat") navigation.navigate("Chat");
     else if (a.target === "crear") setEditor(newItem());
+    else if (a.target === "atrasadas") setVerAtrasadas(true);
     else {
       const item = data.items.find((i) => i.id === a.itemId);
-      if (item) setEditor(item);
+      if (!item) return;
+      if (a.target === "reprogramar")
+        void asistente.enviar(
+          `Reprograma «${item.title}» en el primer hueco libre`,
+          "rapido",
+        );
+      else if (a.target === "hecha") toggle(item);
+      else if (a.target === "soltar")
+        change((d) => aPapelera(d, [item.id]).data);
+      else setEditor(item);
     }
   };
 
@@ -190,6 +222,9 @@ export default function Resumen() {
       <SectionTitle title="Desde el día 1" />
       <CurvaDesde desde={progreso.desde} hoy={progreso.hoy} />
 
+      {verAtrasadas && (
+        <HojaAtrasadas onCerrar={() => setVerAtrasadas(false)} />
+      )}
       {editor && (
         <ItemEditor
           key={editor.id}
