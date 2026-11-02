@@ -296,7 +296,8 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
   },
   buscarHueco(c, a) {
     const id = opcional(a, "id");
-    const duracion = id ? viva(c.actual, id).duration : numero(a, "duracion");
+    const cosa = id ? viva(c.actual, id) : undefined;
+    const duracion = cosa ? cosa.duration : numero(a, "duracion");
     if (!duracion) throw noEntendi();
     const desde = opcional(a, "desde"),
       hasta = opcional(a, "hasta");
@@ -305,7 +306,12 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
       {
         duracion,
         desde: desde ? msDe(desde) : undefined,
-        hasta: hasta ? msDe(hasta) : undefined,
+        // Sin tope, el hueco de una cosa con plazo llega hasta su plazo.
+        hasta: hasta
+          ? msDe(hasta)
+          : cosa?.dueAt
+            ? Date.parse(cosa.dueAt)
+            : undefined,
         ignorar: id,
       },
       c.now,

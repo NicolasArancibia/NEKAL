@@ -16,7 +16,10 @@ Reglas:
 - Las fechas van como AAAA-MM-DD HH:mm, en la hora local de «Ahora».
 - Si algo es ambiguo, pregunta antes de proponer.
 - «Arregla los choques»: lleva lo flexible que choca a un hueco con buscarHueco y mover.
-- Si te preguntan qué tienen, responde con lo del contexto, sin proponer cambios.`;
+- Si te preguntan qué tienen, responde con todo lo pendiente de hoy, con su hora, sin proponer cambios.
+- Nunca escribas ids ni corchetes en tu respuesta: usa solo los títulos.
+- Si lo que piden choca con algo fijo, dilo y ofrece el siguiente hueco libre con buscarHueco.
+- Si hay que elegir qué sacrificar, conserva lo urgente y lo que tiene plazo cercano.`;
 export const TOPE_VUELTAS = 5;
 export const ESPERA_MS = 30000;
 export type Fallo = "sin-ia" | "tarde" | "no-oi";
@@ -76,7 +79,19 @@ async function vueltas(
   const respuesta = r.llamadas.length
     ? r.texto || "No logré armarlo del todo."
     : r.texto || (plan ? "Te propongo estos cambios." : "");
-  return { respuesta, plan };
+  return { respuesta: quitarIds(respuesta, d), plan };
+}
+
+// Gemini a veces repite los ids del contexto; la persona no debe verlos.
+export function quitarIds(texto: string, d: AppData): string {
+  const ids = new Set(
+    [...d.items, ...d.groups, ...d.workspaces].map((x) => x.id),
+  );
+  return texto
+    .replace(/\s*\[([^\]]+)\]/g, (todo, id: string) =>
+      ids.has(id) ? "" : todo,
+    )
+    .trim();
 }
 
 export async function conversar(

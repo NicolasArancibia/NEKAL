@@ -42,7 +42,8 @@ export function linea(d: AppData, i: Item): string {
     ]
       .filter(Boolean)
       .join(" · ") || "sin fecha";
-  return `- [${i.id}] ${i.type} «${i.title}» · ${cuando} · ${i.duration} min · ${i.flexible ? "flexible" : "fija"} · ${i.status} · ${donde}`;
+  const prioridad = i.priority === "media" ? "" : ` · prioridad ${i.priority}`;
+  return `- [${i.id}] ${i.type} «${i.title}» · ${cuando} · ${i.duration} min · ${i.flexible ? "flexible" : "fija"} · ${i.status}${prioridad} · ${donde}`;
 }
 
 export function enVentana(i: Item, now: number): boolean {

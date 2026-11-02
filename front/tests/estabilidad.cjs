@@ -261,3 +261,71 @@ test("herramientas: sin hueco antes del plazo no hay alternativa", () => {
     { id: "tarde", titulo: "tarde", alternativa: null },
   ]);
 });
+
+// Tarea 4: plazo, prioridad y respuestas sin ruido.
+const ctx = require("../.test-build/agente/contexto.js");
+const cv = require("../.test-build/agente/conversar.js");
+
+test("buscarHueco: con id usa el plazo de la cosa", () => {
+  const ocupado = cosa("ocupado", {
+    type: "Evento",
+    flexible: false,
+    scheduledAt: ti(8, 0),
+    duration: 120,
+  });
+  const conPlazo = con(
+    cosa("x", { duration: 60, dueAt: ti(10, 0) }),
+    ocupado,
+  );
+  const a = llamar(conPlazo, "buscarHueco", {
+    id: "x",
+    desde: "2030-05-06 09:00",
+  });
+  assert.equal(a.resultado.inicio, null);
+  const sinPlazo = con(cosa("x", { duration: 60 }), ocupado);
+  const b = llamar(sinPlazo, "buscarHueco", {
+    id: "x",
+    desde: "2030-05-06 09:00",
+  });
+  assert.equal(b.resultado.inicio, "2030-05-06 10:00");
+});
+
+test("contexto: la prioridad aparece si no es media", () => {
+  const d = con();
+  const urgente = cosa("u", { scheduledAt: ti(10, 0), priority: "urgente" });
+  const media = cosa("m", { scheduledAt: ti(10, 0) });
+  assert.match(ctx.linea(d, urgente), /prioridad urgente/);
+  assert.doesNotMatch(ctx.linea(d, media), /prioridad/);
+});
+
+test("quitarIds: borra ids reales y respeta corchetes ajenos", () => {
+  const d = {
+    ...con(cosa("gym", { scheduledAt: ti(10, 0) })),
+    groups: [{ ...m.newGroup("Tesis", "general"), id: "g1" }],
+  };
+  assert.equal(cv.quitarIds("Tienes Estirar [gym].", d), "Tienes Estirar.");
+  assert.equal(cv.quitarIds("Dijo [sic] eso", d), "Dijo [sic] eso");
+  assert.equal(cv.quitarIds("En Tesis [g1] hay algo", d), "En Tesis hay algo");
+  assert.equal(cv.quitarIds("En General [general] también", d), "En General también");
+  assert.equal(cv.quitarIds("[gym] primero", d), "primero");
+});
+
+test("conversar: la respuesta sale sin ids", async () => {
+  const d = con(cosa("gym", { scheduledAt: ti(10, 0) }));
+  const dice = (texto) => ({
+    transcribir: async () => "",
+    sesion: () => ({
+      enviar: async () => ({ texto, llamadas: [] }),
+      devolver: async () => ({ texto, llamadas: [] }),
+    }),
+  });
+  const r = await cv.conversar(dice("Hoy: Gym [gym]"), d, "¿qué tengo?", now);
+  assert.equal(r.respuesta, "Hoy: Gym");
+});
+
+test("INSTRUCCIONES: sin ids, todo lo pendiente de hoy, siguiente hueco y lo urgente", () => {
+  assert.match(cv.INSTRUCCIONES, /nunca escribas ids/i);
+  assert.match(cv.INSTRUCCIONES, /todo lo pendiente de hoy/i);
+  assert.match(cv.INSTRUCCIONES, /siguiente hueco libre/i);
+  assert.match(cv.INSTRUCCIONES, /conserva lo urgente/i);
+});
