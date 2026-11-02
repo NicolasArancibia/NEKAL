@@ -2,6 +2,7 @@ import {
   arbol,
   diasHasta,
   enVentana,
+  estaAtrasada,
   Estado,
   estadoDe,
   fechaDe,
@@ -105,7 +106,7 @@ export function acomodoTiempo(
   const nodos: NodoTiempo[] = [];
   const grupos = new Map<string, Puesto[]>();
   for (const i of timedItems(d)) {
-    const p = puesto(i, v, now, radios);
+    const p = estaAtrasada(i, now) ? null : puesto(i, v, now, radios);
     if (!p || !lista.some((s) => s.workspaceId === i.workspaceId)) continue;
     const k = `${i.workspaceId}|${p.anillo}`;
     grupos.set(k, [...(grupos.get(k) ?? []), p]);

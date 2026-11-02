@@ -1,4 +1,4 @@
-import { esRutina, fechaDe } from "./espacio";
+import { ATRASO_DIAS, esRutina, fechaDe } from "./espacio";
 import {
   activeItems,
   AppData,
@@ -100,13 +100,18 @@ export function aplicarRutinas(d: AppData, now: number, tope = Infinity): AppDat
   return data;
 }
 
-// "Anteriores": días pasados con todo completado. El resto, actuales.
+// "Anteriores": días pasados con todo completado, o de hace más de ATRASO_DIAS
+// días (lo pendiente de ahí es atrasado). El resto, actuales.
 export function ocurrencias(
   d: AppData,
   rutinaId: string,
   now: number,
 ): { actuales: Group[]; anteriores: Group[] } {
   const hoy = localDay(new Date(now));
+  const t = new Date(now);
+  const corte = localDay(
+    new Date(t.getFullYear(), t.getMonth(), t.getDate() - ATRASO_DIAS),
+  );
   const prefijo = `${rutinaId}~`;
   const vivas = activeItems(d);
   const todas = d.groups
@@ -114,10 +119,11 @@ export function ocurrencias(
     .sort((p, q) => (p.id < q.id ? -1 : 1));
   const anteriores = todas.filter(
     (g) =>
-      g.id.slice(prefijo.length) < hoy &&
-      vivas
-        .filter((i) => i.groupId === g.id)
-        .every((i) => i.status === "completado"),
+      g.id.slice(prefijo.length) < corte ||
+      (g.id.slice(prefijo.length) < hoy &&
+        vivas
+          .filter((i) => i.groupId === g.id)
+          .every((i) => i.status === "completado")),
   );
   return { actuales: todas.filter((g) => !anteriores.includes(g)), anteriores };
 }

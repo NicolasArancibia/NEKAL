@@ -96,3 +96,69 @@ test("esImportante: urgente, con fecha límite o Deadline", () => {
   assert.equal(esp.esImportante(cosa("d", { priority: "media" })), false);
   assert.equal(esp.esImportante(cosa("e", { priority: "baja" })), false);
 });
+
+// Tarea 2: la regla en círculo, choques, rutinas y Neka.
+const tiempo = require("../.test-build/acomodo/tiempo.js");
+const plan = require("../.test-build/planner.js");
+const rut = require("../.test-build/rutinas.js");
+const neka = require("../.test-build/neka.js");
+const ctx = require("../.test-build/agente/contexto.js");
+
+test("acomodoTiempo: no dibuja atrasadas", () => {
+  const d = con(
+    cosa("h1", { scheduledAt: dia(0, 11) }),
+    cosa("h2", { scheduledAt: dia(0, 12) }),
+    cosa("h3", { scheduledAt: dia(0, 13) }),
+    cosa("ayer", { scheduledAt: dia(-1) }),
+    ...[3, 5, 10, 20, 30].map((n) => cosa("v" + n, { scheduledAt: dia(-n) })),
+  );
+  const ids = tiempo.acomodoTiempo(d, "semana", now, 300).nodos.map((x) => x.id);
+  assert.deepEqual(ids.sort(), ["ayer", "h1", "h2", "h3"]);
+});
+test("findConflicts: ignora lo atrasado y sigue marcando lo de ayer", () => {
+  const vieja = con(cosa("a", { dueAt: dia(-5) }));
+  assert.deepEqual(plan.findConflicts(vieja, now), []);
+  const ayer = con(cosa("b", { dueAt: dia(-1) }));
+  assert.equal(plan.findConflicts(ayer, now).length, 1);
+});
+test("ocurrencias: lo más viejo que 2 días pasa a anteriores aunque tenga pendientes", () => {
+  const rutina = {
+    ...m.newGroup("Rutina", "general", { repeat: "diario", repeatStart: "2026-10-01" }),
+    id: "r",
+  };
+  const oc = (d) => ({ ...m.newGroup("Día " + d, "general", { parentId: "r" }), id: `r~${d}` });
+  const d = {
+    ...con(
+      cosa("vieja", { groupId: "r~2026-10-28", scheduledAt: dia(-5) }),
+      cosa("hace2", { groupId: "r~2026-10-31", scheduledAt: dia(-2) }),
+      cosa("ayer", { groupId: "r~2026-11-01", scheduledAt: dia(-1) }),
+    ),
+    groups: [rutina, oc("2026-10-28"), oc("2026-10-31"), oc("2026-11-01")],
+  };
+  const o = rut.ocurrencias(d, "r", now);
+  assert.deepEqual(o.anteriores.map((g) => g.id), ["r~2026-10-28"]);
+  assert.deepEqual(o.actuales.map((g) => g.id), ["r~2026-10-31", "r~2026-11-01"]);
+  const v = rut.sinAnteriores(d, now);
+  assert.deepEqual(v.groups.map((g) => g.id).sort(), ["r", "r~2026-10-31", "r~2026-11-01"]);
+  assert.ok(!v.items.some((i) => i.id === "vieja"));
+});
+test("nekaState: lo atrasado no cuenta como vencido", () => {
+  const viejas = Array.from({ length: 10 }, (_, k) => cosa("v" + k, { dueAt: dia(-20) }));
+  assert.notEqual(neka.nekaState(con(...viejas), now).kind, "vencido");
+  const conAyer = con(...viejas, cosa("ayer", { dueAt: dia(-1) }));
+  assert.equal(neka.nekaState(conAyer, now).kind, "vencido");
+});
+test("contexto: cuenta las importantes atrasadas y no lista las atrasadas", () => {
+  const d = con(
+    cosa("urg", { scheduledAt: dia(-6), priority: "urgente" }),
+    cosa("ent", { dueAt: dia(-4) }),
+    cosa("comun", { scheduledAt: dia(-8) }),
+    cosa("hoy", { scheduledAt: dia(0, 12) }),
+  );
+  const c = ctx.contexto(d, now);
+  assert.match(c, /Atrasadas importantes: 2\./);
+  assert.ok(!c.includes("[urg]") && !c.includes("[comun]"));
+  assert.ok(c.includes("[hoy]"));
+  const sin = ctx.contexto(con(cosa("hoy", { scheduledAt: dia(0, 12) })), now);
+  assert.doesNotMatch(sin, /Atrasadas importantes/);
+});

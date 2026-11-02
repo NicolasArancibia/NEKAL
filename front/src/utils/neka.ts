@@ -1,4 +1,4 @@
-import { timedItems } from "./espacio";
+import { estaAtrasada, timedItems } from "./espacio";
 import { AppData, Item, localDay, passive } from "./model";
 import { findConflicts } from "./planner";
 
@@ -114,7 +114,8 @@ export function nekaState(data: AppData, now = Date.now()): NekaState {
       !passive(i) &&
       i.status !== "completado" &&
       i.dueAt &&
-      Date.parse(i.dueAt) < now,
+      Date.parse(i.dueAt) < now &&
+      !estaAtrasada(i, now),
   );
   if (overdue.length === 1)
     return {
