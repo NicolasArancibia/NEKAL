@@ -35,6 +35,7 @@ import { typeIcons } from "../ItemCard";
 import AvisoBorde from "./AvisoBorde";
 import CapaConexiones from "./CapaConexiones";
 import HojaCosas from "./HojaCosas";
+import { PLANO_ACTIVO } from "../../../utils/vistasActivas";
 
 const VENTANAS: Ventana[] = ["hoy", "semana", "2semanas", "todo"];
 const BANDA: Record<Ventana, string> = {
@@ -713,7 +714,7 @@ export default function TiempoVista({
           </Txt>
         </View>
       )}
-      {fuera.size > 0 && (
+      {PLANO_ACTIVO && fuera.size > 0 && (
         <View
           style={{
             position: "absolute",

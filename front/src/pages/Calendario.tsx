@@ -38,12 +38,13 @@ import ItemEditor from "../components/ui/ItemEditor";
 import HojaAtrasadas from "../components/ui/espacio/HojaAtrasadas";
 import PlanoVista from "../components/ui/espacio/PlanoVista";
 import type { Destino } from "../utils/estructura";
+import { PLANO_ACTIVO } from "../utils/vistasActivas";
 
 type Modo = "mes" | "agenda" | "plano";
 const MODOS: [Modo, string][] = [
   ["mes", "Mes"],
   ["agenda", "Agenda"],
-  ["plano", "Plano"],
+  ...(PLANO_ACTIVO ? ([["plano", "Plano"]] as [Modo, string][]) : []),
 ];
 const CLAVE = "nekal:calendario";
 const DIAS_AGENDA = 14;
@@ -115,7 +116,7 @@ export default function Calendario({
   useEffect(() => {
     const p = route.params;
     if (!p?.modo) return;
-    setModo(p.modo);
+    if (p.modo !== "plano" || PLANO_ACTIVO) setModo(p.modo);
     if (p.modo === "plano")
       setPlanoDe({ destino: p.destino ?? null, marcada: p.marcada ?? "" });
     navigation.setParams({
