@@ -84,6 +84,7 @@ require("./rutinas.cjs");
 require("./demo.cjs");
 require("./agente.cjs");
 require("./gemini.cjs");
+require("./estabilidad.cjs");
 require("./progreso.cjs");
 require("./amigos.cjs");
 require("./styles.cjs");

@@ -7,6 +7,7 @@ import {
   saveItem,
 } from "../model";
 import { Destino, crearGrupo, crearMesa, moverItems } from "../estructura";
+import { Conflict, findConflicts } from "../planner";
 
 // El plan de Neka (spec D §4.4): pasos que se prueban sobre una copia con las
 // mismas funciones que la edición a mano y se aplican solo al aceptar.
@@ -128,6 +129,39 @@ export function probar(
   return { data, errores };
 }
 
+// Un choque que el plan crea (spec H1): los que ya había antes no cuentan.
+// `bloquea` = lo que el plan mueve o crea, y es flexible, queda encima de otra
+// cosa o fuera de su plazo o antes de lo que espera; dos cosas fijas entre sí
+// (o la falta de hueco de otra) solo avisan.
+export type Choque = { clave: string; descripcion: string; bloquea: boolean };
+const claveDe = (c: Conflict) => `${c.kind}|${[...c.itemIds].sort().join(",")}`;
+
+export function choquesDelPlan(
+  d: AppData,
+  pasos: PasoPlan[],
+  marcados: boolean[],
+  now: number,
+): Choque[] {
+  const { data } = probar(d, pasos, marcados, now);
+  const habia = new Set(findConflicts(d, now).map(claveDe));
+  const tocados = new Set<string>();
+  pasos.forEach((p, n) => {
+    if (!marcados[n]) return;
+    for (const id of [...Object.keys(p.toca), ...crea(p)]) tocados.add(id);
+  });
+  const flexible = (id: string) =>
+    data.items.find((i) => i.id === id)?.flexible === true;
+  return findConflicts(data, now)
+    .filter((c) => !habia.has(claveDe(c)))
+    .map((c) => ({
+      clave: claveDe(c),
+      descripcion: c.description,
+      bloquea:
+        c.kind !== "capacity" &&
+        c.itemIds.some((id) => tocados.has(id) && flexible(id)),
+    }));
+}
+
 export function aceptar(
   d: AppData,
   plan: Plan,
@@ -143,5 +177,12 @@ export function aceptar(
   const { data, errores } = probar(d, plan.pasos, marcados, now);
   const error = errores.find((e) => e);
   if (error) throw new Error(error);
+  const bloqueo = choquesDelPlan(d, plan.pasos, marcados, now).find(
+    (c) => c.bloquea,
+  );
+  if (bloqueo)
+    throw new Error(
+      `La agenda cambió: ${bloqueo.descripcion} Pídeselo de nuevo.`,
+    );
   return data;
 }
