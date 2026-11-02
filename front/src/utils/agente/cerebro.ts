@@ -1,5 +1,4 @@
 import {
-  Content,
   GenerateContentResult,
   GoogleAIBackend,
   ObjectSchemaRequest,
@@ -7,14 +6,12 @@ import {
   getGenerativeModel,
 } from "firebase/ai";
 import { firebaseApp } from "../firebase";
-import type { Cerebro, Respuesta, Turno } from "./tipos";
+import { MODELO, TRANSCRIBIR, crearCerebroStudio, historia } from "./gemini";
+import type { Cerebro, Respuesta } from "./tipos";
 
-// Único archivo que habla con Gemini (Firebase AI Logic, API gratis). Flash-Lite:
-// en el plan gratis Flash (3.5 → 3.6) da solo 20 consultas al día al proyecto.
-export const MODELO = "gemini-3.5-flash-lite";
-
-const TRANSCRIBIR =
-  "Escribe exactamente lo que dice este audio, en español. Si no se entiende, responde vacío.";
+// Único archivo que importa el SDK de Gemini (Firebase AI Logic, API gratis).
+// Flash-Lite: en el plan gratis Flash (3.5 → 3.6) da solo 20 consultas al día
+// al proyecto.
 
 function respuesta(r: GenerateContentResult): Respuesta {
   const llamadas = (r.response.functionCalls() ?? []).map((c) => ({
@@ -30,23 +27,12 @@ function respuesta(r: GenerateContentResult): Respuesta {
   return { texto: texto.trim(), llamadas };
 }
 
-// Gemini pide que el historial empiece por la persona y alterne turnos; el
-// último de la persona se quita porque el mensaje nuevo va con `enviar`.
-function historia(turnos: Turno[]): Content[] {
-  const out: Content[] = [];
-  for (const t of turnos) {
-    if (!t.texto.trim()) continue;
-    const role = t.deUsuario ? "user" : "model";
-    if (!out.length && role === "model") continue;
-    const ultimo = out[out.length - 1];
-    if (ultimo?.role === role) ultimo.parts.push({ text: t.texto });
-    else out.push({ role, parts: [{ text: t.texto }] });
-  }
-  if (out[out.length - 1]?.role === "user") out.pop();
-  return out;
-}
-
 export function crearCerebro(): Cerebro {
+  // Con una clave de Google AI Studio en `.env.development.local` se habla
+  // directo con Gemini, con la cuota de ese otro proyecto. Esa variable no
+  // entra en la build publicada (la clave quedaría a la vista de todos).
+  const clave = process.env.EXPO_PUBLIC_GEMINI_STUDIO_KEY;
+  if (clave) return crearCerebroStudio({ clave, modelo: MODELO });
   if (!firebaseApp) throw new Error("Firebase no está configurado.");
   const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
   return {
