@@ -139,3 +139,58 @@ test("choquesDelPlan: notas y completadas no cuentan", () => {
   const pasos = [mover("nota", 20, 15), mover("hecha", 20, 30)];
   assert.deepEqual(pl.choquesDelPlan(d, pasos, [true, true], now), []);
 });
+
+// Tarea 2: Neka no propone lo que choca.
+const tarde = () =>
+  con(
+    cosa("tarea", { scheduledAt: ti(18, 0), duration: 30 }),
+    cosa("reunion", {
+      type: "Meeting",
+      flexible: false,
+      scheduledAt: ti(20, 0),
+      duration: 60,
+    }),
+  );
+
+test("ejecutar: mover una tarea sobre algo fijo se rechaza", () => {
+  const e = llamar(tarde(), "mover", { id: "tarea", inicio: "2030-05-06 20:15" });
+  assert.deepEqual(e.pasos, []);
+  assert.match(e.resultado.error, /se superpone/);
+  assert.match(e.resultado.error, /buscarHueco/);
+});
+test("ejecutar: crear una tarea sobre algo fijo se rechaza", () => {
+  const e = llamar(tarde(), "crear", {
+    tipo: "Tarea",
+    titulo: "Informe",
+    inicio: "2030-05-06 20:30",
+    duracion: 30,
+  });
+  assert.deepEqual(e.pasos, []);
+  assert.match(e.resultado.error, /se superpone/);
+});
+test("ejecutar: crear un evento fijo sobre algo fijo se permite", () => {
+  const e = llamar(tarde(), "crear", {
+    tipo: "Evento",
+    titulo: "Cena",
+    inicio: "2030-05-06 20:30",
+    duracion: 30,
+    fija: true,
+  });
+  assert.equal(e.resultado.error, undefined);
+  assert.equal(e.pasos.length, 1);
+});
+test("ejecutar: mover a un hueco libre sigue funcionando", () => {
+  const e = llamar(tarde(), "mover", { id: "tarea", inicio: "2030-05-06 21:30" });
+  assert.equal(e.resultado.error, undefined);
+  assert.equal(e.pasos.length, 1);
+});
+test("ejecutar: lo que ya chocaba antes de la propuesta no la rechaza", () => {
+  const d = con(
+    cosa("a", { scheduledAt: ti(10, 0), duration: 60 }),
+    cosa("b", { scheduledAt: ti(10, 30), duration: 60 }),
+    cosa("c", { scheduledAt: ti(15, 0), duration: 30 }),
+  );
+  const e = llamar(d, "mover", { id: "c", inicio: "2030-05-06 16:00" });
+  assert.equal(e.resultado.error, undefined);
+  assert.equal(e.pasos.length, 1);
+});

@@ -17,7 +17,7 @@ import { GENERAL } from "../estructura";
 import { moverAFecha, timedItems } from "../espacio";
 import { buscarHueco, correrDesde } from "../planner";
 import { COLORES_MESA } from "../colores";
-import { PasoPlan, probar } from "./plan";
+import { PasoPlan, choquesDelPlan, probar } from "./plan";
 import { corto, fechaHora, hora, linea } from "./contexto";
 import type { Declaracion, Llamada } from "./tipos";
 
@@ -566,7 +566,20 @@ export function ejecutar(
     const error = probar(d, juntos, todos(juntos.length), now)
       .errores.slice(previos.length)
       .find((x) => x);
-    return error ? { resultado: { error }, pasos: [] } : e;
+    if (error) return { resultado: { error }, pasos: [] };
+    // Lo que choca se le devuelve a Neka para que busque otro hueco (spec H1).
+    const bloquean = (ps: PasoPlan[]) =>
+      choquesDelPlan(d, ps, todos(ps.length), now).filter((c) => c.bloquea);
+    const habia = new Set(bloquean(previos).map((c) => c.clave));
+    const choque = bloquean(juntos).find((c) => !habia.has(c.clave));
+    return choque
+      ? {
+          resultado: {
+            error: `Choca: ${choque.descripcion} Busca otro hueco con buscarHueco; si es por lo que no cabe hoy, llévalo antes a otro día.`,
+          },
+          pasos: [],
+        }
+      : e;
   } catch (err) {
     return { resultado: { error: (err as Error).message }, pasos: [] };
   }
