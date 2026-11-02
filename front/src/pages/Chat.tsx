@@ -69,6 +69,9 @@ export default function Chat() {
             />
           ),
         )}
+        {!!neka.aviso && !neka.pensando && (
+          <ChatMessage isUser={false} message={neka.aviso} />
+        )}
         {neka.pensando && (
           <ChatMessage isUser={false} message="Neka está pensando…" />
         )}

@@ -329,3 +329,40 @@ test("INSTRUCCIONES: sin ids, todo lo pendiente de hoy, siguiente hueco y lo urg
   assert.match(cv.INSTRUCCIONES, /siguiente hueco libre/i);
   assert.match(cv.INSTRUCCIONES, /conserva lo urgente/i);
 });
+
+// Tarea 5: un fallo de IA no se guarda en el historial.
+const ms = require("../.test-build/agente/mensajes.js");
+
+test("mensajesDelTurno: un fallo no guarda nada", () => {
+  const r = ms.mensajesDelTurno({
+    respuesta: "Ahora no puedo pensar con IA; te dejo lo de siempre.",
+    plan: null,
+    fallo: "sin-ia",
+  });
+  assert.deepEqual(r, { respuesta: null, plan: null });
+});
+test("mensajesDelTurno: sin plan guarda un mensaje de 3 claves", () => {
+  const r = ms.mensajesDelTurno({ respuesta: "Hoy tienes 2 cosas.", plan: null });
+  assert.equal(r.plan, null);
+  assert.deepEqual(Object.keys(r.respuesta).sort(), ["id", "isUser", "text"]);
+  assert.equal(r.respuesta.text, "Hoy tienes 2 cosas.");
+  assert.equal(r.respuesta.isUser, false);
+});
+test("mensajesDelTurno: con plan guarda además el mensaje del plan pendiente", () => {
+  const r = ms.mensajesDelTurno({
+    respuesta: "Te propongo correr el gimnasio.",
+    plan: { id: "p", resumen: "1 cambio", pasos: [] },
+  });
+  assert.equal(r.respuesta.text, "Te propongo correr el gimnasio.");
+  assert.deepEqual(Object.keys(r.plan).sort(), [
+    "audio",
+    "estado",
+    "id",
+    "isUser",
+    "plan",
+    "text",
+  ]);
+  assert.equal(r.plan.plan, "1 cambio");
+  assert.equal(r.plan.estado, "pendiente");
+  assert.equal(r.plan.isUser, false);
+});
