@@ -202,3 +202,71 @@ test("agruparNodos: el máximo se puede cambiar", () => {
   assert.equal(tiempo.agruparNodos(fila("u", "hoy", 7), 10).burbujas.length, 0);
   assert.equal(tiempo.agruparNodos(fila("u", "hoy", 7), 4).burbujas.length, 1);
 });
+
+// Tarea 4: la agenda.
+const ag = require("../.test-build/agenda.js");
+const ids = (dias) => dias.map((x) => x.filas.map((f) => f.item.id));
+
+test("agenda: días en orden y cosas por hora, sin días vacíos", () => {
+  const d = con(
+    cosa("tarde", { scheduledAt: dia(0, 17) }),
+    cosa("temprano", { scheduledAt: dia(0, 11) }),
+    cosa("pasado", { scheduledAt: dia(2, 9) }),
+  );
+  const r = ag.agenda(d, now);
+  assert.deepEqual(r.map((x) => x.dia), ["2026-11-02", "2026-11-04"]);
+  assert.deepEqual(ids(r), [["temprano", "tarde"], ["pasado"]]);
+});
+test("agenda: fin y minutos salen de la duración", () => {
+  const d = con(cosa("a", { scheduledAt: dia(0, 11), duration: 45 }));
+  const f = ag.agenda(d, now)[0].filas[0];
+  assert.equal(f.minutos, 45);
+  assert.equal(Date.parse(f.fin) - Date.parse(f.inicio), 45 * 60000);
+});
+test("agenda: lo superpuesto marca «choca» en las dos", () => {
+  const d = con(
+    cosa("a", { scheduledAt: dia(0, 11), duration: 60 }),
+    cosa("b", { scheduledAt: dia(0, 11, 30), duration: 60 }),
+    cosa("c", { scheduledAt: dia(0, 15), duration: 30 }),
+  );
+  const f = ag.agenda(d, now)[0].filas;
+  assert.deepEqual(f.map((x) => x.choca), [true, true, false]);
+});
+test("agenda: lo atrasado no sale; lo de ayer y anteayer sí, si está pendiente", () => {
+  const d = con(
+    cosa("vieja", { scheduledAt: dia(-3) }),
+    cosa("anteayer", { scheduledAt: dia(-2) }),
+    cosa("ayer", { scheduledAt: dia(-1) }),
+    cosa("ayerHecha", { scheduledAt: dia(-1), status: "completado" }),
+    cosa("hoy", { scheduledAt: dia(0, 12) }),
+  );
+  assert.deepEqual(ids(ag.agenda(d, now)), [["anteayer"], ["ayer"], ["hoy"]]);
+});
+test("agenda: las hechas se ven solo hoy", () => {
+  const d = con(
+    cosa("hechaHoy", { scheduledAt: dia(0, 9), status: "completado" }),
+    cosa("hechaManana", { scheduledAt: dia(1, 9), status: "completado" }),
+  );
+  const r = ag.agenda(d, now);
+  assert.deepEqual(ids(r), [["hechaHoy"]]);
+  assert.equal(r[0].filas[0].hecha, true);
+  assert.equal(r[0].filas[0].choca, false);
+});
+test("agenda: ventana de 14 días, notas, sin hora y filtro por mesa", () => {
+  const d = {
+    ...con(
+      cosa("d13", { scheduledAt: dia(13) }),
+      cosa("d14", { scheduledAt: dia(14) }),
+      cosa("nota", { type: "Nota", scheduledAt: dia(1) }),
+      cosa("sinHora"),
+      cosa("deU", { scheduledAt: dia(1), workspaceId: "u" }),
+    ),
+    workspaces: [...m.emptyData().workspaces, { id: "u", name: "Uni", color: "#2E9E6B" }],
+  };
+  assert.deepEqual(ids(ag.agenda(d, now)), [["deU"], ["d13"]]);
+  assert.deepEqual(ids(ag.agenda(d, now, 14, "u")), [["deU"]]);
+  assert.deepEqual(ids(ag.agenda(d, now, 30)), [["deU"], ["d13"], ["d14"]]);
+});
+test("agenda: sin cosas es una lista vacía", () => {
+  assert.deepEqual(ag.agenda(con(), now), []);
+});

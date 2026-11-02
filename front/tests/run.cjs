@@ -7,6 +7,7 @@ const build = spawnSync(
     path.join(root, "node_modules/typescript/bin/tsc"),
     "src/utils/model.ts",
     "src/utils/planner.ts",
+    "src/utils/agenda.ts",
     "src/utils/storage.ts",
     "src/utils/syncModel.ts",
     "src/utils/SyncEngine.ts",
