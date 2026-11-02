@@ -194,3 +194,70 @@ test("ejecutar: lo que ya chocaba antes de la propuesta no la rechaza", () => {
   assert.equal(e.resultado.error, undefined);
   assert.equal(e.pasos.length, 1);
 });
+
+// Tarea 3: explicar el salto y «no cabe todo» con alternativa.
+const p = require("../.test-build/planner.js");
+const t = (hh, min = 0) => new Date(2030, 4, 6, hh, min).getTime();
+const mamaYGimnasio = () =>
+  con(
+    cosa("mama", { scheduledAt: ti(19, 30), duration: 30 }),
+    cosa("gimnasio", {
+      type: "Evento",
+      flexible: false,
+      scheduledAt: ti(19, 50),
+      duration: 10,
+    }),
+  );
+
+test("correrDesde: dice qué fijo saltó", () => {
+  const [c] = p.correrDesde(mamaYGimnasio(), 20, ahora19);
+  assert.equal(c.salta, "gimnasio");
+  const libre = con(cosa("gym", { scheduledAt: ti(9, 30), duration: 60 }));
+  assert.equal(p.correrDesde(libre, 20, t(9, 10))[0].salta, null);
+});
+test("herramientas: el paso explica el salto", () => {
+  const e = llamar(
+    mamaYGimnasio(),
+    "correrDesde",
+    { minutos: 20, desde: "2030-05-06 19:00" },
+    [],
+    ahora19,
+  );
+  assert.match(e.pasos[0].texto, /19:30 → 20:00/);
+  assert.match(e.pasos[0].texto, /salta «gimnasio», que es fija/);
+});
+test("correrDesde: no empuja algo más allá de su plazo", () => {
+  const d = con(
+    cosa("x", { scheduledAt: ti(10, 0), duration: 30, dueAt: ti(10, 30) }),
+  );
+  const [c] = p.correrDesde(d, 20, t(9, 10));
+  assert.equal(c.noCabe, true);
+  assert.equal(c.pasaPlazo, true);
+  assert.equal(c.despues, c.antes);
+  const holgada = con(
+    cosa("x", { scheduledAt: ti(10, 0), duration: 30, dueAt: ti(11, 0) }),
+  );
+  const [ok] = p.correrDesde(holgada, 20, t(9, 10));
+  assert.equal(ok.noCabe, false);
+  assert.equal(ok.pasaPlazo, false);
+});
+test("herramientas: lo que no cabe trae su alternativa del día siguiente", () => {
+  const d = con(cosa("tarde", { scheduledAt: ti(20, 30), duration: 30 }));
+  const e = llamar(d, "correrDesde", { minutos: 40, desde: "2030-05-06 20:00" });
+  assert.deepEqual(e.resultado.noCaben, [
+    { id: "tarde", titulo: "tarde", alternativa: "2030-05-07 08:00" },
+  ]);
+});
+test("herramientas: sin hueco antes del plazo no hay alternativa", () => {
+  const d = con(
+    cosa("tarde", {
+      scheduledAt: ti(20, 30),
+      duration: 30,
+      dueAt: ti(21, 0),
+    }),
+  );
+  const e = llamar(d, "correrDesde", { minutos: 40, desde: "2030-05-06 20:00" });
+  assert.deepEqual(e.resultado.noCaben, [
+    { id: "tarde", titulo: "tarde", alternativa: null },
+  ]);
+});

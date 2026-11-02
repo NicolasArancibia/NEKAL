@@ -183,6 +183,8 @@ export type Corrimiento = {
   antes: string;
   despues: string;
   noCabe: boolean;
+  salta: string | null; // id de la cosa fija que lo empujó
+  pasaPlazo: boolean; // correrlo lo dejaría después de su plazo
 };
 // "Voy atrasado" (spec D §4.3): la primera flexible que aún no termina se corre
 // `minutos`; las siguientes empiezan cuando termina la anterior, saltando lo
@@ -220,16 +222,25 @@ export function correrDesde(
       cursor === -Infinity
         ? inicio + minutos * 60000
         : Math.max(inicio, cursor);
-    for (let f = choca(s); f; f = choca(s)) s = end(f);
+    let salta: string | null = null;
+    for (let f = choca(s); f; f = choca(s)) {
+      s = end(f);
+      salta = f.id;
+    }
     cursor = s + dur;
     if (s === inicio) continue;
+    const pasaPlazo = !!i.dueAt && s + dur > Date.parse(i.dueAt);
     const noCabe =
-      s + dur > finJornada.getTime() || localDay(new Date(s + dur - 1)) !== dia;
+      pasaPlazo ||
+      s + dur > finJornada.getTime() ||
+      localDay(new Date(s + dur - 1)) !== dia;
     out.push({
       itemId: i.id,
       antes: i.scheduledAt,
       despues: noCabe ? i.scheduledAt : new Date(s).toISOString(),
       noCabe,
+      salta,
+      pasaPlazo,
     });
   }
   return out;

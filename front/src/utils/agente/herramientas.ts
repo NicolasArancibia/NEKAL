@@ -419,21 +419,43 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
       .filter((x) => !x.noCabe)
       .map((x) => {
         const i = viva(c.actual, x.itemId);
-        return pasoMover(c, i, {
+        const paso = pasoMover(c, i, {
           scheduledAt: x.despues,
           dueAt: i.dueAt,
           startDate: i.startDate,
         });
+        return x.salta
+          ? {
+              ...paso,
+              texto: `${paso.texto} (salta «${viva(c.actual, x.salta).title}», que es fija)`,
+            }
+          : paso;
       });
+    // Lo que no cabe hoy trae su primer hueco desde mañana (antes de su plazo).
+    const manana = new Date(desde ? msDe(desde) : c.now);
+    manana.setHours(24, 0, 0, 0);
+    const alternativa = (i: Item) => {
+      const hueco = buscarHueco(
+        c.actual,
+        {
+          duracion: i.duration,
+          desde: manana.getTime(),
+          hasta: i.dueAt ? Date.parse(i.dueAt) : undefined,
+          ignorar: i.id,
+        },
+        c.now,
+      );
+      return hueco ? fechaHora(Date.parse(hueco)) : null;
+    };
     return {
       resultado: {
         corridas: pasos.map((p) => p.texto),
         noCaben: r
           .filter((x) => x.noCabe)
-          .map((x) => ({
-            id: x.itemId,
-            titulo: viva(c.actual, x.itemId).title,
-          })),
+          .map((x) => {
+            const i = viva(c.actual, x.itemId);
+            return { id: i.id, titulo: i.title, alternativa: alternativa(i) };
+          }),
       },
       pasos,
     };
