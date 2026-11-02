@@ -58,6 +58,7 @@ export type Neka = {
   soltar(): Promise<void>;
   aceptar(marcados: boolean[]): void;
   descartar(): void;
+  repetir(): void; // descarta el plan pendiente y repite la última pregunta con la agenda de ahora
   leer(texto: string): void;
 };
 
@@ -277,6 +278,12 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     setHoja(false);
     setError("");
   };
+  const repetir = () => {
+    const pregunta = turno?.pregunta;
+    const desde = turno?.origen ?? "chat";
+    descartar();
+    if (pregunta) void enviar(pregunta, desde);
+  };
   const abrirPlan = (mensajeId: string) => {
     if (turno && mensajeId === pendienteId) {
       setTurno({ ...turno, origen: "chat" });
@@ -306,6 +313,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
         soltar,
         aceptar,
         descartar,
+        repetir,
         leer: leerEnVoz,
       }}
     >

@@ -366,3 +366,55 @@ test("mensajesDelTurno: con plan guarda además el mensaje del plan pendiente", 
   assert.equal(r.plan.estado, "pendiente");
   assert.equal(r.plan.isUser, false);
 });
+
+// Tarea 6 (hallazgo en vivo): «te propongo…» sin ningún cambio armado.
+const guion = (...respuestas) => {
+  const reg = { enviados: [], devueltos: 0 };
+  let n = 0;
+  const siguiente = () => respuestas[Math.min(n++, respuestas.length - 1)];
+  return {
+    reg,
+    cerebro: {
+      transcribir: async () => "",
+      sesion: () => ({
+        enviar: async (t) => (reg.enviados.push(t), siguiente()),
+        devolver: async () => (reg.devueltos++, siguiente()),
+      }),
+    },
+  };
+};
+const dice = (texto, ...llamadas) => ({ texto, llamadas });
+const pide = (nombre, args = {}) => ({ nombre, args });
+
+test("conversar: si dice «te propongo» sin armar cambios, se le pide una vez que lo arme", async () => {
+  const g = guion(
+    dice("", pide("mover", { id: "tarea", inicio: "2030-05-06 20:15" })),
+    dice("Choca con la reunión. Te propongo las 21:30."),
+    dice("", pide("mover", { id: "tarea", inicio: "2030-05-06 21:30" })),
+    dice("Te propongo moverla a las 21:30."),
+  );
+  const r = await cv.conversar(g.cerebro, tarde(), "pasa tarea a las 20:15", now);
+  assert.equal(g.reg.enviados.length, 2);
+  assert.match(g.reg.enviados[1], /ninguna herramienta/);
+  assert.equal(r.plan.pasos.length, 1);
+  assert.equal(r.respuesta, "Te propongo moverla a las 21:30.");
+});
+test("conversar: el recordatorio se hace una sola vez", async () => {
+  const g = guion(dice("Te propongo las 21:30."));
+  const r = await cv.conversar(g.cerebro, tarde(), "pasa tarea", now);
+  assert.equal(g.reg.enviados.length, 2);
+  assert.equal(r.plan, null);
+  assert.equal(r.respuesta, "Te propongo las 21:30.");
+});
+test("conversar: sin «propongo» o con plan no hay recordatorio", async () => {
+  const sin = guion(dice("Hoy tienes 2 cosas."));
+  await cv.conversar(sin.cerebro, tarde(), "¿qué tengo?", now);
+  assert.equal(sin.reg.enviados.length, 1);
+  const con2 = guion(
+    dice("", pide("mover", { id: "tarea", inicio: "2030-05-06 21:30" })),
+    dice("Te propongo moverla a las 21:30."),
+  );
+  const r = await cv.conversar(con2.cerebro, tarde(), "pasa tarea", now);
+  assert.equal(con2.reg.enviados.length, 1);
+  assert.equal(r.plan.pasos.length, 1);
+});

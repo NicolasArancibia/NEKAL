@@ -21,6 +21,8 @@ Reglas:
 - Si lo que piden choca con algo fijo, dilo y ofrece el siguiente hueco libre con buscarHueco.
 - Si hay que elegir qué sacrificar, conserva lo urgente y lo que tiene plazo cercano.`;
 export const TOPE_VUELTAS = 5;
+const RECORDATORIO =
+  "No llamaste a ninguna herramienta, así que no hay ningún cambio que la persona pueda aceptar. Si quieres proponerlo, llama a mover o crear con el hueco que dijiste; si no, no digas «te propongo».";
 export const ESPERA_MS = 30000;
 export type Fallo = "sin-ia" | "tarde" | "no-oi";
 export const MENSAJES: Record<Fallo, string> = {
@@ -61,13 +63,22 @@ async function vueltas(
   );
   let r = await sesion.enviar(texto);
   const pasos: PasoPlan[] = [];
-  for (let n = 0; r.llamadas.length && n < TOPE_VUELTAS; n++) {
-    const resultados: Resultado[] = r.llamadas.map((l) => {
-      const e = ejecutar(d, pasos, l, now);
-      pasos.push(...e.pasos);
-      return { nombre: l.nombre, respuesta: e.resultado };
-    });
-    r = await sesion.devolver(resultados);
+  const correr = async () => {
+    for (let n = 0; r.llamadas.length && n < TOPE_VUELTAS; n++) {
+      const resultados: Resultado[] = r.llamadas.map((l) => {
+        const e = ejecutar(d, pasos, l, now);
+        pasos.push(...e.pasos);
+        return { nombre: l.nombre, respuesta: e.resultado };
+      });
+      r = await sesion.devolver(resultados);
+    }
+  };
+  await correr();
+  // Dijo «te propongo…» sin armar ningún cambio (visto en vivo tras un choque
+  // rechazado): la persona se quedaría sin nada que aceptar. Se le pide una vez.
+  if (!pasos.length && !r.llamadas.length && /propong/i.test(r.texto)) {
+    r = await sesion.enviar(RECORDATORIO);
+    await correr();
   }
   const plan = pasos.length
     ? {

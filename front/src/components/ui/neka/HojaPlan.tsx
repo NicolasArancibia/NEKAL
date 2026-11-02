@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, PressableScale, Sheet, Txt } from "../base";
-import { color, size, space } from "../../../styles/theme";
+import { color, radius, size, space } from "../../../styles/theme";
 import { useApp } from "../../../utils/AppContext";
 import { useNeka } from "../../../utils/NekaContext";
-import { probar } from "../../../utils/agente/plan";
+import { choquesDelPlan, probar } from "../../../utils/agente/plan";
 import { bloquesDelDia } from "../../../utils/agente/dia";
 import DiaPlan from "./DiaPlan";
 
@@ -29,7 +29,17 @@ export default function HojaPlan({ onAbrirChat }: { onAbrirChat: () => void }) {
     () => (plan ? bloquesDelDia(data, plan, marcados) : null),
     [data, plan, marcados],
   );
+  // Lo que el plan dejaría chocando con la agenda de ahora (maqueta H/01).
+  const choques = useMemo(
+    () => (plan ? choquesDelPlan(data, plan.pasos, marcados, Date.now()) : []),
+    [data, plan, marcados],
+  );
+  const bloqueos = choques.filter((c) => c.bloquea);
+  const avisos = choques.filter((c) => !c.bloquea);
   const n = marcados.filter(Boolean).length;
+  const todos = n === marcados.length;
+  // Con todo marcado, un choque quiere decir que la agenda cambió: se pide de nuevo.
+  const cambio = bloqueos.length > 0 && todos;
   const conError = errores.some((e, i) => e && marcados[i]);
   if (!t) return null;
   return (
@@ -115,18 +125,80 @@ export default function HojaPlan({ onAbrirChat }: { onAbrirChat: () => void }) {
           </View>
         </Pressable>
       ))}
-      {!!neka.error && (
+      {avisos.map((c) => (
+        <View
+          key={c.clave}
+          style={{
+            flexDirection: "row",
+            gap: space.sm,
+            alignItems: "flex-start",
+            padding: space.md,
+            borderRadius: radius.sm,
+            borderWidth: 1,
+            borderColor: color.line,
+            backgroundColor: color.background,
+          }}
+        >
+          <Ionicons
+            name="warning-outline"
+            size={size.icon - 4}
+            color={color.warning}
+          />
+          <Txt variant="callout" style={{ flex: 1 }}>
+            Ojo: {c.descripcion}
+          </Txt>
+        </View>
+      ))}
+      {bloqueos.length > 0 && (
+        <View
+          accessibilityRole="alert"
+          style={{
+            gap: space.xs,
+            padding: space.md,
+            borderRadius: radius.sm,
+            backgroundColor: color.dangerSoft,
+          }}
+        >
+          <Txt variant="callout" weight={700} tone="danger">
+            {cambio
+              ? "La agenda cambió"
+              : "Con lo que dejaste marcado queda un choque"}
+          </Txt>
+          {bloqueos.map((c) => (
+            <Txt key={c.clave} variant="callout">
+              {c.descripcion}
+            </Txt>
+          ))}
+          {cambio && (
+            <Txt variant="callout">
+              Pídeselo de nuevo y Neka lo acomoda con tu agenda de ahora.
+            </Txt>
+          )}
+        </View>
+      )}
+      {!!neka.error && !bloqueos.length && (
         <Txt variant="callout" tone="danger" accessibilityRole="alert">
           {neka.error}
         </Txt>
       )}
       {plan && (
         <>
-          <Button
-            title={`Aceptar ${n} cambio${n === 1 ? "" : "s"}`}
-            disabled={!n || conError}
-            onPress={() => neka.aceptar(marcados)}
-          />
+          {cambio ? (
+            <Button title="Pedir de nuevo" onPress={neka.repetir} />
+          ) : (
+            <Button
+              title={`Aceptar ${n} cambio${n === 1 ? "" : "s"}`}
+              disabled={!n || conError || bloqueos.length > 0}
+              onPress={() => neka.aceptar(marcados)}
+            />
+          )}
+          {!cambio && !!neka.error && !bloqueos.length && !!t.pregunta && (
+            <Button
+              title="Pedir de nuevo"
+              variant="secondary"
+              onPress={neka.repetir}
+            />
+          )}
           <Button
             title="Descartar"
             variant="secondary"
