@@ -1,7 +1,7 @@
 import { FirebaseApp, initializeApp, getApps } from "firebase/app";
 import {
   CustomProvider,
-  ReCaptchaV3Provider,
+  ReCaptchaEnterpriseProvider,
   initializeAppCheck,
 } from "firebase/app-check";
 import { getAuth, initializeAuth, Auth, Persistence } from "firebase/auth";
@@ -28,7 +28,10 @@ let firebaseApp: FirebaseApp | null = null;
 // App Check (spec D §7): Gemini solo responde a la app de verdad. En desarrollo
 // (web local y Expo Go) se usa el token de depuración de
 // `.env.development.local`, que no entra en la build de producción; la web
-// publicada usa reCAPTCHA v3. Sin ninguno, Gemini falla y Neka queda sin IA.
+// publicada usa reCAPTCHA Enterprise (Fraud Defense; reCAPTCHA Classic quedó
+// obsoleto y Firebase ya no deja registrarlo). La clave del sitio debe ser la
+// de Enterprise registrada en App Check. Sin ninguno, Gemini falla y Neka queda
+// sin IA.
 function protegerConAppCheck(app: FirebaseApp) {
   const depuracion = process.env.EXPO_PUBLIC_APPCHECK_DEBUG_TOKEN;
   const sitio = process.env.EXPO_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -42,7 +45,7 @@ function protegerConAppCheck(app: FirebaseApp) {
     initializeAppCheck(app, {
       provider:
         !depuracion && Platform.OS === "web" && sitio
-          ? new ReCaptchaV3Provider(sitio)
+          ? new ReCaptchaEnterpriseProvider(sitio)
           : sinProveedor,
       isTokenAutoRefreshEnabled: true,
     });
