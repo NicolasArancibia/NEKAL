@@ -7,6 +7,9 @@ const build = spawnSync(
     path.join(root, "node_modules/typescript/bin/tsc"),
     "src/utils/model.ts",
     "src/utils/planner.ts",
+    "src/utils/agenda.ts",
+    "src/utils/atrasadas.ts",
+    "src/utils/prefsEspacio.ts",
     "src/utils/storage.ts",
     "src/utils/syncModel.ts",
     "src/utils/SyncEngine.ts",
@@ -85,6 +88,7 @@ require("./demo.cjs");
 require("./agente.cjs");
 require("./gemini.cjs");
 require("./estabilidad.cjs");
+require("./vistas.cjs");
 require("./progreso.cjs");
 require("./amigos.cjs");
 require("./styles.cjs");

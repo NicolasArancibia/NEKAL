@@ -7,6 +7,7 @@ import { Item, passive } from "../../../utils/model";
 import { Button, Txt } from "../base";
 import ItemEditor from "../ItemEditor";
 import ConectarCon from "./ConectarCon";
+import { PLANO_ACTIVO } from "../../../utils/vistasActivas";
 
 // La hoja de una cosa en las tres vistas: el ItemEditor de siempre, más
 // "Conectar con…" y "Ver dónde está". `aviso` explica dónde queda algo que la
@@ -51,15 +52,17 @@ export default function HojaCosa({
                   onPress={() => setConectar(true)}
                 />
               )}
-              <Button
-                title="Ver dónde está"
-                variant="secondary"
-                small
-                onPress={() => {
-                  onVerDonde(item);
-                  onClose();
-                }}
-              />
+              {PLANO_ACTIVO && (
+                <Button
+                  title="Ver dónde está"
+                  variant="secondary"
+                  small
+                  onPress={() => {
+                    onVerDonde(item);
+                    onClose();
+                  }}
+                />
+              )}
             </View>
           )}
           {conectar && (

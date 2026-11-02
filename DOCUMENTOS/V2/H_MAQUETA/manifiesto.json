@@ -50,6 +50,86 @@
       "titulo": "Cuando la IA no responde",
       "explicacion": "El aviso aparece en el chat pero ya no se guarda en el historial.",
       "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 1,
+      "cuadro": "A",
+      "titulo": "Hoy, así se ve",
+      "explicacion": "El círculo con todo lo atrasado amontonado en «Hoy» y tres vistas (con Mesas 3D).",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 2,
+      "cuadro": "B",
+      "titulo": "Después",
+      "explicacion": "Círculo sin lo atrasado hace más de 2 días, selector de dos vistas, burbujas «+N» y nombre al tocar un punto.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 3,
+      "cuadro": "C",
+      "titulo": "Atrasadas",
+      "explicacion": "Hoja con la lista de lo atrasado: «A hoy», completar o mandar a la papelera.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Calendario",
+      "orden": 4,
+      "cuadro": "D",
+      "titulo": "Agenda",
+      "explicacion": "El Calendario con modo Mes | Agenda, choques marcados y «Arreglar con Neka».",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 10,
+      "cuadro": "E",
+      "titulo": "Espacio solo con el círculo",
+      "explicacion": "Sin selector ni 3D; mismo selector de tiempo, burbujas +N y píldora de atrasadas.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Calendario",
+      "orden": 11,
+      "cuadro": "F",
+      "titulo": "Calendario con Plano",
+      "explicacion": "El Calendario pasa a Mes | Agenda | Plano; el Plano se muda aquí.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 12,
+      "cuadro": "G",
+      "titulo": "Neka pregunta por lo importante",
+      "explicacion": "Tarjeta del Resumen: reprogramar, ya la hice o soltarla, una a la vez.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 13,
+      "cuadro": "H",
+      "titulo": "Atrasadas, lo importante primero",
+      "explicacion": "Hoja con Importantes arriba (con entrega, urgente) y las demás debajo.",
+      "estado": "aprobada (2/11/2026)"
     }
   ]
 }

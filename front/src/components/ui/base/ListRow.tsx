@@ -80,6 +80,7 @@ export default function ListRow({
   dotColor,
   done,
   tag,
+  detail,
   onPress,
   onToggle,
 }: {
@@ -88,6 +89,7 @@ export default function ListRow({
   dotColor: string;
   done: boolean;
   tag?: { text: string; tone: TagTone };
+  detail?: string; // segunda línea bajo el título (la Agenda)
   onPress: () => void;
   onToggle?: () => void;
 }) {
@@ -146,14 +148,16 @@ export default function ListRow({
           pointerEvents: "none",
         }}
       >
-        <Txt
-          numberOfLines={1}
-          strike={done}
-          tone={done ? "done" : "ink"}
-          style={{ flex: 1 }}
-        >
-          {title}
-        </Txt>
+        <View style={{ flex: 1 }}>
+          <Txt numberOfLines={1} strike={done} tone={done ? "done" : "ink"}>
+            {title}
+          </Txt>
+          {!!detail && (
+            <Txt variant="caption" tone="secondary" numberOfLines={1}>
+              {detail}
+            </Txt>
+          )}
+        </View>
         {tag && <Tag text={tag.text} tone={tag.tone} />}
       </View>
     </View>

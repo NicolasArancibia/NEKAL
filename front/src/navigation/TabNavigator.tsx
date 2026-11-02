@@ -8,6 +8,7 @@ import Calendario from "../pages/Calendario";
 import EspacioTrabajo from "../pages/EspacioTrabajo";
 import Chat from "../pages/Chat";
 import Perfil from "../pages/Perfil";
+import type { Destino } from "../utils/estructura";
 import { useDemo } from "../utils/useDemo";
 import { useRutinas } from "../utils/useRutinas";
 import { NekaProvider } from "../utils/NekaContext";
@@ -18,7 +19,13 @@ import LogroNuevo from "../components/ui/progreso/LogroNuevo";
 
 export type TabParamList = {
   Resumen: undefined;
-  Calendario: undefined;
+  Calendario:
+    | {
+        modo?: "mes" | "agenda" | "plano";
+        destino?: Destino;
+        marcada?: string;
+      }
+    | undefined;
   EspacioTrabajo: undefined;
   Chat: undefined;
   Perfil: { settings?: boolean } | undefined;

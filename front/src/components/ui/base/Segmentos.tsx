@@ -1,37 +1,34 @@
 import { View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { color, radius, shadow, size } from "../../../styles/theme";
+import { color, radius, shadow, space } from "../../../styles/theme";
 import { haptic } from "../../../utils/haptics";
-import { PressableScale } from "../base";
-import type { Vista } from "./useEspacioPrefs";
+import PressableScale from "./PressableScale";
+import Txt from "./Txt";
 
-const OPCIONES: [Vista, keyof typeof Ionicons.glyphMap, string][] = [
-  ["tiempo", "planet-outline", "Tiempo"],
-  ["mesas", "cube-outline", "Mesas"],
-  ["plano", "map-outline", "Plano"],
-];
-
-// Botón de 3 segmentos (B_SISTEMA_VISUAL §4): cápsula violeta suave; el activo,
-// blanco con sombra.
-export default function VistaSelector({
-  vista,
+// Control de segmentos con texto (maqueta H/02 y H/03): cápsula violeta suave y
+// el segmento activo en blanco con sombra, como el selector de vistas del
+// Espacio pero con nombres. Mes · Agenda · Plano en el Calendario.
+export default function Segmentos<T extends string>({
+  opciones,
+  valor,
   onCambio,
 }: {
-  vista: Vista;
-  onCambio: (v: Vista) => void;
+  opciones: [T, string][];
+  valor: T;
+  onCambio: (v: T) => void;
 }) {
   return (
     <View
       accessibilityRole="tablist"
       style={{
         flexDirection: "row",
+        alignSelf: "flex-start",
         backgroundColor: color.primarySoft,
         borderRadius: radius.pill,
         padding: 3,
       }}
     >
-      {OPCIONES.map(([v, icono, nombre]) => {
-        const activa = v === vista;
+      {opciones.map(([v, nombre]) => {
+        const activa = v === valor;
         return (
           <PressableScale
             key={v}
@@ -45,8 +42,9 @@ export default function VistaSelector({
             accessibilityState={{ selected: activa }}
             hitSlop={5}
             style={{
-              width: size.minTouch,
+              minWidth: 64,
               height: 34,
+              paddingHorizontal: space.lg,
               borderRadius: radius.pill,
               alignItems: "center",
               justifyContent: "center",
@@ -54,11 +52,13 @@ export default function VistaSelector({
               boxShadow: activa ? shadow.card : undefined,
             }}
           >
-            <Ionicons
-              name={icono}
-              size={18}
-              color={activa ? color.primary : color.lineStrong}
-            />
+            <Txt
+              variant="callout"
+              weight={700}
+              tone={activa ? "primary" : "secondary"}
+            >
+              {nombre}
+            </Txt>
           </PressableScale>
         );
       })}

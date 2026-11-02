@@ -31,6 +31,30 @@ export function diasHasta(fecha: string, now: number) {
   return dia(new Date(fecha)) - dia(new Date(now));
 }
 
+// Atrasada (spec H2 §3): pendiente, con fecha, de hace más de ATRASO_DIAS días
+// de calendario. Lo sin fecha no vence; Nota e Idea no son de tiempo. Derivada:
+// no se guarda nada, y reprogramar o completar la devuelve a la vista normal.
+export const ATRASO_DIAS = 2;
+export function estaAtrasada(i: Item, now: number): boolean {
+  const f = fechaDe(i);
+  return (
+    !!f &&
+    !i.deletedAt &&
+    !passive(i) &&
+    i.status !== "completado" &&
+    diasHasta(f, now) < -ATRASO_DIAS
+  );
+}
+// Más recientes primero.
+export function atrasadas(d: AppData, now: number): Item[] {
+  return timedItems(d)
+    .filter((i) => estaAtrasada(i, now))
+    .sort((a, b) => fechaDe(b).localeCompare(fechaDe(a)));
+}
+// Lo que Neka pregunta si se pasó: urgente, con fecha límite o Deadline.
+export const esImportante = (i: Item) =>
+  i.priority === "urgente" || !!i.dueAt || i.type === "Deadline";
+
 // Lo atrasado sin completar cuenta como dentro; lo que se ve siempre, también.
 export function enVentana(i: Item, v: Ventana, now: number): boolean {
   if (siempreVisible(i)) return true;

@@ -1,4 +1,4 @@
-import { timedItems } from "./espacio";
+import { estaAtrasada, timedItems } from "./espacio";
 import { AppData, Item, activeItems, localDay, passive } from "./model";
 export type Conflict = {
   id: string;
@@ -9,7 +9,7 @@ export type Conflict = {
 const end = (i: Item) => Date.parse(i.scheduledAt) + i.duration * 60000;
 export function findConflicts(data: AppData, now = Date.now()): Conflict[] {
   const items = timedItems(data).filter(
-    (i) => !passive(i) && i.status !== "completado",
+    (i) => !passive(i) && i.status !== "completado" && !estaAtrasada(i, now),
   );
   const result: Conflict[] = [];
   for (let a = 0; a < items.length; a++) {

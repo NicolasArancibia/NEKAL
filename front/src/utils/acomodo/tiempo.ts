@@ -2,6 +2,7 @@ import {
   arbol,
   diasHasta,
   enVentana,
+  estaAtrasada,
   Estado,
   estadoDe,
   fechaDe,
@@ -105,7 +106,7 @@ export function acomodoTiempo(
   const nodos: NodoTiempo[] = [];
   const grupos = new Map<string, Puesto[]>();
   for (const i of timedItems(d)) {
-    const p = puesto(i, v, now, radios);
+    const p = estaAtrasada(i, now) ? null : puesto(i, v, now, radios);
     if (!p || !lista.some((s) => s.workspaceId === i.workspaceId)) continue;
     const k = `${i.workspaceId}|${p.anillo}`;
     grupos.set(k, [...(grupos.get(k) ?? []), p]);
@@ -141,6 +142,46 @@ export function acomodoTiempo(
       });
     }
   return { nodos, sectores: lista, radios };
+}
+
+// Burbujas «+N» (spec H2 §4): si un sector y anillo juntan más de `max` puntos,
+// se dibujan los 3 primeros y el resto va en una burbuja en su centro; tocarla
+// abre la lista. No se pierde ninguno.
+export type Burbuja = {
+  workspaceId: string;
+  anillo: NodoTiempo["anillo"];
+  x: number;
+  y: number;
+  ids: string[];
+};
+const PUNTOS_A_LA_VISTA = 3;
+export function agruparNodos(
+  nodos: NodoTiempo[],
+  max = 6,
+): { puntos: NodoTiempo[]; burbujas: Burbuja[] } {
+  const grupos = new Map<string, NodoTiempo[]>();
+  for (const n of nodos) {
+    const k = `${n.workspaceId}|${n.anillo}`;
+    grupos.set(k, [...(grupos.get(k) ?? []), n]);
+  }
+  const puntos: NodoTiempo[] = [];
+  const burbujas: Burbuja[] = [];
+  for (const g of grupos.values()) {
+    if (g.length <= max) {
+      puntos.push(...g);
+      continue;
+    }
+    const resto = g.slice(PUNTOS_A_LA_VISTA);
+    puntos.push(...g.slice(0, PUNTOS_A_LA_VISTA));
+    burbujas.push({
+      workspaceId: g[0].workspaceId,
+      anillo: g[0].anillo,
+      x: resto.reduce((s, n) => s + n.x, 0) / resto.length,
+      y: resto.reduce((s, n) => s + n.y, 0) / resto.length,
+      ids: resto.map((n) => n.id),
+    });
+  }
+  return { puntos, burbujas };
 }
 
 // Al soltar: a qué día corresponde la distancia al centro. "" = sin fecha.

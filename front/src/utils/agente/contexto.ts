@@ -1,5 +1,5 @@
 import { AppData, Item, dateInput, passive } from "../model";
-import { timedItems } from "../espacio";
+import { atrasadas, esImportante, timedItems } from "../espacio";
 import { esOcurrencia } from "../estructura";
 import { MESES } from "../rutinas";
 import type { Turno } from "./tipos";
@@ -79,10 +79,12 @@ export function contexto(d: AppData, now: number): string {
       ),
     )
     .map((i) => linea(d, i));
+  const importantes = atrasadas(d, now).filter(esImportante).length;
   return [
     `Ahora: ${DIAS[t.getDay()]} ${t.getDate()} ${MESES[t.getMonth()]} ${t.getFullYear()}, ${fechaHora(now)}. Jornada: de ${d.preferences.dayStart}:00 a ${d.preferences.dayEnd}:00.`,
     `Mesas: ${d.workspaces.map((w) => `${w.name} [${w.id}]`).join("; ")}`,
     `Grupos: ${grupos.join("; ") || "ninguno"}`,
+    ...(importantes ? [`Atrasadas importantes: ${importantes}.`] : []),
     cosas.length
       ? "Cosas (id · tipo · «título» · cuándo · duración · fija/flexible · estado · mesa / grupo):"
       : "Cosas: ninguna entre ayer y dentro de 14 días.",

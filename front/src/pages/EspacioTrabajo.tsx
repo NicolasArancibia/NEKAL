@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { TabParamList } from "../navigation/TabNavigator";
 import {
-  Button,
   EmptyState,
   PressableScale,
   ScreenHeader,
@@ -10,39 +12,34 @@ import {
 } from "../components/ui/base";
 import {
   BarraSeleccion,
-  FormGrupo,
   FormMesa,
   HojaCosa,
   MenuCrear,
   SelectorTiempo,
   useEspacioPrefs,
-  VistaSelector,
 } from "../components/ui/espacio";
-import PlanoCerca from "../components/ui/espacio/PlanoCerca";
-import PlanoLejos from "../components/ui/espacio/PlanoLejos";
-import MesasVista from "../components/ui/espacio/MesasVista";
+import HojaAtrasadas from "../components/ui/espacio/HojaAtrasadas";
 import TiempoVista from "../components/ui/espacio/TiempoVista";
 import { color, radius, shadow, size, space } from "../styles/theme";
 import { useApp } from "../utils/AppContext";
-import type { Foco } from "../utils/acomodo/mesas";
-import { gruposBajo, rutaDe } from "../utils/espacio";
+import { atrasadas } from "../utils/espacio";
 import { Destino, GENERAL } from "../utils/estructura";
-import { activeItems, Group, Item, Workspace } from "../utils/model";
+import { activeItems, Item, Workspace } from "../utils/model";
 
-// El Espacio (spec B §3): tres vistas de los mismos datos, con la misma hoja,
-// el mismo menú de crear y la misma selección múltiple.
+// El Espacio (spec H2 §4): una sola vista, el círculo del tiempo. El Plano
+// vive ahora en el Calendario; «Ver dónde está» lo abre ahí.
 export default function EspacioTrabajo() {
   const { data } = useApp();
   const prefs = useEspacioPrefs();
-  const [planoDestino, setPlanoDestino] = useState<Destino | null>(null);
-  const [foco, setFoco] = useState<Foco>({ workspaceId: GENERAL, ruta: [] });
+  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [seleccion, setSeleccion] = useState<string[]>([]);
   const [abierta, setAbierta] = useState<Item | null>(null);
   const [marcada, setMarcada] = useState("");
   const [crear, setCrear] = useState<(Destino & { dia?: string }) | null>(null);
   const [editarMesa, setEditarMesa] = useState<Workspace | null>(null);
-  const [editarGrupo, setEditarGrupo] = useState<Group | null>(null);
   const [aviso, setAviso] = useState("");
+  const [cuenta, setCuenta] = useState(0);
+  const [verAtrasadas, setVerAtrasadas] = useState(false);
   const now = useMemo(() => Date.now(), [data]);
 
   useEffect(() => {
@@ -50,78 +47,18 @@ export default function EspacioTrabajo() {
     const t = setTimeout(() => setAviso(""), 4000);
     return () => clearTimeout(t);
   }, [aviso]);
-  // Dónde estás: en Plano, el lugar abierto; en Mesas, el piso en foco.
-  // `null` = arriba (todo General).
-  const focoLugar: Destino | null =
-    foco.ruta.length || foco.workspaceId !== GENERAL
-      ? { workspaceId: foco.workspaceId, groupId: foco.ruta.at(-1) ?? "" }
-      : null;
-  const existe = (d: Destino | null) =>
-    !d ||
-    (data.workspaces.some((w) => w.id === d.workspaceId) &&
-      (!d.groupId || data.groups.some((g) => g.id === d.groupId)));
-  // Si otro dispositivo borró la mesa o el grupo en que estás, vuelve arriba.
-  const planoOk = existe(planoDestino),
-    focoOk = existe(focoLugar);
-  useEffect(() => {
-    if (!planoOk) setPlanoDestino(null);
-    if (!focoOk) setFoco({ workspaceId: GENERAL, ruta: [] });
-  }, [planoOk, focoOk]);
-  const ir = (d: Destino | null) => {
-    setSeleccion([]);
-    if (prefs.vista === "mesas")
-      setFoco(
-        d
-          ? {
-              workspaceId: d.workspaceId,
-              ruta: d.groupId ? rutaDe(data, d.groupId).map((g) => g.id) : [],
-            }
-          : { workspaceId: GENERAL, ruta: [] },
-      );
-    else setPlanoDestino(d);
-  };
 
-  const mesaDe = (id: string) => data.workspaces.find((w) => w.id === id);
-  const grupoDe = (id: string) => data.groups.find((g) => g.id === id);
-  const vivas = activeItems(data);
   const vacia =
-    !vivas.length && !data.groups.length && data.workspaces.length === 1;
-  const lugar =
-    prefs.vista === "plano" && planoOk
-      ? planoDestino
-      : prefs.vista === "mesas" && focoOk
-        ? focoLugar
-        : null;
-  const grupo = lugar && grupoDe(lugar.groupId);
-  const mesa = mesaDe(lugar?.workspaceId ?? GENERAL);
-  const titulo = grupo?.name ?? mesa?.name ?? "General";
-  const enLugar = lugar && gruposBajo(data, lugar);
-  const cantidad = lugar
-    ? vivas.filter(
-        (i) => i.workspaceId === lugar.workspaceId && enLugar!.has(i.groupId),
-      ).length
-    : vivas.length;
-  const atras = !lugar
-    ? null
-    : grupo
-      ? {
-          texto: grupoDe(grupo.parentId)?.name ?? mesa?.name ?? "General",
-          ir: () =>
-            ir({ workspaceId: grupo.workspaceId, groupId: grupo.parentId }),
-        }
-      : {
-          texto: lugar.workspaceId === GENERAL ? "Todo" : "General",
-          ir: () => ir(null),
-        };
-  const entrar = (d: Destino) => {
-    setSeleccion([]);
-    setPlanoDestino(d);
-  };
-  const verDonde = (i: Item) => {
-    prefs.setVista("plano");
-    setPlanoDestino({ workspaceId: i.workspaceId, groupId: i.groupId });
-    setMarcada(i.id);
-  };
+    !activeItems(data).length &&
+    !data.groups.length &&
+    data.workspaces.length === 1;
+  const atrasadasN = atrasadas(data, now).length;
+  const verPlano = (destino: Destino, marcadaId?: string) =>
+    navigation.navigate("Calendario", {
+      modo: "plano",
+      destino,
+      marcada: marcadaId,
+    });
 
   if (!prefs.listo)
     return <View style={{ flex: 1, backgroundColor: color.background }} />;
@@ -134,55 +71,8 @@ export default function EspacioTrabajo() {
           gap: space.sm,
         }}
       >
-        <View
-          style={{
-            minHeight: 24,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          {atras ? (
-            <PressableScale
-              onPress={atras.ir}
-              accessibilityRole="button"
-              accessibilityLabel={`Volver a ${atras.texto}`}
-              hitSlop={10}
-              style={{ flexDirection: "row", alignItems: "center", gap: 2 }}
-            >
-              <Ionicons name="chevron-back" size={16} color={color.primary} />
-              <Txt variant="callout" weight={700} tone="primary">
-                {atras.texto}
-              </Txt>
-            </PressableScale>
-          ) : (
-            <View />
-          )}
-          {!vacia && (
-            <Button
-              title="Editar"
-              variant="plain"
-              small
-              onPress={() =>
-                grupo ? setEditarGrupo(grupo) : mesa && setEditarMesa(mesa)
-              }
-            />
-          )}
-        </View>
-        <ScreenHeader
-          title={titulo}
-          right={
-            <VistaSelector
-              vista={prefs.vista}
-              onCambio={(v) => {
-                prefs.setVista(v);
-                setSeleccion([]);
-                setMarcada("");
-                if (v === "plano") setPlanoDestino(null);
-              }}
-            />
-          }
-        />
+        <ScreenHeader title="Espacio" />
+        <SelectorTiempo ventana={prefs.ventana} onCambio={prefs.setVentana} />
         <View
           style={{
             flexDirection: "row",
@@ -191,10 +81,39 @@ export default function EspacioTrabajo() {
             gap: space.sm,
           }}
         >
-          <SelectorTiempo ventana={prefs.ventana} onCambio={prefs.setVentana} />
           <Txt variant="caption" tone="secondary">
-            {cantidad} {cantidad === 1 ? "cosa" : "cosas"}
+            {cuenta} {cuenta === 1 ? "cosa" : "cosas"}
           </Txt>
+          {atrasadasN > 0 && (
+            <PressableScale
+              onPress={() => setVerAtrasadas(true)}
+              accessibilityRole="button"
+              accessibilityLabel={`${atrasadasN} atrasadas. Ver la lista`}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: space.xs,
+                minHeight: 32,
+                paddingHorizontal: space.md,
+                borderRadius: radius.pill,
+                backgroundColor: color.line,
+              }}
+            >
+              <Ionicons
+                name="time-outline"
+                size={14}
+                color={color.inkSecondary}
+              />
+              <Txt variant="caption" weight={700} tone="secondary">
+                {atrasadasN} atrasadas
+              </Txt>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={14}
+                color={color.inkSecondary}
+              />
+            </PressableScale>
+          )}
         </View>
       </View>
 
@@ -208,36 +127,7 @@ export default function EspacioTrabajo() {
               onPress: () => setCrear({ workspaceId: GENERAL, groupId: "" }),
             }}
           />
-        ) : prefs.vista === "plano" ? (
-          lugar ? (
-            <PlanoCerca
-              key={`${lugar.workspaceId}|${lugar.groupId}`}
-              destino={lugar}
-              ventana={prefs.ventana}
-              now={now}
-              seleccion={seleccion}
-              marcada={marcada}
-              onAbrir={setAbierta}
-              onSeleccion={setSeleccion}
-              onMarcar={setMarcada}
-              onEntrar={entrar}
-              onCrear={setCrear}
-              onEditar={setEditarGrupo}
-              onAviso={setAviso}
-            />
-          ) : (
-            <PlanoLejos
-              ventana={prefs.ventana}
-              now={now}
-              onEntrar={entrar}
-              onEditar={(z) =>
-                z.tipo === "mesa"
-                  ? setEditarMesa(mesaDe(z.workspaceId) ?? null)
-                  : setEditarGrupo(grupoDe(z.groupId) ?? null)
-              }
-            />
-          )
-        ) : prefs.vista === "tiempo" ? (
+        ) : (
           <TiempoVista
             ventana={prefs.ventana}
             now={now}
@@ -249,28 +139,9 @@ export default function EspacioTrabajo() {
             onCrear={setCrear}
             onVentana={prefs.setVentana}
             onEditarMesa={setEditarMesa}
-            onEntrar={(d) => {
-              prefs.setVista("plano");
-              entrar(d);
-            }}
+            onEntrar={(d) => verPlano(d)}
             onAviso={setAviso}
-          />
-        ) : (
-          <MesasVista
-            foco={foco}
-            ventana={prefs.ventana}
-            now={now}
-            seleccion={seleccion}
-            marcada={marcada}
-            onFoco={(f) => {
-              setSeleccion([]);
-              setFoco(f);
-            }}
-            onAbrir={setAbierta}
-            onSeleccion={setSeleccion}
-            onMarcar={setMarcada}
-            onEditarMesa={setEditarMesa}
-            onEditarGrupo={setEditarGrupo}
+            onCuenta={setCuenta}
           />
         )}
       </View>
@@ -306,9 +177,7 @@ export default function EspacioTrabajo() {
       ) : (
         !vacia && (
           <PressableScale
-            onPress={() =>
-              setCrear(lugar ?? { workspaceId: GENERAL, groupId: "" })
-            }
+            onPress={() => setCrear({ workspaceId: GENERAL, groupId: "" })}
             accessibilityRole="button"
             accessibilityLabel="Crear"
             style={{
@@ -329,11 +198,16 @@ export default function EspacioTrabajo() {
         )
       )}
 
+      {verAtrasadas && (
+        <HojaAtrasadas onCerrar={() => setVerAtrasadas(false)} />
+      )}
       {abierta && (
         <HojaCosa
           item={abierta}
           onClose={() => setAbierta(null)}
-          onVerDonde={verDonde}
+          onVerDonde={(i) =>
+            verPlano({ workspaceId: i.workspaceId, groupId: i.groupId }, i.id)
+          }
         />
       )}
       {crear && (
@@ -344,18 +218,6 @@ export default function EspacioTrabajo() {
           visible
           inicial={editarMesa}
           onClose={() => setEditarMesa(null)}
-        />
-      )}
-      {editarGrupo && (
-        <FormGrupo
-          visible
-          inicial={editarGrupo}
-          destino={{
-            workspaceId: editarGrupo.workspaceId,
-            groupId: editarGrupo.parentId,
-          }}
-          rutina={!!editarGrupo.repeat}
-          onClose={() => setEditarGrupo(null)}
         />
       )}
     </View>
