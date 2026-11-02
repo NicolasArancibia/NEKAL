@@ -8,6 +8,7 @@ const build = spawnSync(
     "src/utils/model.ts",
     "src/utils/planner.ts",
     "src/utils/agenda.ts",
+    "src/utils/prefsEspacio.ts",
     "src/utils/storage.ts",
     "src/utils/syncModel.ts",
     "src/utils/SyncEngine.ts",

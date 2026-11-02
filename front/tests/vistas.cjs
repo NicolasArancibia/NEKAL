@@ -270,3 +270,21 @@ test("agenda: ventana de 14 días, notas, sin hora y filtro por mesa", () => {
 test("agenda: sin cosas es una lista vacía", () => {
   assert.deepEqual(ag.agenda(con(), now), []);
 });
+
+// Tarea 7: preferencias del Espacio (solo queda el tiempo elegido).
+const pe = require("../.test-build/prefsEspacio.js");
+
+test("leerPrefs: ignora la vista guardada y conserva el tiempo", () => {
+  assert.deepEqual(pe.leerPrefs('{"vista":"mesas","ventana":"2semanas"}'), {
+    ventana: "2semanas",
+  });
+  assert.deepEqual(pe.leerPrefs('{"vista":"plano","ventana":"hoy"}'), {
+    ventana: "hoy",
+  });
+});
+test("leerPrefs: sin nada, con basura o con un tiempo desconocido es «semana»", () => {
+  assert.deepEqual(pe.leerPrefs(null), { ventana: "semana" });
+  assert.deepEqual(pe.leerPrefs("{no es json"), { ventana: "semana" });
+  assert.deepEqual(pe.leerPrefs('{"ventana":"siempre"}'), { ventana: "semana" });
+  assert.deepEqual(pe.leerPrefs("null"), { ventana: "semana" });
+});

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -10,10 +10,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import Svg, { Circle, Path } from "react-native-svg";
-import { color, motion, radius, space } from "../../../styles/theme";
+import { color, motion, radius, shadow, space } from "../../../styles/theme";
 import { useApp } from "../../../utils/AppContext";
 import {
   acomodoTiempo,
+  agruparNodos,
+  Burbuja,
   diaDesdeRadio,
   NodoTiempo,
   Radios,
@@ -28,10 +30,11 @@ import {
 import { Destino } from "../../../utils/estructura";
 import { haptic } from "../../../utils/haptics";
 import { Item, localDay, saveItem, Workspace } from "../../../utils/model";
-import { Txt } from "../base";
+import { PressableScale, Txt } from "../base";
 import { typeIcons } from "../ItemCard";
 import AvisoBorde from "./AvisoBorde";
 import CapaConexiones from "./CapaConexiones";
+import HojaCosas from "./HojaCosas";
 
 const VENTANAS: Ventana[] = ["hoy", "semana", "2semanas", "todo"];
 const BANDA: Record<Ventana, string> = {
@@ -226,6 +229,82 @@ function Punto({
   );
 }
 
+// La burbuja «+N» del círculo (spec H2 §4): lo que no cabe a la vista.
+function BurbujaMas({
+  b,
+  mesa,
+  onPress,
+}: {
+  b: Burbuja;
+  mesa: Workspace | undefined;
+  onPress: () => void;
+}) {
+  return (
+    <PressableScale
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${b.ids.length} cosas más en ${mesa?.name ?? "esta mesa"}. Ver la lista`}
+      style={{
+        position: "absolute",
+        left: b.x - 14,
+        top: b.y - 14,
+        width: 28,
+        height: 28,
+        borderRadius: radius.pill,
+        borderWidth: 2,
+        borderColor: color.surface,
+        backgroundColor: tonosDe(mesa?.color).base,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Txt variant="caption" weight={800} tone="onPrimary">
+        +{b.ids.length}
+      </Txt>
+    </PressableScale>
+  );
+}
+
+// El nombre de la cosa marcada, sobre su punto: se toca de nuevo para abrirla.
+function EtiquetaPunto({
+  n,
+  item,
+  mesa,
+  lado,
+}: {
+  n: NodoTiempo;
+  item: Item;
+  mesa: Workspace | undefined;
+  lado: number;
+}) {
+  const ancho = 150;
+  const arriba = n.y > 56;
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        left: Math.min(Math.max(0, n.x - ancho / 2), lado - ancho),
+        top: arriba ? n.y - 50 : n.y + 16,
+        width: ancho,
+        paddingHorizontal: space.md,
+        paddingVertical: space.xs + 2,
+        borderRadius: radius.sm,
+        backgroundColor: color.surface,
+        boxShadow: shadow.card,
+      }}
+    >
+      <Txt variant="caption" weight={700} numberOfLines={1}>
+        {item.title}
+      </Txt>
+      <Txt variant="caption" tone="secondary" numberOfLines={1}>
+        {fechaDe(item) ? diaCorto(localDay(new Date(fechaDe(item)))) : "Sin fecha"}
+        {mesa ? ` · ${mesa.name}` : ""}
+      </Txt>
+    </View>
+  );
+}
+
 // Vista Tiempo (spec B §3.1): hoy al centro, un anillo por tramo y una porción
 // por mesa. La distancia al centro es la fecha.
 export default function TiempoVista({
@@ -241,6 +320,7 @@ export default function TiempoVista({
   onEditarMesa,
   onEntrar,
   onAviso,
+  onCuenta,
 }: {
   ventana: Ventana;
   now: number;
@@ -254,11 +334,13 @@ export default function TiempoVista({
   onEditarMesa: (w: Workspace) => void;
   onEntrar: (d: Destino) => void;
   onAviso: (texto: string) => void;
+  onCuenta?: (n: number) => void; // cuántas cosas dibuja el círculo
 }) {
   const { data, change } = useApp();
   const [caja, setCaja] = useState({ w: 0, h: 0 });
   const [cambio, setCambio] = useState<{ de: string; a: string } | null>(null);
   const ultimo = useRef("");
+  const [lista, setLista] = useState<string[] | null>(null);
   const lado = Math.min(caja.w, caja.h);
   const c = lado / 2;
   const r = useMemo(
@@ -269,6 +351,14 @@ export default function TiempoVista({
   const mesas = new Map(data.workspaces.map((w) => [w.id, w]));
   const enSeleccion = seleccion.length > 0;
   const nodos = new Map((r?.nodos ?? []).map((n) => [n.id, n]));
+  // Más de 6 en un mismo sector y anillo: 3 puntos y una burbuja «+N».
+  const { puntos, burbujas } = useMemo(
+    () => agruparNodos(r?.nodos ?? []),
+    [r],
+  );
+  useEffect(() => {
+    onCuenta?.(r ? r.nodos.length : 0);
+  }, [r]);
 
   const diaEn = (x: number, y: number, rs: Radios) =>
     diaDesdeRadio(Math.hypot(x - c, y - c), rs, ventana, now);
@@ -284,10 +374,9 @@ export default function TiempoVista({
           ? seleccion.filter((x) => x !== id)
           : [...seleccion, id],
       );
-    else {
-      onMarcar(id);
-      onAbrir(i);
-    }
+    // El primer toque marca la cosa (su nombre y sus flechas); el segundo la abre.
+    else if (marcada === id) onAbrir(i);
+    else onMarcar(id);
   };
   const elegir = (id: string) => {
     haptic.light();
@@ -571,7 +660,7 @@ export default function TiempoVista({
           >
             <CapaConexiones flechas={flechas} />
           </View>
-          {r.nodos.map((n) => {
+          {puntos.map((n) => {
             const i = porId.get(n.id);
             return i ? (
               <Punto
@@ -588,6 +677,22 @@ export default function TiempoVista({
               />
             ) : null;
           })}
+          {burbujas.map((b) => (
+            <BurbujaMas
+              key={`${b.workspaceId}|${b.anillo}`}
+              b={b}
+              mesa={mesas.get(b.workspaceId)}
+              onPress={() => setLista(b.ids)}
+            />
+          ))}
+          {marcada && nodos.get(marcada) && porId.get(marcada) && (
+            <EtiquetaPunto
+              n={nodos.get(marcada)!}
+              item={porId.get(marcada)!}
+              mesa={mesas.get(nodos.get(marcada)!.workspaceId)}
+              lado={lado}
+            />
+          )}
         </View>
       )}
       {cambio && (
@@ -630,6 +735,20 @@ export default function TiempoVista({
             );
           })}
         </View>
+      )}
+      {lista && (
+        <HojaCosas
+          titulo={`${lista.length} cosas`}
+          items={lista
+            .map((id) => porId.get(id))
+            .filter((x): x is Item => !!x)}
+          onAbrir={(it) => {
+            setLista(null);
+            onMarcar(it.id);
+            onAbrir(it);
+          }}
+          onCerrar={() => setLista(null)}
+        />
       )}
     </View>
   );
