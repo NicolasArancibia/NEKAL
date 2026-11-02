@@ -18,9 +18,11 @@ import {
   SelectorTiempo,
   useEspacioPrefs,
 } from "../components/ui/espacio";
+import HojaAtrasadas from "../components/ui/espacio/HojaAtrasadas";
 import TiempoVista from "../components/ui/espacio/TiempoVista";
 import { color, radius, shadow, size, space } from "../styles/theme";
 import { useApp } from "../utils/AppContext";
+import { atrasadas } from "../utils/espacio";
 import { Destino, GENERAL } from "../utils/estructura";
 import { activeItems, Item, Workspace } from "../utils/model";
 
@@ -37,6 +39,7 @@ export default function EspacioTrabajo() {
   const [editarMesa, setEditarMesa] = useState<Workspace | null>(null);
   const [aviso, setAviso] = useState("");
   const [cuenta, setCuenta] = useState(0);
+  const [verAtrasadas, setVerAtrasadas] = useState(false);
   const now = useMemo(() => Date.now(), [data]);
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export default function EspacioTrabajo() {
     !activeItems(data).length &&
     !data.groups.length &&
     data.workspaces.length === 1;
+  const atrasadasN = atrasadas(data, now).length;
   const verPlano = (destino: Destino, marcadaId?: string) =>
     navigation.navigate("Calendario", {
       modo: "plano",
@@ -68,6 +72,7 @@ export default function EspacioTrabajo() {
         }}
       >
         <ScreenHeader title="Espacio" />
+        <SelectorTiempo ventana={prefs.ventana} onCambio={prefs.setVentana} />
         <View
           style={{
             flexDirection: "row",
@@ -76,10 +81,39 @@ export default function EspacioTrabajo() {
             gap: space.sm,
           }}
         >
-          <SelectorTiempo ventana={prefs.ventana} onCambio={prefs.setVentana} />
           <Txt variant="caption" tone="secondary">
             {cuenta} {cuenta === 1 ? "cosa" : "cosas"}
           </Txt>
+          {atrasadasN > 0 && (
+            <PressableScale
+              onPress={() => setVerAtrasadas(true)}
+              accessibilityRole="button"
+              accessibilityLabel={`${atrasadasN} atrasadas. Ver la lista`}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: space.xs,
+                minHeight: 32,
+                paddingHorizontal: space.md,
+                borderRadius: radius.pill,
+                backgroundColor: color.line,
+              }}
+            >
+              <Ionicons
+                name="time-outline"
+                size={14}
+                color={color.inkSecondary}
+              />
+              <Txt variant="caption" weight={700} tone="secondary">
+                {atrasadasN} atrasadas
+              </Txt>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={14}
+                color={color.inkSecondary}
+              />
+            </PressableScale>
+          )}
         </View>
       </View>
 
@@ -164,6 +198,9 @@ export default function EspacioTrabajo() {
         )
       )}
 
+      {verAtrasadas && (
+        <HojaAtrasadas onCerrar={() => setVerAtrasadas(false)} />
+      )}
       {abierta && (
         <HojaCosa
           item={abierta}

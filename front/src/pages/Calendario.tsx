@@ -13,7 +13,7 @@ import {
   newItem,
   passive,
 } from "../utils/model";
-import { timedItems } from "../utils/espacio";
+import { atrasadas, timedItems } from "../utils/espacio";
 import { agenda } from "../utils/agenda";
 import { hhmm, timeOn } from "../utils/neka";
 import { useNeka } from "../utils/NekaContext";
@@ -35,6 +35,7 @@ import {
   Txt,
 } from "../components/ui/base";
 import ItemEditor from "../components/ui/ItemEditor";
+import HojaAtrasadas from "../components/ui/espacio/HojaAtrasadas";
 import PlanoVista from "../components/ui/espacio/PlanoVista";
 import type { Destino } from "../utils/estructura";
 
@@ -81,6 +82,7 @@ export default function Calendario({
   const neka = useNeka();
   const now = useNow();
   const scroll = useRef<ScrollView>(null);
+  const [verAtrasadas, setVerAtrasadas] = useState(false);
   const [modo, setModo] = useState<Modo>("mes"),
     [dias, setDias] = useState(DIAS_AGENDA),
     [month, setMonth] = useState(
@@ -166,6 +168,7 @@ export default function Calendario({
     justifyContent: "center",
   } as const;
   const mesaDe = (id: string) => data.workspaces.find((w) => w.id === id);
+  const atrasadasN = atrasadas(data, now).length;
 
   const irHoy = () => {
     if (modo === "agenda") scroll.current?.scrollTo({ y: 0, animated: true });
@@ -248,6 +251,34 @@ export default function Calendario({
       {modo === "agenda" ? (
         <>
           {chipsMesa}
+          {atrasadasN > 0 && (
+            <Card
+              onPress={() => setVerAtrasadas(true)}
+              accessibilityLabel={`${atrasadasN} atrasadas hace más de 2 días. Ver la lista`}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.md,
+              }}
+            >
+              <Ionicons
+                name="time-outline"
+                size={size.icon - 4}
+                color={color.inkSecondary}
+              />
+              <Txt variant="callout" style={{ flex: 1 }}>
+                <Txt variant="callout" weight={700}>
+                  {atrasadasN} atrasadas
+                </Txt>{" "}
+                hace más de 2 días
+              </Txt>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={size.icon - 6}
+                color={color.inkSecondary}
+              />
+            </Card>
+          )}
           {!!error && (
             <Txt variant="caption" tone="danger" accessibilityRole="alert">
               {error}
@@ -545,6 +576,9 @@ export default function Calendario({
             Lo que no tiene hora aparece en su fecha de inicio.
           </Txt>
         </>
+      )}
+      {verAtrasadas && (
+        <HojaAtrasadas onCerrar={() => setVerAtrasadas(false)} />
       )}
       {editor && (
         <ItemEditor
