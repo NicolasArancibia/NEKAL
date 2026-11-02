@@ -288,3 +288,64 @@ test("leerPrefs: sin nada, con basura o con un tiempo desconocido es «semana»"
   assert.deepEqual(pe.leerPrefs('{"ventana":"siempre"}'), { ventana: "semana" });
   assert.deepEqual(pe.leerPrefs("null"), { ventana: "semana" });
 });
+
+// Tarea 8: «A hoy» y «A la papelera».
+const atr = require("../.test-build/atrasadas.js");
+const fija = (id, h1, m1, h2, m2) =>
+  cosa(id, {
+    type: "Meeting",
+    flexible: false,
+    scheduledAt: dia(0, h1, m1),
+    duration: (h2 - h1) * 60 + (m2 - m1),
+  });
+
+test("aHoy: la pasa al primer hueco libre de hoy y deja de ser atrasada", () => {
+  const d = con(
+    cosa("vieja", { scheduledAt: dia(-9), duration: 30 }),
+    fija("reunion", 10, 15, 11, 0),
+  );
+  const r = atr.aHoy(d, "vieja", now);
+  const i = r.items.find((x) => x.id === "vieja");
+  assert.equal(esp.estaAtrasada(i, now), false);
+  assert.equal(new Date(i.scheduledAt).getDate(), 2);
+  assert.ok(Date.parse(i.scheduledAt) >= now);
+  assert.ok(Date.parse(i.scheduledAt) >= new Date(2026, 10, 2, 11, 0).getTime());
+});
+test("aHoy: una con fecha límite vieja también sale de atrasadas", () => {
+  const d = con(cosa("entrega", { dueAt: dia(-5), duration: 30 }));
+  const i = atr.aHoy(d, "entrega", now).items[0];
+  assert.equal(new Date(i.scheduledAt).getDate(), 2);
+  assert.equal(esp.estaAtrasada(i, now), false);
+});
+test("aHoy: si hoy no cabe, lanza «Hoy no cabe.» y no cambia nada", () => {
+  const d = con(
+    cosa("vieja", { scheduledAt: dia(-9), duration: 60 }),
+    fija("todoElDia", 10, 15, 21, 0),
+  );
+  assert.throws(() => atr.aHoy(d, "vieja", now), { message: "Hoy no cabe." });
+  assert.equal(d.items[0].scheduledAt, dia(-9));
+});
+test("aHoy: una cosa que ya no existe lanza error", () => {
+  assert.throws(() => atr.aHoy(con(), "fantasma", now), /ya no existe/);
+});
+test("aPapelera: manda las cosas a la papelera", () => {
+  const d = con(cosa("a", { scheduledAt: dia(-9) }), cosa("b", { scheduledAt: dia(-8) }), cosa("c", { scheduledAt: dia(-7) }));
+  const r = atr.aPapelera(d, ["a", "b", "c"]);
+  assert.equal(r.omitidas, 0);
+  assert.ok(r.data.items.every((i) => i.deletedAt));
+});
+test("aPapelera: actúa de a 200 y deja el resto", () => {
+  assert.equal(atr.MAX_PAPELERA, 200);
+  const todas = Array.from({ length: 250 }, (_, k) => cosa("x" + k, { scheduledAt: dia(-9) }));
+  const r = atr.aPapelera(con(...todas), todas.map((i) => i.id));
+  assert.equal(r.data.items.filter((i) => i.deletedAt).length, 200);
+  assert.equal(r.omitidas, 0);
+});
+test("aPapelera: lo que otra cosa necesita se omite sin fallar", () => {
+  const base = cosa("base", { scheduledAt: dia(-9) });
+  const dependiente = cosa("dep", { scheduledAt: dia(1), dependencies: ["base"] });
+  const r = atr.aPapelera(con(base, dependiente, cosa("suelta", { scheduledAt: dia(-9) })), ["base", "suelta"]);
+  assert.equal(r.omitidas, 1);
+  assert.ok(!r.data.items.find((i) => i.id === "base").deletedAt);
+  assert.ok(r.data.items.find((i) => i.id === "suelta").deletedAt);
+});
