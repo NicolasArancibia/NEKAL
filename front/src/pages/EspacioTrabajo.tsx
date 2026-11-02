@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { TabParamList } from "../navigation/TabNavigator";
 import {
   Button,
   EmptyState,
@@ -34,6 +37,7 @@ import { activeItems, Group, Item, Workspace } from "../utils/model";
 export default function EspacioTrabajo() {
   const { data } = useApp();
   const prefs = useEspacioPrefs();
+  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const [planoDestino, setPlanoDestino] = useState<Destino | null>(null);
   const [foco, setFoco] = useState<Foco>({ workspaceId: GENERAL, ruta: [] });
   const [seleccion, setSeleccion] = useState<string[]>([]);
@@ -117,11 +121,13 @@ export default function EspacioTrabajo() {
     setSeleccion([]);
     setPlanoDestino(d);
   };
-  const verDonde = (i: Item) => {
-    prefs.setVista("plano");
-    setPlanoDestino({ workspaceId: i.workspaceId, groupId: i.groupId });
-    setMarcada(i.id);
-  };
+  // El Plano vive en el Calendario (spec H2): «Ver dónde está» lo abre ahí.
+  const verDonde = (i: Item) =>
+    navigation.navigate("Calendario", {
+      modo: "plano",
+      destino: { workspaceId: i.workspaceId, groupId: i.groupId },
+      marcada: i.id,
+    });
 
   if (!prefs.listo)
     return <View style={{ flex: 1, backgroundColor: color.background }} />;
@@ -249,10 +255,9 @@ export default function EspacioTrabajo() {
             onCrear={setCrear}
             onVentana={prefs.setVentana}
             onEditarMesa={setEditarMesa}
-            onEntrar={(d) => {
-              prefs.setVista("plano");
-              entrar(d);
-            }}
+            onEntrar={(d) =>
+              navigation.navigate("Calendario", { modo: "plano", destino: d })
+            }
             onAviso={setAviso}
           />
         ) : (

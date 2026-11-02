@@ -20,7 +20,11 @@ import LogroNuevo from "../components/ui/progreso/LogroNuevo";
 export type TabParamList = {
   Resumen: undefined;
   Calendario:
-    | { modo?: "mes" | "agenda" | "plano"; destino?: Destino }
+    | {
+        modo?: "mes" | "agenda" | "plano";
+        destino?: Destino;
+        marcada?: string;
+      }
     | undefined;
   EspacioTrabajo: undefined;
   Chat: undefined;

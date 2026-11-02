@@ -35,6 +35,8 @@ import {
   Txt,
 } from "../components/ui/base";
 import ItemEditor from "../components/ui/ItemEditor";
+import PlanoVista from "../components/ui/espacio/PlanoVista";
+import type { Destino } from "../utils/estructura";
 
 type Modo = "mes" | "agenda" | "plano";
 const MODOS: [Modo, string][] = [
@@ -72,6 +74,7 @@ function tituloDia(dia: string, now: number) {
 
 export default function Calendario({
   route,
+  navigation,
 }: BottomTabScreenProps<TabParamList, "Calendario">) {
   const { data } = useApp();
   const { toggle, error } = useToggleDone();
@@ -101,12 +104,27 @@ export default function Calendario({
       })
       .catch(() => {});
   }, []);
-  // «Ver dónde está» y los avisos del borde abren el Calendario en un modo.
+  // «Ver dónde está» y los avisos del borde abren el Calendario en un modo (y,
+  // en Plano, en su lugar). Los parámetros se consumen para no repetirse.
+  const [planoDe, setPlanoDe] = useState<{
+    destino: Destino | null;
+    marcada: string;
+  } | null>(null);
   useEffect(() => {
-    if (route.params?.modo) setModo(route.params.modo);
-  }, [route.params?.modo, route.params?.destino]);
+    const p = route.params;
+    if (!p?.modo) return;
+    setModo(p.modo);
+    if (p.modo === "plano")
+      setPlanoDe({ destino: p.destino ?? null, marcada: p.marcada ?? "" });
+    navigation.setParams({
+      modo: undefined,
+      destino: undefined,
+      marcada: undefined,
+    } as never);
+  }, [route.params?.modo, route.params?.destino, route.params?.marcada]);
   const cambiarModo = (m: Modo) => {
     setModo(m);
+    if (m !== "plano") setPlanoDe(null);
     AsyncStorage.setItem(CLAVE, JSON.stringify({ modo: m })).catch(() => {});
   };
 
@@ -196,18 +214,14 @@ export default function Calendario({
 
   if (modo === "plano")
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: color.background,
-          padding: spacing.screen,
-          gap: spacing.lg,
-        }}
-      >
-        {encabezado}
-        <EmptyState
-          pose={3}
-          text="El Plano llega a esta pestaña en el siguiente paso."
+      <View style={{ flex: 1, backgroundColor: color.background }}>
+        <View style={{ padding: spacing.screen, gap: spacing.lg }}>
+          {encabezado}
+        </View>
+        <PlanoVista
+          key={`${planoDe?.destino?.workspaceId}|${planoDe?.destino?.groupId}|${planoDe?.marcada}`}
+          destino={planoDe?.destino}
+          marcadaInicial={planoDe?.marcada}
         />
       </View>
     );
