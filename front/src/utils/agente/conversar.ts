@@ -16,8 +16,13 @@ Reglas:
 - Las fechas van como AAAA-MM-DD HH:mm, en la hora local de «Ahora».
 - Si algo es ambiguo, pregunta antes de proponer.
 - «Arregla los choques»: lleva lo flexible que choca a un hueco con buscarHueco y mover.
-- Si te preguntan qué tienen, responde con lo del contexto, sin proponer cambios.`;
+- Si te preguntan qué tienen, responde con todo lo pendiente de hoy, con su hora, sin proponer cambios.
+- Nunca escribas ids ni corchetes en tu respuesta: usa solo los títulos.
+- Si lo que piden choca con algo fijo, dilo y ofrece el siguiente hueco libre con buscarHueco.
+- Si hay que elegir qué sacrificar, conserva lo urgente y lo que tiene plazo cercano.`;
 export const TOPE_VUELTAS = 5;
+const RECORDATORIO =
+  "No llamaste a ninguna herramienta, así que no hay ningún cambio que la persona pueda aceptar. Si quieres proponerlo, llama a mover o crear con el hueco que dijiste; si no, no digas «te propongo».";
 export const ESPERA_MS = 30000;
 export type Fallo = "sin-ia" | "tarde" | "no-oi";
 export const MENSAJES: Record<Fallo, string> = {
@@ -58,13 +63,22 @@ async function vueltas(
   );
   let r = await sesion.enviar(texto);
   const pasos: PasoPlan[] = [];
-  for (let n = 0; r.llamadas.length && n < TOPE_VUELTAS; n++) {
-    const resultados: Resultado[] = r.llamadas.map((l) => {
-      const e = ejecutar(d, pasos, l, now);
-      pasos.push(...e.pasos);
-      return { nombre: l.nombre, respuesta: e.resultado };
-    });
-    r = await sesion.devolver(resultados);
+  const correr = async () => {
+    for (let n = 0; r.llamadas.length && n < TOPE_VUELTAS; n++) {
+      const resultados: Resultado[] = r.llamadas.map((l) => {
+        const e = ejecutar(d, pasos, l, now);
+        pasos.push(...e.pasos);
+        return { nombre: l.nombre, respuesta: e.resultado };
+      });
+      r = await sesion.devolver(resultados);
+    }
+  };
+  await correr();
+  // Dijo «te propongo…» sin armar ningún cambio (visto en vivo tras un choque
+  // rechazado): la persona se quedaría sin nada que aceptar. Se le pide una vez.
+  if (!pasos.length && !r.llamadas.length && /propong/i.test(r.texto)) {
+    r = await sesion.enviar(RECORDATORIO);
+    await correr();
   }
   const plan = pasos.length
     ? {
@@ -76,7 +90,19 @@ async function vueltas(
   const respuesta = r.llamadas.length
     ? r.texto || "No logré armarlo del todo."
     : r.texto || (plan ? "Te propongo estos cambios." : "");
-  return { respuesta, plan };
+  return { respuesta: quitarIds(respuesta, d), plan };
+}
+
+// Gemini a veces repite los ids del contexto; la persona no debe verlos.
+export function quitarIds(texto: string, d: AppData): string {
+  const ids = new Set(
+    [...d.items, ...d.groups, ...d.workspaces].map((x) => x.id),
+  );
+  return texto
+    .replace(/\s*\[([^\]]+)\]/g, (todo, id: string) =>
+      ids.has(id) ? "" : todo,
+    )
+    .trim();
 }
 
 export async function conversar(

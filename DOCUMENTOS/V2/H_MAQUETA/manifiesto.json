@@ -1,0 +1,55 @@
+{
+  "_nota": "Índice de maquetas de la fase H para armar la mega maqueta al final: una entrada por cuadro, en orden de flujo. Cada maqueta se conserva (nunca se borra); una versión nueva es un archivo nuevo.",
+  "cuadros": [
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 1,
+      "cuadro": "A",
+      "titulo": "El plan dice por qué",
+      "explicacion": "Atraso de 20 minutos con un compromiso fijo en medio: el paso explica que se salta el Gimnasio, que es fijo.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 2,
+      "cuadro": "B",
+      "titulo": "Aviso, no bloqueo",
+      "explicacion": "Dos cosas fijas que pediste chocan entre sí: se avisa y se puede aceptar.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 3,
+      "cuadro": "C",
+      "titulo": "La agenda cambió",
+      "explicacion": "Mientras miras el plan entra una reunión: «Aceptar» se reemplaza por «Pedir de nuevo».",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 4,
+      "cuadro": "D",
+      "titulo": "No cabe todo hoy",
+      "explicacion": "Lo que no cabe hoy se propone para el primer hueco de mañana, calculado por la app.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Estados de error",
+      "orden": 1,
+      "cuadro": "E",
+      "titulo": "Cuando la IA no responde",
+      "explicacion": "El aviso aparece en el chat pero ya no se guarda en el historial.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    }
+  ]
+}

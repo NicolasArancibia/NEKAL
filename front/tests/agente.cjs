@@ -318,7 +318,9 @@ test("herramientas: correrDesde agrega lo que cambia y avisa lo que no cabe", ()
     minutos: 40,
     desde: "2030-05-06 20:00",
   });
-  assert.deepEqual(tarde.resultado.noCaben, [{ id: "tarde", titulo: "tarde" }]);
+  assert.deepEqual(tarde.resultado.noCaben, [
+    { id: "tarde", titulo: "tarde", alternativa: "2030-05-07 08:00" },
+  ]);
 });
 test("herramientas: mover algo fijo queda marcado", () => {
   const d = {

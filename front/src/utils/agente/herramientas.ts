@@ -17,7 +17,7 @@ import { GENERAL } from "../estructura";
 import { moverAFecha, timedItems } from "../espacio";
 import { buscarHueco, correrDesde } from "../planner";
 import { COLORES_MESA } from "../colores";
-import { PasoPlan, probar } from "./plan";
+import { PasoPlan, choquesDelPlan, probar } from "./plan";
 import { corto, fechaHora, hora, linea } from "./contexto";
 import type { Declaracion, Llamada } from "./tipos";
 
@@ -296,7 +296,8 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
   },
   buscarHueco(c, a) {
     const id = opcional(a, "id");
-    const duracion = id ? viva(c.actual, id).duration : numero(a, "duracion");
+    const cosa = id ? viva(c.actual, id) : undefined;
+    const duracion = cosa ? cosa.duration : numero(a, "duracion");
     if (!duracion) throw noEntendi();
     const desde = opcional(a, "desde"),
       hasta = opcional(a, "hasta");
@@ -305,7 +306,12 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
       {
         duracion,
         desde: desde ? msDe(desde) : undefined,
-        hasta: hasta ? msDe(hasta) : undefined,
+        // Sin tope, el hueco de una cosa con plazo llega hasta su plazo.
+        hasta: hasta
+          ? msDe(hasta)
+          : cosa?.dueAt
+            ? Date.parse(cosa.dueAt)
+            : undefined,
         ignorar: id,
       },
       c.now,
@@ -419,21 +425,43 @@ const EJECUTORES: Record<string, (c: Ctx, a: Args) => Efecto> = {
       .filter((x) => !x.noCabe)
       .map((x) => {
         const i = viva(c.actual, x.itemId);
-        return pasoMover(c, i, {
+        const paso = pasoMover(c, i, {
           scheduledAt: x.despues,
           dueAt: i.dueAt,
           startDate: i.startDate,
         });
+        return x.salta
+          ? {
+              ...paso,
+              texto: `${paso.texto} (salta «${viva(c.actual, x.salta).title}», que es fija)`,
+            }
+          : paso;
       });
+    // Lo que no cabe hoy trae su primer hueco desde mañana (antes de su plazo).
+    const manana = new Date(desde ? msDe(desde) : c.now);
+    manana.setHours(24, 0, 0, 0);
+    const alternativa = (i: Item) => {
+      const hueco = buscarHueco(
+        c.actual,
+        {
+          duracion: i.duration,
+          desde: manana.getTime(),
+          hasta: i.dueAt ? Date.parse(i.dueAt) : undefined,
+          ignorar: i.id,
+        },
+        c.now,
+      );
+      return hueco ? fechaHora(Date.parse(hueco)) : null;
+    };
     return {
       resultado: {
         corridas: pasos.map((p) => p.texto),
         noCaben: r
           .filter((x) => x.noCabe)
-          .map((x) => ({
-            id: x.itemId,
-            titulo: viva(c.actual, x.itemId).title,
-          })),
+          .map((x) => {
+            const i = viva(c.actual, x.itemId);
+            return { id: i.id, titulo: i.title, alternativa: alternativa(i) };
+          }),
       },
       pasos,
     };
@@ -566,7 +594,20 @@ export function ejecutar(
     const error = probar(d, juntos, todos(juntos.length), now)
       .errores.slice(previos.length)
       .find((x) => x);
-    return error ? { resultado: { error }, pasos: [] } : e;
+    if (error) return { resultado: { error }, pasos: [] };
+    // Lo que choca se le devuelve a Neka para que busque otro hueco (spec H1).
+    const bloquean = (ps: PasoPlan[]) =>
+      choquesDelPlan(d, ps, todos(ps.length), now).filter((c) => c.bloquea);
+    const habia = new Set(bloquean(previos).map((c) => c.clave));
+    const choque = bloquean(juntos).find((c) => !habia.has(c.clave));
+    return choque
+      ? {
+          resultado: {
+            error: `Choca: ${choque.descripcion} Busca otro hueco con buscarHueco; si es por lo que no cabe hoy, llévalo antes a otro día.`,
+          },
+          pasos: [],
+        }
+      : e;
   } catch (err) {
     return { resultado: { error: (err as Error).message }, pasos: [] };
   }

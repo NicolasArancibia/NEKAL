@@ -19,7 +19,12 @@ import { useApp } from "./AppContext";
 import { crearCerebro } from "./agente/cerebro";
 import { Contestacion, MENSAJES, conversar, oir } from "./agente/conversar";
 import { Plan, aceptar as aceptarPlan } from "./agente/plan";
-import { agregar, marcarPlan, nuevoMensaje } from "./agente/mensajes";
+import {
+  agregar,
+  marcarPlan,
+  mensajesDelTurno,
+  nuevoMensaje,
+} from "./agente/mensajes";
 import { leerAudio } from "./audio";
 
 // Neka para toda la app (spec D §5): conversación, plan pendiente (solo en
@@ -44,6 +49,7 @@ export type Neka = {
   turno: TurnoNeka | null;
   pendienteId: string | null;
   hoja: boolean;
+  aviso: string; // fallo de IA del último turno; solo en memoria, no se guarda
   abrirPlan(mensajeId: string): void;
   cerrarHoja(): void;
   error: string;
@@ -52,6 +58,7 @@ export type Neka = {
   soltar(): Promise<void>;
   aceptar(marcados: boolean[]): void;
   descartar(): void;
+  repetir(): void; // descarta el plan pendiente y repite la última pregunta con la agenda de ahora
   leer(texto: string): void;
 };
 
@@ -77,6 +84,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
   const [pendienteId, setPendienteId] = useState<string | null>(null);
   const [hoja, setHoja] = useState(false);
   const [error, setError] = useState("");
+  const [aviso, setAviso] = useState("");
   const [origen, setOrigen] = useState<Origen>("chat");
   const datos = useRef(data);
   datos.current = data;
@@ -134,13 +142,12 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     }
     setSinIA(c.fallo === "sin-ia");
     if (__DEV__ && c.motivo) console.warn("Neka sin IA:", c.motivo);
-    const respuesta = nuevoMensaje(c.respuesta, false);
-    const planMsg = c.plan
-      ? nuevoMensaje("", false, { plan: c.plan.resumen, estado: "pendiente" })
-      : null;
-    guardar((d) => agregar(d, respuesta, ...(planMsg ? [planMsg] : [])));
+    const { respuesta, plan: planMsg } = mensajesDelTurno(c);
+    if (respuesta)
+      guardar((d) => agregar(d, respuesta, ...(planMsg ? [planMsg] : [])));
+    else setAviso(c.respuesta);
     setTurno({
-      mensajeId: planMsg?.id ?? respuesta.id,
+      mensajeId: planMsg?.id ?? respuesta?.id ?? pregunta.id,
       pregunta: texto,
       audio,
       respuesta: c.respuesta,
@@ -157,6 +164,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     ocupado.current = true;
     setPensando(true);
     setError("");
+    setAviso("");
     try {
       await fn();
     } finally {
@@ -198,18 +206,18 @@ export function NekaProvider({ children }: { children: ReactNode }) {
       const r = await oir(crearCerebro(), await leerAudio(uri));
       if (!r.fallo) return turnoCon(r.texto, origen, true);
       if (r.fallo === "sin-ia") setSinIA(true);
-      const aviso = nuevoMensaje(MENSAJES[r.fallo], false);
-      guardar((d) => agregar(d, aviso));
+      const nota = nuevoMensaje(MENSAJES[r.fallo], false);
+      setAviso(nota.text);
       setTurno({
-        mensajeId: aviso.id,
+        mensajeId: nota.id,
         pregunta: "",
         audio: true,
-        respuesta: aviso.text,
+        respuesta: nota.text,
         plan: null,
         origen,
       });
       if (origen === "rapido") setHoja(true);
-      if (vozRef.current) leerEnVoz(aviso.text);
+      if (vozRef.current) leerEnVoz(nota.text);
     });
   };
 
@@ -270,6 +278,12 @@ export function NekaProvider({ children }: { children: ReactNode }) {
     setHoja(false);
     setError("");
   };
+  const repetir = () => {
+    const pregunta = turno?.pregunta;
+    const desde = turno?.origen ?? "chat";
+    descartar();
+    if (pregunta) void enviar(pregunta, desde);
+  };
   const abrirPlan = (mensajeId: string) => {
     if (turno && mensajeId === pendienteId) {
       setTurno({ ...turno, origen: "chat" });
@@ -290,6 +304,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
         turno,
         pendienteId,
         hoja,
+        aviso,
         abrirPlan,
         cerrarHoja: () => setHoja(false),
         error,
@@ -298,6 +313,7 @@ export function NekaProvider({ children }: { children: ReactNode }) {
         soltar,
         aceptar,
         descartar,
+        repetir,
         leer: leerEnVoz,
       }}
     >

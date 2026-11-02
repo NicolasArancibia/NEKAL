@@ -26,6 +26,7 @@ const build = spawnSync(
     "src/utils/agente/contexto.ts",
     "src/utils/agente/herramientas.ts",
     "src/utils/agente/conversar.ts",
+    "src/utils/agente/gemini.ts",
     "src/utils/agente/mensajes.ts",
     "src/utils/agente/dia.ts",
     "src/utils/progreso/nivel.ts",
@@ -82,6 +83,8 @@ require("./espacio.cjs");
 require("./rutinas.cjs");
 require("./demo.cjs");
 require("./agente.cjs");
+require("./gemini.cjs");
+require("./estabilidad.cjs");
 require("./progreso.cjs");
 require("./amigos.cjs");
 require("./styles.cjs");
