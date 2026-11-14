@@ -92,3 +92,70 @@ test("conexiones: permisos", () => {
     correo: false,
   });
 });
+
+const est = require("../.test-build/conexiones/estado.js");
+const cuenta = (proveedor, correo, extra = {}) => ({
+  proveedor,
+  correo,
+  nombre: "Sofía",
+  desde: "2026-11-14T10:00:00.000Z",
+  ...extra,
+});
+
+test("conexiones: agregar sin duplicar", () => {
+  let c = est.agregarCuenta(est.CONEXIONES_VACIAS, cuenta("google", "a@b.cl"));
+  c = est.agregarCuenta(
+    c,
+    cuenta("google", "a@b.cl", { nombre: "Sofi", desde: "2030-01-01" }),
+  );
+  assert.equal(c.cuentas.length, 1);
+  assert.equal(c.cuentas[0].nombre, "Sofi");
+  assert.equal(c.cuentas[0].desde, "2026-11-14T10:00:00.000Z");
+  c = est.agregarCuenta(c, cuenta("microsoft", "a@b.cl"));
+  assert.equal(c.cuentas.length, 2);
+  assert.deepEqual(est.CONEXIONES_VACIAS, { cuentas: [], ofrecido: false });
+});
+
+test("conexiones: quitar", () => {
+  const c = {
+    cuentas: [cuenta("google", "a@b.cl"), cuenta("microsoft", "a@b.cl")],
+    ofrecido: true,
+  };
+  assert.deepEqual(est.quitarCuenta(c, "google", "a@b.cl"), {
+    cuentas: [cuenta("microsoft", "a@b.cl")],
+    ofrecido: true,
+  });
+});
+
+test("conexiones: normalizar", () => {
+  for (const v of [undefined, null, "x", { cuentas: "no" }])
+    assert.deepEqual(est.normalizarConexiones(v), est.CONEXIONES_VACIAS);
+  const r = est.normalizarConexiones({
+    cuentas: [
+      cuenta("google", "a@b.cl"),
+      cuenta("yahoo", "c@d.cl"),
+      { proveedor: "google", nombre: "x", desde: "" },
+    ],
+    ofrecido: true,
+  });
+  assert.deepEqual(r, { cuentas: [cuenta("google", "a@b.cl")], ofrecido: true });
+  const muchas = Array.from({ length: 8 }, (_, i) => cuenta("google", `${i}@b.cl`));
+  assert.equal(est.normalizarConexiones({ cuentas: muchas, ofrecido: false }).cuentas.length, 6);
+});
+
+test("conexiones: estado", () => {
+  const ahora = 1_000_000;
+  const e = (o) => est.estadoCuenta({ correoPermitido: true, ahora, ...o });
+  assert.equal(e({ tienePase: false, vence: null }), "activar_aqui");
+  assert.equal(e({ tienePase: true, vence: ahora + 30_000 }), "actualizar");
+  assert.equal(e({ tienePase: true, vence: ahora + 3_600_000 }), "activa");
+  assert.equal(
+    e({ tienePase: true, vence: ahora + 3_600_000, correoPermitido: false }),
+    "falta_correo",
+  );
+  assert.equal(e({ tienePase: true, vence: null }), "activa");
+  assert.equal(est.TEXTO_ESTADO.actualizar, "Toca para actualizar");
+  assert.equal(est.TEXTO_ESTADO.activar_aqui, "Toca para activar aquí");
+  assert.equal(est.TEXTO_ESTADO.falta_correo, "Falta permiso de correo");
+  assert.equal(est.TEXTO_ESTADO.activa, "Activa");
+});
