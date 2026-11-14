@@ -153,6 +153,31 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
       "estudio",
     );
     console.log("OK Firestore: área de mesa y logros vistos");
+    // V2/H3: cuentas conectadas (spec H3 §5.2), sin pases.
+    const cuentaH3 = {
+      proveedor: "google",
+      correo: "a@b.cl",
+      nombre: "Alice",
+      desde: at,
+    };
+    await invalid("settings/conexiones", {
+      cuentas: [cuentaH3],
+      ofrecido: true,
+      token: "x",
+    });
+    await invalid("settings/conexiones", {
+      cuentas: Array.from({ length: 7 }, () => cuentaH3),
+      ofrecido: true,
+    });
+    await invalid("settings/conexiones", { cuentas: [], ofrecido: "si" });
+    const conCuentas = {
+      ...dataOf(snap.records),
+      conexiones: { cuentas: [cuentaH3], ofrecido: true },
+    };
+    await a.commit(snap, operation(dataOf(snap.records), conCuentas));
+    snap = await a.read();
+    assert.deepEqual(dataOf(snap.records).conexiones, conCuentas.conexiones);
+    console.log("OK Firestore: cuentas conectadas");
     // V2/F: códigos, amistades y tarjetas (spec F §5).
     const carol = env.authenticatedContext("carol").firestore();
     const par = (x, y) => (x < y ? `${x}_${y}` : `${y}_${x}`);

@@ -1,3 +1,5 @@
+import type { Conexiones } from "./conexiones/tipos";
+
 export const TYPES = [
   "Nota",
   "Idea",
@@ -148,6 +150,7 @@ export type AppData = {
   rewards: Reward[];
   messages: Message[];
   logros: LogroVisto[];
+  conexiones: Conexiones;
   profile: { name: string; roles: string };
   preferences: {
     softAlerts: boolean;
@@ -173,6 +176,7 @@ export const emptyData = (): AppData => ({
   rewards: [],
   messages: [],
   logros: [],
+  conexiones: { cuentas: [], ofrecido: false },
   workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
   profile: { name: "", roles: "" },
   preferences: {

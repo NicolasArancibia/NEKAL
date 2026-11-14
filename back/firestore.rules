@@ -28,6 +28,7 @@ return (kind=='items' && item(v))
 || (kind=='rewardEntries' && fields(v,['key','itemId','points','at','reason','order']) && ident(v.key) && ident(v.itemId) && v.points is number && v.points>=0 && v.points<=100000 && str(v.at,40) && str(v.reason,500) && v.order is int && v.order>=0 && v.order<10000)
 || (kind=='logros' && fields(v,['id','at']) && v.id==id && v.id in logroIds() && str(v.at,40))
 || (kind=='settings' && id=='profile' && fields(v,['name','roles']) && str(v.name,500) && str(v.roles,2000))
+|| (kind=='settings' && id=='conexiones' && fields(v,['cuentas','ofrecido']) && v.cuentas is list && v.cuentas.size()<=6 && v.ofrecido is bool)
 || (kind=='settings' && id=='preferences' && fields(v,['softAlerts','quiet','quietStart','quietEnd','dayStart','dayEnd']) && v.softAlerts is bool && v.quiet is bool && hour(v.quietStart) && hour(v.quietEnd) && hour(v.dayStart) && hour(v.dayEnd) && v.dayStart<v.dayEnd);
 }
 function validRecord(kind,id) {return fields(request.resource.data,['value','updatedAt']) && request.resource.data.updatedAt==request.time && validValue(kind,id,request.resource.data.value);}

@@ -10,6 +10,7 @@ import {
   validateItem,
   passive,
 } from "./model";
+import { normalizarConexiones } from "./conexiones/estado";
 
 // Grupos guardados antes de la V2/B (3 campos) reciben los campos nuevos vacíos.
 export function normalizeGroup(g: any): Group {
@@ -247,6 +248,8 @@ export function readBackup(text: string): AppData {
     )
   )
     throw new Error("Logros inválidos.");
+  // Cuentas conectadas (spec H3 §5.2): respaldos viejos no las traen.
+  d.conexiones = normalizarConexiones(d.conexiones);
   for (const k of ["dayStart", "dayEnd", "quietStart", "quietEnd"])
     if (
       !Number.isInteger(d.preferences[k]) ||
