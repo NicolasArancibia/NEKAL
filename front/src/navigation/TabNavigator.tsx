@@ -17,6 +17,7 @@ import { ConexionesProvider } from "../utils/ConexionesContext";
 import HojaPlan from "../components/ui/neka/HojaPlan";
 import CapaGrabando from "../components/ui/neka/CapaGrabando";
 import LogroNuevo from "../components/ui/progreso/LogroNuevo";
+import { HojaConectar } from "../components/ui/conexiones";
 
 export type TabParamList = {
   Resumen: undefined;
@@ -96,6 +97,7 @@ export default function TabNavigator() {
               <Tab.Screen name="Perfil" component={Perfil} />
             </Tab.Navigator>
             <CapaGrabando />
+          <HojaConectar />
           </SafeAreaView>
         </NekaProvider>
       </ConexionesProvider>

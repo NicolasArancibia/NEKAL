@@ -94,6 +94,7 @@ export function ConexionesProvider({
   const [estados, setEstados] = useState<Record<string, EstadoCuenta>>({});
   const [ultima, setUltima] = useState<UltimaConexion | null>(null);
   const [ejemplo, setEjemplo] = useState<CuentaVista[] | null>(null);
+  const [forzar, setForzar] = useState(false);
   const recogida = useRef(false);
   const cuentas = data.conexiones.cuentas;
 
@@ -166,12 +167,22 @@ export function ConexionesProvider({
   // Solo en desarrollo: `nekalConexiones()` muestra dos cuentas de ejemplo, sin guardar nada.
   useEffect(() => {
     if (!__DEV__) return;
-    const g = globalThis as { nekalConexiones?: (apagar?: false) => string };
-    g.nekalConexiones = (apagar) => {
-      setEjemplo(apagar === false ? null : EJEMPLO);
-      return apagar === false
-        ? "Cuentas de ejemplo quitadas."
-        : "Dos cuentas de ejemplo.";
+    const g = globalThis as {
+      nekalConexiones?: (modo?: false | "hoja" | "vuelta" | "error") => string;
+    };
+    // nekalConexiones() cuentas · ("hoja") A1 · ("vuelta") A2 · ("error") falla · (false) quita.
+    g.nekalConexiones = (modo) => {
+      setEjemplo(modo === false ? null : EJEMPLO);
+      setForzar(modo === "hoja");
+      if (modo === "vuelta" || modo === "error")
+        setUltima({
+          proveedor: "google",
+          ok: modo === "vuelta",
+          correo: EJEMPLO[0].correo,
+          error: "cancelado",
+          origen: "inicio",
+        });
+      return modo === false ? "Ejemplo quitado." : "Ejemplo de conexiones.";
     };
     return () => {
       delete g.nekalConexiones;
@@ -194,7 +205,7 @@ export function ConexionesProvider({
         ...c,
         estado: estados[`${c.proveedor}:${c.correo}`] ?? "activar_aqui",
       })),
-    ofrecer: disponible && !data.conexiones.ofrecido,
+    ofrecer: forzar || (disponible && !data.conexiones.ofrecido),
     ultima,
     conectar: (p, origen) => {
       recordarOrigen(origen);
@@ -218,11 +229,13 @@ export function ConexionesProvider({
         conexiones: quitarCuenta(d.conexiones, c.proveedor, c.correo),
       }));
     },
-    marcarOfrecido: () =>
+    marcarOfrecido: () => {
+      setForzar(false);
       change((d) => ({
         ...d,
         conexiones: { ...d.conexiones, ofrecido: true },
-      })),
+      }));
+    },
     limpiarUltima: () => setUltima(null),
   };
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;

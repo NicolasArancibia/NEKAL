@@ -18,6 +18,7 @@ import {
   Toggle,
   Txt,
 } from "../components/ui/base";
+import { SeccionCuentas } from "../components/ui/conexiones";
 
 type Where = "neka" | "jornada" | "backup" | "json" | "trash";
 
@@ -228,6 +229,9 @@ export default function Ajustes({
             {cuentaError}
           </Txt>
         )}
+      </Section>
+      <Section title="Cuentas conectadas">
+        <SeccionCuentas />
       </Section>
       <Section title="Neka">
         <Toggle
