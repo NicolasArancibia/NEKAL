@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Nekal — video del examen de título</title>
+    <script src="assets/lib/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/base/estilo/nekal.css" />
+    <link rel="stylesheet" href="estilo-video.css" />
+  </head>
+  <body>
+    <!--
+      LÍNEA DE TIEMPO DEL VIDEO
+      Cada escena es un archivo en compositions/.
+        data-start    = segundo en que empieza
+        data-duration = cuántos segundos dura
+      Regla: el data-start de una escena = data-start + data-duration de la anterior.
+      Al final, data-duration de #root = suma de todo (hoy 106 s = 1:46; máximo 120).
+      El detalle de qué pasa dentro de cada escena está en GUION.md.
+    -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="106" data-width="1920" data-height="1080">
+
+      <div id="e01" class="clip" data-composition-id="e01-portada" data-composition-src="compositions/e01-portada.html"
+           data-start="0" data-duration="6" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e02" class="clip" data-composition-id="e02-problema" data-composition-src="compositions/e02-problema.html"
+           data-start="6" data-duration="16" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e03" class="clip" data-composition-id="e03-pregunta" data-composition-src="compositions/e03-pregunta.html"
+           data-start="22" data-duration="9" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e04" class="clip" data-composition-id="e04-nekal" data-composition-src="compositions/e04-nekal.html"
+           data-start="31" data-duration="9" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e05" class="clip" data-composition-id="e05-resumen" data-composition-src="compositions/e05-resumen.html"
+           data-start="40" data-duration="7" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e06" class="clip" data-composition-id="e06-plan" data-composition-src="compositions/e06-plan.html"
+           data-start="47" data-duration="23" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e07" class="clip" data-composition-id="e07-espacio" data-composition-src="compositions/e07-espacio.html"
+           data-start="70" data-duration="7" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e08" class="clip" data-composition-id="e08-progreso" data-composition-src="compositions/e08-progreso.html"
+           data-start="77" data-duration="8" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e09" class="clip" data-composition-id="e09-proceso" data-composition-src="compositions/e09-proceso.html"
+           data-start="85" data-duration="13" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <div id="e10" class="clip" data-composition-id="e10-cierre" data-composition-src="compositions/e10-cierre.html"
+           data-start="98" data-duration="8" data-track-index="0" data-width="1920" data-height="1080"></div>
+
+      <!--
+        AUDIO (todavía no hay). Cuando existan los archivos, quitar los comentarios:
+        la voz parte en el segundo 0 y la música queda más baja para no taparla.
+
+        <audio id="voz" src="assets/audio/locucion.mp3" data-start="0" data-duration="106" data-track-index="1" data-volume="1"></audio>
+        <audio id="musica" src="assets/audio/musica.mp3" data-start="0" data-duration="106" data-track-index="2" data-volume="0.18" data-fade-in="1" data-fade-out="2"></audio>
+      -->
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nekal — Examen de Proyecto de Título</title>
+<link rel="stylesheet" href="estilo/presentacion.css">
+</head>
+<body>
+<!--
+  PRESENTACIÓN DE NEKAL — plantilla (noviembre 2026)
+
+  Cómo está armado este archivo:
+  · Cada diapositiva es un bloque  <section class="dp dp-TIPO"> … </section>.
+  · Para una diapositiva nueva: copia una completa, pégala donde vaya y cambia el texto.
+  · data-bloque = el nombre que sale abajo a la izquierda (si no lo pones, hereda el anterior).
+  · data-min    = minutos pensados para esa diapositiva (0.5 = 30 segundos). Con eso se arma el reparto.
+  · <aside class="notas"> = lo que dices tú. No se proyecta; se ve con la tecla N.
+  · <span class="marca-falta">FALTA</span> y <span class="marca-revisar">REVISAR</span> son avisos de trabajo:
+    se borran cuando el contenido esté confirmado.
+  · El contenido sale de 00_BASE/RELATO.md. Cifras y citas: solo las que están ahí.
+
+  Tipos disponibles (hay un ejemplo de cada uno más abajo):
+  dp-portada · dp-seccion · dp-frase · dp-cita · dp-cifra · dp-cifras · dp-comparacion ·
+  dp-pantalla · dp-pantallas · dp-pasos · dp-linea · dp-tabla · dp-tarjetas · dp-falta ·
+  dp-video · dp-demo · dp-cierre · dp-lista
+-->
+<main id="escenario">
+
+<!-- ═════════════ APERTURA ═════════════ -->
+
+<!-- TIPO: portada -->
+<section class="dp dp-portada" data-bloque="Apertura" data-min="0.4">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose3.png" alt="Neka saludando">
+  <h1 class="marca">Nekal</h1>
+  <p class="lema">Un planificador personal que negocia contigo cuando tus planes cambian. <span class="marca-revisar">REVISAR</span></p>
+  <p class="ficha">
+    <b>Nicolás Arancibia de Groote</b><br>
+    Proyecto de Título 2026 · Diseño de Interacción Digital<br>
+    Facultad de Diseño, Universidad del Desarrollo<br>
+    Profesores guía: Mauricio Reyes y Alex Hurtado
+  </p>
+  <aside class="notas">
+    <p>Buenos días. Soy Nicolás Arancibia y les presento Nekal, mi proyecto de título.</p>
+    <p>En una frase: es un planificador personal que negocia contigo cuando tus planes cambian.</p>
+    <p>Voy a contar el problema, la propuesta, mostrar la app funcionando y cerrar con el proceso, la validación y lo que viene.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ PARTE 1 · EL PROBLEMA ═════════════ -->
+
+<!-- TIPO: título de sección -->
+<section class="dp dp-seccion" data-bloque="1 · Contexto y problema" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose14.png" alt="Neka con papeles y un reloj">
+  <p class="parte">Parte 1 de 5</p>
+  <h2 class="titulo">El problema</h2>
+  <p class="bajada">Qué pasa cuando los planes cambian, y qué dice la evidencia.</p>
+  <aside class="notas">
+    <p>Parto por el problema: de dónde sale y por qué importa.</p>
+  </aside>
+</section>
+
+<!-- TIPO: frase (una idea, con su fuente) -->
+<section class="dp dp-frase" data-min="0.5">
+  <p class="frase">Cada interrupción tiene un costo medible: tiempo y estrés.</p>
+  <p class="bajada">Reorientar la atención obliga a reconstruir el contexto de lo que se estaba haciendo.</p>
+  <p class="fuente">Gloria Mark, <i>Attention Span</i> (2023)</p>
+  <aside class="notas">
+    <p>Gloria Mark lo midió: cada vez que algo nos interrumpe y tenemos que reorientar la atención, pagamos un costo en tiempo y en estrés.</p>
+    <p>Reorganizar la semana es exactamente eso: una interrupción que obliga a rearmar todo en la cabeza.</p>
+  </aside>
+</section>
+
+<section class="dp dp-frase" data-min="0.6">
+  <p class="etiqueta">El problema tiene nombre</p>
+  <p class="frase" style="margin-top:28px">Asimetría de planificación</p>
+  <p class="bajada">Las personas reorganizan su planificación todo el tiempo, por cambios que vienen de distintos ámbitos de su vida. Las herramientas no las acompañan en ese proceso.</p>
+  <aside class="notas">
+    <p>Al problema lo llamo asimetría de planificación.</p>
+    <p>La universidad o el trabajo fijan plazos y horarios. Cuando algo cambia, la que se ajusta es siempre la persona.</p>
+  </aside>
+</section>
+
+<!-- TIPO: comparación (dos lados) -->
+<section class="dp dp-comparacion" data-min="0.7">
+  <h2 class="titulo">El cambio llega de afuera. El reajuste se hace a mano.</h2>
+  <div class="cuerpo">
+    <div class="lado">
+      <span class="etiqueta gris">Lo que pasa</span>
+      <h3>Los planes cambian todo el tiempo</h3>
+      <p>Un plazo que se adelanta, una reunión nueva, una clase que se mueve. Vienen de distintos ámbitos de la vida.</p>
+    </div>
+    <div class="lado fuerte">
+      <span class="etiqueta">Lo que hacen las herramientas</span>
+      <h3>Dejan a la persona redistribuir sola</h3>
+      <p>Tareas, prioridades y tiempos se mueven uno por uno. Ninguna apoya ese proceso de manera integrada.</p>
+    </div>
+  </div>
+  <aside class="notas">
+    <p>Por un lado, los cambios son constantes y vienen de afuera.</p>
+    <p>Por otro, las herramientas registran bien, pero cuando algo cambia te dejan solo: hay que mover a mano tareas, prioridades y tiempos.</p>
+  </aside>
+</section>
+
+<!-- TIPO: cifra grande -->
+<section class="dp dp-cifra" data-bloque="2 · Evidencia" data-min="0.5">
+  <p class="numero">85,4<small>%</small></p>
+  <p class="que">modifica su planificación al menos una vez por semana.</p>
+  <p class="ademas"><span class="etiqueta">54,2 % lo hace a diario o varias veces por semana</span></p>
+  <p class="fuente">Encuesta exploratoria propia, Nekal 2026 (n = 48)</p>
+  <aside class="notas">
+    <p>Hice una encuesta exploratoria a 48 personas.</p>
+    <p>El 85,4 % cambia su planificación al menos una vez por semana. Más de la mitad, a diario o varias veces por semana.</p>
+    <p>Cambiar los planes es lo normal.</p>
+  </aside>
+</section>
+
+<!-- TIPO: cifras lado a lado (con flecha de «pasa de… a…») -->
+<section class="dp dp-cifras" data-min="0.5">
+  <h2 class="titulo">Las herramientas se conocen, pero no duran.</h2>
+  <div class="cuerpo">
+    <div class="cifra apagada">
+      <p class="numero">81,3<small>%</small></p>
+      <p class="que">ha usado alguna herramienta digital de organización.</p>
+    </div>
+    <div class="flecha" aria-hidden="true">→</div>
+    <div class="cifra">
+      <p class="numero">39,6<small>%</small></p>
+      <p class="que">la sigue usando.</p>
+    </div>
+  </div>
+  <p class="fuente">Encuesta exploratoria propia, Nekal 2026 (n = 48)</p>
+  <aside class="notas">
+    <p>Ocho de cada diez han usado alguna herramienta digital para organizarse. Solo cuatro de cada diez la siguen usando.</p>
+    <p>El problema no es que no las conozcan: es que no logran mantenerlas.</p>
+  </aside>
+</section>
+
+<section class="dp dp-cifra" data-min="0.4">
+  <p class="numero">62,5<small>%</small></p>
+  <p class="que">reorganiza a mano todo lo demás cuando aparece una obligación que no se puede mover.</p>
+  <p class="fuente">Encuesta exploratoria propia, Nekal 2026 (n = 48)</p>
+  <aside class="notas">
+    <p>Cuando aparece una obligación académica o laboral que no se puede mover, el 62,5 % dice que es la propia persona quien reorganiza a mano todo lo demás.</p>
+    <p>El costo del cambio lo absorbe la persona.</p>
+  </aside>
+</section>
+
+<section class="dp dp-cifra" data-min="0.4">
+  <p class="numero">72,9<small>%</small></p>
+  <p class="que">aceptaría que una herramienta digital intervenga para ayudar a reorganizar, manteniendo la decisión final.</p>
+  <p class="fuente">Encuesta exploratoria propia, Nekal 2026 (n = 48)</p>
+  <aside class="notas">
+    <p>Y hay disposición: el 72,9 % aceptaría que una herramienta le ayude a reorganizar.</p>
+    <p>Con una condición que marca todo el proyecto: la decisión final sigue siendo de la persona.</p>
+  </aside>
+</section>
+
+<section class="dp dp-cifras" data-min="0.4">
+  <h2 class="titulo">Y las apps de productividad se abandonan rápido.</h2>
+  <div class="cuerpo">
+    <div class="cifra">
+      <p class="numero">82<small>%</small></p>
+      <p class="que">las abandona en la primera semana.</p>
+    </div>
+    <div class="cifra">
+      <p class="numero">93<small>%</small></p>
+      <p class="que">las abandona en el primer mes.</p>
+    </div>
+  </div>
+  <p class="fuente">De Luna et al., KTH Royal Institute of Technology (2025)</p>
+  <aside class="notas">
+    <p>Esto calza con evidencia externa: un estudio del KTH de 2025 encontró que el 82 % abandona las apps de productividad en la primera semana y el 93 % en el primer mes.</p>
+  </aside>
+</section>
+
+<section class="dp dp-frase" data-min="0.3">
+  <p class="frase">Cambiar los planes no es la excepción. Es lo normal.</p>
+  <p class="bajada">El desafío no es registrar: es mantener vigente la planificación cuando las condiciones cambian.</p>
+  <aside class="notas">
+    <p>La lectura de toda la evidencia: el desafío no es anotar cosas, es mantener el plan vigente cuando todo cambia.</p>
+  </aside>
+</section>
+
+<!-- TIPO: tarjetas (ideas paralelas, sin orden) -->
+<section class="dp dp-tarjetas" data-bloque="3 · Marco teórico y estado del arte" data-min="0.8">
+  <h2 class="titulo">Cinco ideas sostienen el proyecto</h2>
+  <div class="cuerpo">
+    <div class="tarjeta">
+      <h3>Carga cognitiva</h3>
+      <p>La memoria de trabajo es limitada. Demasiada información dificulta decidir.</p>
+      <p class="autor">Sweller, 2019</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Autorregulación</h3>
+      <p>Pensamientos y conductas que la propia persona genera para lograr sus objetivos.</p>
+      <p class="autor">Zimmerman, 2002</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Gestión personal de información</h3>
+      <p>Crear, guardar, organizar y mantener información para cumplir objetivos.</p>
+      <p class="autor">Jones, 2008</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Mente extendida</h3>
+      <p>La mente funciona en colaboración con recursos externos.</p>
+      <p class="autor">Clark, 1997</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Gamificación</h3>
+      <p>Elementos de juego en contextos que no son juego.</p>
+      <p class="autor">Deterding et al., 2011</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose13.png" alt="Neka con mochila y un libro">
+  </div>
+  <aside class="notas">
+    <p>El marco teórico se apoya en cinco ideas. No las leo todas: destaco dos.</p>
+    <p>Carga cognitiva: reorganizar exige recordar, comparar y decidir a la vez, y la memoria de trabajo es limitada.</p>
+    <p>Mente extendida: pensamos mejor apoyados en recursos externos. Por eso la app saca el plan de la cabeza y lo pone a la vista.</p>
+  </aside>
+</section>
+
+<!-- TIPO: línea de tiempo -->
+<section class="dp dp-linea" data-min="0.4">
+  <h2 class="titulo">Siempre hemos sacado la memoria fuera de la cabeza</h2>
+  <div class="cuerpo">
+    <div class="linea">
+      <div class="hito"><p class="cuando">3500 a. C.</p><h3>Escritura cuneiforme</h3></div>
+      <div class="hito"><p class="cuando">700 d. C.</p><h3>El cero</h3></div>
+      <div class="hito"><p class="cuando">1450</p><h3>Quipu inca</h3></div>
+      <div class="hito"><p class="cuando">1800–1995</p><h3>Archivos físicos</h3></div>
+      <div class="hito"><p class="cuando">1995</p><h3>Agendas electrónicas</h3></div>
+      <div class="hito hoy"><p class="cuando">Hoy</p><h3>Apps</h3></div>
+    </div>
+  </div>
+  <aside class="notas">
+    <p>Organizar la información fuera de la cabeza es tan antiguo como la escritura: de las tablillas al quipu, de los archivadores a las apps.</p>
+    <p>Lo que cambia es el soporte. La pregunta es qué le falta al soporte de hoy.</p>
+  </aside>
+</section>
+
+<!-- TIPO: tabla -->
+<section class="dp dp-tabla" data-min="1">
+  <h2 class="titulo">Qué hacen bien las herramientas de hoy, y qué les falta</h2>
+  <div class="cuerpo">
+    <table>
+      <thead><tr><th>Referente</th><th>A favor</th><th>En contra</th></tr></thead>
+      <tbody>
+        <tr><td>Notion</td><td>Flexible, centraliza todo</td><td>Mucho mantenimiento manual; no detecta ni negocia choques</td></tr>
+        <tr><td>Todoist</td><td>Simple y rápida, buenos recordatorios</td><td>Binaria (hecho / no hecho); lo atrasado se acumula</td></tr>
+        <tr><td>Google Calendar</td><td>Muestra bien el tiempo comprometido</td><td>No ayuda a gestionar; no detecta ni negocia choques</td></tr>
+        <tr><td>Motion, Reclaim AI, Sunsama</td><td>Automatizan y sugieren bloques</td><td>Optimizan y ejecutan; no negocian con la persona</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notas">
+    <p>Revisé los referentes directos. Las clásicas (Notion, Todoist, Google Calendar) registran bien, pero no detectan ni negocian un choque.</p>
+    <p>Las nuevas con IA (Motion, Reclaim, Sunsama) sí reorganizan, pero optimizan y ejecutan por ti: no negocian contigo.</p>
+  </aside>
+</section>
+
+<section class="dp dp-frase" data-min="0.4">
+  <p class="etiqueta">El vacío</p>
+  <p class="frase media" style="margin-top:28px">Nadie media la negociación entre la persona y sus estructuras externas dejando la decisión final en la persona.</p>
+  <aside class="notas">
+    <p>Ese es el vacío que encontré: ninguna herramienta media esa negociación dejando la última palabra en la persona.</p>
+    <p>Ahí se instala Nekal.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ PARTE 2 · LA PROPUESTA ═════════════ -->
+
+<section class="dp dp-seccion" data-bloque="4 · Pregunta y objetivos" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose9.png" alt="Neka con una ampolleta">
+  <p class="parte">Parte 2 de 5</p>
+  <h2 class="titulo">La propuesta</h2>
+  <p class="bajada">La pregunta, los objetivos, para quién se diseña y con qué principios.</p>
+  <aside class="notas">
+    <p>Con el problema claro, paso a la propuesta.</p>
+  </aside>
+</section>
+
+<section class="dp dp-frase" data-min="0.5">
+  <p class="etiqueta">Pregunta de investigación</p>
+  <p class="frase media" style="margin-top:28px">¿Qué atributos debe tener un sistema planificador que medie en la negociación entre las personas y los contextos temporales a los que pertenecen, para mitigar las asimetrías de planificación?</p>
+  <aside class="notas">
+    <p>La pregunta que guía el proyecto es esta. (Leerla una vez, sin apuro.)</p>
+    <p>La palabra clave es «medie»: no un sistema que decida por ti, sino uno que se ponga al medio.</p>
+  </aside>
+</section>
+
+<section class="dp dp-frase" data-min="0.5">
+  <p class="etiqueta">Objetivo general</p>
+  <p class="frase media" style="margin-top:28px">Diseñar un sistema planificador negociador con recursos mnemotécnicos, mediante IA y mecánicas de gamificación.</p>
+  <p class="bajada">Dirigido a personas con dificultades de organización, para conciliar de forma más simétrica sus objetivos personales con los de las estructuras organizacionales.</p>
+  <aside class="notas">
+    <p>El objetivo general: diseñar un planificador que negocia, con recursos que ayudan a la memoria, usando IA y gamificación.</p>
+    <p>Para personas a las que les cuesta organizarse, y para que sus objetivos pesen lo mismo que los de la institución.</p>
+  </aside>
+</section>
+
+<!-- TIPO: pasos (secuencia numerada; «de-4» = cuatro en una fila) -->
+<section class="dp dp-pasos de-4" data-min="0.5">
+  <h2 class="titulo">Cuatro objetivos específicos</h2>
+  <div class="cuerpo">
+    <div class="paso"><h3>Identificar</h3><p>Patrones de conducta y quiebres en la planificación, con encuesta y entrevistas.</p></div>
+    <div class="paso"><h3>Definir</h3><p>Las funciones del sistema mnemotécnico y gamificado, desde los referentes y el marco teórico.</p></div>
+    <div class="paso"><h3>Diseñar</h3><p>La información y el prototipo navegable, con metodología centrada en el usuario.</p></div>
+    <div class="paso"><h3>Evaluar</h3><p>La propuesta con usuarios reales: pruebas de usabilidad e iteración.</p></div>
+  </div>
+  <aside class="notas">
+    <p>Cuatro objetivos específicos que son también las etapas del proyecto: identificar, definir, diseñar y evaluar.</p>
+    <p>Voy a volver al cuarto, evaluar con usuarios, en la parte de validación.</p>
+  </aside>
+</section>
+
+<!-- TIPO: cita -->
+<section class="dp dp-cita" data-bloque="5 · Usuarios" data-min="0.3">
+  <p class="comillas" aria-hidden="true">«</p>
+  <p class="cita">No decide, solo reacciona.</p>
+  <p class="autor"><b>Usuario principal: estudiante universitario.</b> Su calendario lo fija la institución.</p>
+  <aside class="notas">
+    <p>¿Para quién diseño? El usuario principal es el estudiante universitario.</p>
+    <p>Su calendario lo fija la institución. Cada vez que choca con un plazo que no se negocia, rearma la semana. No decide: reacciona.</p>
+  </aside>
+</section>
+
+<section class="dp dp-tarjetas altas" data-min="0.7">
+  <h2 class="titulo">Tres perfiles, una misma situación</h2>
+  <div class="cuerpo">
+    <div class="tarjeta">
+      <span class="etiqueta">Principal</span>
+      <h3>Estudiante universitario</h3>
+      <p>Reorganiza la semana cada vez que choca con un plazo no negociable.</p>
+      <p class="dicho">«No decide, solo reacciona.»</p>
+    </div>
+    <div class="tarjeta">
+      <span class="etiqueta gris">Secundario</span>
+      <h3>Trabajador</h3>
+      <p>Reuniones, turnos y entregas predefinidos.</p>
+      <p class="dicho">«Ajustarse le sale más barato que reclamar.»</p>
+    </div>
+    <div class="tarjeta">
+      <span class="etiqueta gris">Transversal</span>
+      <h3>Cualquier persona con compromisos externos</h3>
+      <p>No depende de una ocupación: depende de estructuras que no controla.</p>
+      <p class="dicho">«Un cambio nunca llega solo.»</p>
+    </div>
+  </div>
+  <aside class="notas">
+    <p>El secundario es el trabajador: reuniones, turnos y entregas que vienen definidos. Ajustarse le sale más barato que reclamar.</p>
+    <p>Y es transversal a cualquiera con compromisos externos, porque un cambio nunca llega solo: mueve todo lo demás.</p>
+  </aside>
+</section>
+
+<!-- TIPO: pantalla + explicación (un teléfono) -->
+<section class="dp dp-pantalla" data-bloque="6 · Propuesta y principios" data-min="0.5">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/01-bienvenida.png" alt="Pantalla de bienvenida de Nekal"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Organiza tu día. Neka te avisa si algo choca.</h2>
+    <ul class="puntos">
+      <li>Anotas lo que tienes que hacer.</li>
+      <li>La app lo ordena en el tiempo.</li>
+      <li>Neka te avisa si algo choca y te propone cómo arreglarlo.</li>
+    </ul>
+    <p class="aporte">Tú siempre confirmas antes de que algo cambie.</p>
+  </div>
+  <aside class="notas">
+    <p>Esto es Nekal: una app de organización personal con una asistente, Neka.</p>
+    <p>Anotas lo que tienes que hacer, la app lo ordena en el tiempo, y Neka te avisa si algo choca y te propone un arreglo.</p>
+    <p>Lo más importante: tú siempre confirmas antes de que algo cambie.</p>
+  </aside>
+</section>
+
+<section class="dp dp-tarjetas de-4" data-min="1">
+  <h2 class="titulo">Cuatro principios de diseño <span class="marca-revisar">REVISAR</span></h2>
+  <div class="cuerpo">
+    <div class="tarjeta numerada">
+      <h3>Neka propone, tú decides</h3>
+      <p>Nada cambia sin tu sí.</p>
+    </div>
+    <div class="tarjeta numerada">
+      <h3>Lo fijo no se mueve</h3>
+      <p>Una clase, una visita. Lo flexible, solo con tu aprobación.</p>
+    </div>
+    <div class="tarjeta numerada">
+      <h3>Nada se borra solo</h3>
+      <p>Neka pregunta por una cosa importante atrasada a la vez.</p>
+    </div>
+    <div class="tarjeta numerada">
+      <h3>Lo que ves es lo que se aplica</h3>
+      <p>La propuesta que revisas es exactamente la que queda.</p>
+    </div>
+  </div>
+  <aside class="notas">
+    <p>La respuesta al vacío se resume en cuatro principios.</p>
+    <p>Uno: Neka propone, tú decides. Dos: lo fijo, como una clase, nunca se mueve; lo flexible solo con tu aprobación.</p>
+    <p>Tres: nada se borra solo. Lo atrasado no desaparece ni se acumula en silencio: Neka pregunta por una cosa a la vez.</p>
+    <p>Cuatro: la propuesta que ves es exactamente la que se aplica. Sin sorpresas.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ PARTE 3 · LA APP ═════════════ -->
+
+<section class="dp dp-seccion" data-bloque="7 · La app" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose15.png" alt="Neka junto a un calendario">
+  <p class="parte">Parte 3 de 5</p>
+  <h2 class="titulo">La app</h2>
+  <p class="bajada">Un recorrido por las pantallas reales, el video y una demostración en vivo.</p>
+  <aside class="notas">
+    <p>Ahora la app. No es un prototipo de pantallas: está publicada y funciona en la web y en el iPhone.</p>
+  </aside>
+</section>
+
+<!-- TIPO: varias pantallas en fila -->
+<section class="dp dp-pantallas" data-min="0.4">
+  <h2 class="titulo">Cinco partes</h2>
+  <div class="cuerpo">
+    <figure><div class="telefono"><img src="../00_BASE/pantallas/03-resumen.png" alt="Resumen"></div><figcaption>Resumen</figcaption></figure>
+    <figure><div class="telefono"><img src="../00_BASE/pantallas/05-calendario-mes.png" alt="Calendario"></div><figcaption>Calendario</figcaption></figure>
+    <figure><div class="telefono"><img src="../00_BASE/pantallas/07-espacio-circulo.png" alt="Espacio"></div><figcaption>Espacio</figcaption></figure>
+    <figure><div class="telefono"><img src="../00_BASE/pantallas/08-neka-chat.png" alt="Neka"></div><figcaption>Neka</figcaption></figure>
+    <figure><div class="telefono"><img src="../00_BASE/pantallas/09-perfil.png" alt="Perfil"></div><figcaption>Perfil</figcaption></figure>
+  </div>
+  <aside class="notas">
+    <p>La app tiene cinco partes: Resumen, Calendario, Espacio, Neka y Perfil. Las paso rápido, porque después las van a ver funcionando.</p>
+  </aside>
+</section>
+
+<!-- TIPO: pantalla + explicación (dos teléfonos) -->
+<section class="dp dp-pantalla" data-min="0.3">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/03-resumen.png" alt="Resumen: lo siguiente y lo de hoy"></div>
+    <div class="telefono"><img src="../00_BASE/pantallas/04-resumen-tus-dias.png" alt="Resumen: racha y mapa de tus días"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Resumen</h2>
+    <ul class="puntos">
+      <li>Qué viene ahora y qué falta hoy.</li>
+      <li>Tu racha y el mapa de tus días.</li>
+    </ul>
+    <p class="aporte">Menos búsqueda manual</p>
+  </div>
+  <aside class="notas">
+    <p>Resumen responde «¿qué hago ahora?»: lo siguiente, lo que falta hoy, la racha y el mapa de tus días.</p>
+    <p>Aporte: menos búsqueda manual.</p>
+  </aside>
+</section>
+
+<section class="dp dp-pantalla invertida" data-min="0.3">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/06-calendario-agenda.png" alt="Calendario como agenda"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Calendario</h2>
+    <ul class="puntos">
+      <li>Todo lo que tiene fecha, por mes o como agenda.</li>
+      <li>Marca los choques y ofrece «Arreglar con Neka».</li>
+    </ul>
+    <p class="aporte">Ver el conflicto antes del atraso</p>
+  </div>
+  <aside class="notas">
+    <p>Calendario muestra todo lo que tiene fecha, por mes o como agenda.</p>
+    <p>Cuando dos cosas chocan lo marca, y ofrece arreglarlo con Neka. Así el conflicto se ve antes de que sea un atraso.</p>
+  </aside>
+</section>
+
+<section class="dp dp-pantalla" data-min="0.3">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/07-espacio-circulo.png" alt="Espacio: círculo del tiempo"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Espacio</h2>
+    <ul class="puntos">
+      <li>Tus cosas en mesas: Casa, Trabajo, Universidad.</li>
+      <li>Alrededor de «hoy», en un círculo del tiempo: hoy, mañana, la semana, sin fecha.</li>
+    </ul>
+    <p class="aporte">Saca la planificación de la cabeza</p>
+  </div>
+  <aside class="notas">
+    <p>Espacio es el recurso mnemotécnico del proyecto. Tus cosas se agrupan en mesas y se ordenan en un círculo del tiempo: al centro hoy, hacia afuera mañana, la semana y lo sin fecha.</p>
+    <p>De un vistazo se ve qué tengo y cuándo.</p>
+  </aside>
+</section>
+
+<section class="dp dp-pantalla invertida" data-min="0.3">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/08-neka-chat.png" alt="Chat con Neka"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Neka</h2>
+    <ul class="puntos">
+      <li>Le hablas por texto o por voz.</li>
+      <li>«Voy atrasado 20 minutos» y propone un plan dibujado en el día.</li>
+      <li>Aceptar o Descartar.</li>
+    </ul>
+    <p class="aporte">Menos esfuerzo de calcular cada reajuste</p>
+  </div>
+  <aside class="notas">
+    <p>Neka es la asistente. Le escribes o le hablas: «voy atrasado 20 minutos».</p>
+    <p>Ella propone un plan dibujado sobre tu día y tú aceptas o descartas. El cálculo del reajuste ya no lo haces tú.</p>
+  </aside>
+</section>
+
+<section class="dp dp-pantalla" data-min="0.3">
+  <div class="telefonos">
+    <div class="telefono"><img src="../00_BASE/pantallas/09-perfil.png" alt="Perfil"></div>
+    <div class="telefono"><img src="../00_BASE/pantallas/02-logro-nuevo.png" alt="Aviso de logro nuevo"></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">Perfil</h2>
+    <ul class="puntos">
+      <li>Nivel, 25 logros y rating por mesa.</li>
+      <li>Amigos, con su perfil en corto.</li>
+    </ul>
+    <p class="aporte">Motivación para mantener el hábito</p>
+  </div>
+  <aside class="notas">
+    <p>Perfil es la gamificación: nivel, 25 logros, rating por mesa y amigos.</p>
+    <p>Responde al dato del abandono: da motivos para seguir usando la app.</p>
+  </aside>
+</section>
+
+<!-- TIPO: video. Guarda el archivo como media/video.mp4 y aparece solo. -->
+<section class="dp dp-video" data-min="2">
+  <video src="media/video.mp4" controls preload="metadata"></video>
+  <div class="sin-video">
+    <p><span class="marca-falta">FALTA</span></p>
+    <h2>Video (2:00)</h2>
+    <p>Aquí va la pieza audiovisual que pide la universidad: máximo 2 minutos, con portada que identifique el proyecto y su autor.</p>
+    <p>Para ponerlo: guarda el archivo como <code>02_PRESENTACION/media/video.mp4</code>. Aparece solo en esta diapositiva.</p>
+  </div>
+  <aside class="notas">
+    <p>Antes de la demo, el video del proyecto. Dura dos minutos. (Clic en el video para reproducir. No hablar encima.)</p>
+  </aside>
+</section>
+
+<!-- TIPO: demo en vivo -->
+<section class="dp dp-demo" data-min="2">
+  <div class="texto">
+    <h2 class="titulo">Demo en vivo</h2>
+    <ol class="recorrido">
+      <li>El día en Resumen y el círculo del Espacio.</li>
+      <li>Un choque en el Calendario: «Arreglar con Neka».</li>
+      <li>«Voy atrasado 20 minutos»: plan, Aceptar.</li>
+    </ol>
+    <p class="plan-b"><span class="marca-revisar">REVISAR</span> Este recorrido es una propuesta. Plan B si falla internet o el proyector: seguir con las pantallas de las diapositivas anteriores.</p>
+  </div>
+  <img class="neka" src="../00_BASE/marca/Neka_Pose10.png" alt="Neka mostrando una pantalla">
+  <aside class="notas">
+    <p>Ahora en vivo. (Cambiar a la app, ya abierta y con sesión iniciada.)</p>
+    <p>1. Mostrar el Resumen y el círculo del Espacio. 2. Ir al Calendario, mostrar un choque y tocar «Arreglar con Neka». 3. En el chat, decir «voy atrasado 20 minutos», mostrar el plan dibujado y aceptar.</p>
+    <p>Máximo 2 minutos. Si algo falla, volver a las diapositivas y seguir: no arreglar nada frente a la comisión.</p>
+  </aside>
+</section>
+
+<!-- TIPO: pasos (seis, en dos filas; «clave» destaca uno) -->
+<section class="dp dp-pasos" data-bloque="8 · Cómo negocia Neka" data-min="1">
+  <h2 class="titulo">Cómo negocia Neka</h2>
+  <div class="cuerpo">
+    <div class="paso"><h3>Pides o cambia algo</h3><p>Por texto, por voz o desde un choque en el Calendario.</p></div>
+    <div class="paso"><h3>Neka lee tu agenda</h3><p>Qué es fijo, qué es flexible, cuánto dura, tu jornada.</p></div>
+    <div class="paso"><h3>Arma un plan</h3><p>Mueve solo lo flexible y salta lo fijo.</p></div>
+    <div class="paso"><h3>El plan se revisa solo</h3><p>No puede crear choques nuevos. Si la agenda cambió, avisa y se pide de nuevo.</p></div>
+    <div class="paso clave"><h3>Tú decides</h3><p>Aceptar o Descartar, viendo el día dibujado.</p></div>
+    <div class="paso"><h3>Se aplica y queda guardado</h3><p>Sincronizado en tu cuenta.</p></div>
+  </div>
+  <aside class="notas">
+    <p>Lo que acaban de ver, por dentro, son seis pasos.</p>
+    <p>Pides algo; Neka lee tu agenda, sabiendo qué es fijo y qué es flexible; arma un plan que mueve solo lo flexible.</p>
+    <p>El paso cuatro es clave para la confianza: el plan se revisa con reglas, no con otra IA, y no puede crear choques nuevos.</p>
+    <p>Paso cinco: tú decides. Recién ahí se aplica y se guarda.</p>
+  </aside>
+</section>
+
+<section class="dp dp-pantalla invertida" data-min="0.5">
+  <div class="telefonos">
+    <div class="telefono falta"><span><span class="marca-falta">FALTA</span><br><br>Pantallazo del «Plan de Neka»: el día dibujado con Aceptar y Descartar</span></div>
+  </div>
+  <div class="texto">
+    <h2 class="titulo">La pantalla del proyecto</h2>
+    <ul class="puntos">
+      <li>El plan se ve dibujado sobre tu día, antes de aplicarse.</li>
+      <li>Dos botones: Aceptar o Descartar.</li>
+    </ul>
+    <p class="aporte">Neka propone, tú decides</p>
+  </div>
+  <aside class="notas">
+    <p>Si tuviera que quedarme con una sola pantalla, es esta: el plan de Neka dibujado sobre tu día, con dos botones.</p>
+    <p>Aquí se juega la negociación: la persona ve exactamente qué va a cambiar y dice sí o no.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ PARTE 4 · EL PROCESO ═════════════ -->
+
+<section class="dp dp-seccion" data-bloque="9 · Proceso y decisiones" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose7.png" alt="Neka pensando">
+  <p class="parte">Parte 4 de 5</p>
+  <h2 class="titulo">El proceso</h2>
+  <p class="bajada">Qué cambió desde el anteproyecto, por qué, y cómo se validó con usuarios.</p>
+  <aside class="notas">
+    <p>Varios de ustedes vieron el anteproyecto. El proyecto cambió bastante desde entonces y quiero explicar por qué.</p>
+  </aside>
+</section>
+
+<section class="dp dp-linea" data-min="0.7">
+  <h2 class="titulo">De la exploración a una app real</h2>
+  <div class="cuerpo">
+    <div class="linea">
+      <div class="hito"><p class="cuando"><span class="marca-falta">FALTA fecha</span></p><h3>V0</h3><p>Exploración.</p></div>
+      <div class="hito"><p class="cuando"><span class="marca-falta">FALTA fecha</span></p><h3>V1</h3><p>Primera app publicada en la web.</p></div>
+      <div class="hito hoy" style="flex:2"><p class="cuando">Octubre–noviembre 2026</p><h3>V2</h3><p>Por fases: sistema de diseño, Espacio (tres vistas probadas), Neka con IA, gamificación, amigos y estabilización.</p></div>
+    </div>
+  </div>
+  <aside class="notas">
+    <p>Trabajé en tres versiones. La V0 fue exploración. La V1, la primera app publicada en la web.</p>
+    <p>La V2, de octubre y noviembre, se hizo por fases: sistema de diseño, el Espacio con tres vistas probadas, Neka con IA, gamificación, amigos y una fase final de estabilización.</p>
+  </aside>
+</section>
+
+<!-- TIPO: comparación con «por qué» abajo -->
+<section class="dp dp-comparacion" data-min="0.5">
+  <h2 class="titulo">De tres agentes a una sola asistente <span class="marca-revisar">REVISAR</span></h2>
+  <div class="cuerpo">
+    <div class="lado">
+      <span class="etiqueta gris">Anteproyecto</span>
+      <h3>Sistema multiagente</h3>
+      <p>Tres IA: planificador, revisor y monitor.</p>
+    </div>
+    <div class="lado fuerte">
+      <span class="etiqueta">Hoy</span>
+      <h3>Neka, con revisión por código</h3>
+      <p>Una asistente que propone y reglas que revisan cada plan.</p>
+    </div>
+  </div>
+  <p class="porque"><b>Por qué:</b> es más simple de entender y más confiable. El revisor ya no es otra IA: son reglas que no fallan.</p>
+  <aside class="notas">
+    <p>Primer cambio. En el anteproyecto eran tres agentes de IA: planificador, revisor y monitor.</p>
+    <p>Hoy es una sola asistente, Neka, y la revisión la hacen reglas escritas en código. Es más simple de entender y más confiable.</p>
+  </aside>
+</section>
+
+<section class="dp dp-comparacion" data-min="0.5">
+  <h2 class="titulo">De bloques y 3D al círculo del tiempo <span class="marca-revisar">REVISAR</span></h2>
+  <div class="cuerpo">
+    <div class="lado">
+      <span class="etiqueta gris">Anteproyecto y pruebas</span>
+      <h3>Bloques para arrastrar, mesas en 3D y un plano</h3>
+      <p>La vista 3D y el plano no se leían bien en el iPhone.</p>
+    </div>
+    <div class="lado fuerte">
+      <span class="etiqueta">Hoy</span>
+      <h3>Círculo del tiempo</h3>
+      <p>Responde «qué tengo y cuándo» de un vistazo.</p>
+    </div>
+  </div>
+  <p class="porque"><b>Por qué:</b> se probaron tres vistas (Tiempo, Mesas 3D y Plano) y quedó la que se entendía en un teléfono.</p>
+  <aside class="notas">
+    <p>Segundo cambio: la interfaz espacial. Partió como bloques para arrastrar; probé una vista 3D de mesas y un plano.</p>
+    <p>En el iPhone no se leían bien. Quedó el círculo del tiempo, que responde «qué tengo y cuándo» de un vistazo.</p>
+    <p>(Si hay tiempo o preguntan: mostrar las maquetas descartadas.)</p>
+  </aside>
+</section>
+
+<!-- TIPO: tabla compacta (tres columnas: antes, hoy, por qué) -->
+<section class="dp dp-tabla compacta" data-min="0.7">
+  <h2 class="titulo">Otros cambios desde el anteproyecto <span class="marca-revisar">REVISAR</span></h2>
+  <div class="cuerpo">
+    <table>
+      <thead><tr><th>Anteproyecto</th><th>Hoy</th><th>Por qué</th></tr></thead>
+      <tbody>
+        <tr><td>Prototipo navegable de 6 pantallas</td><td>App real: cuentas, datos en la nube, web publicada e iPhone</td><td>Se decidió que todo fuera real y no pantallas de muestra</td></tr>
+        <tr><td>Perfil con reglas personales de equilibrio</td><td>Perfil de progreso; la jornada se define en Ajustes</td><td><span class="marca-falta">FALTA</span> la razón, en palabras de Nicolás</td></tr>
+        <tr><td>No existía</td><td>Lo atrasado como regla propia; Neka pregunta</td><td>Responde a la crítica a Todoist: lo atrasado no se acumula</td></tr>
+        <tr><td>No existía</td><td>Amigos, con código de 6 caracteres</td><td>Es parte de la gamificación</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notas">
+    <p>Otros cambios. El más grande: pasé de un prototipo de seis pantallas a una app real, con cuentas y datos en la nube.</p>
+    <p>El perfil dejó de ser «reglas de equilibrio» y pasó a ser progreso. (Decir aquí la razón propia.)</p>
+    <p>Y aparecieron dos cosas nuevas: el manejo de lo atrasado, que responde a la crítica que le hice a Todoist, y los amigos.</p>
+  </aside>
+</section>
+
+<section class="dp dp-tarjetas" data-min="0.5">
+  <h2 class="titulo">Con qué está hecha</h2>
+  <div class="cuerpo">
+    <div class="tarjeta">
+      <h3>Una sola base para web e iPhone</h3>
+      <p>Expo y React Native, con TypeScript.</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Cuentas, datos y alojamiento</h3>
+      <p>Firebase. Hoy corre en su plan gratuito.</p>
+    </div>
+    <div class="tarjeta">
+      <h3>La IA de Neka</h3>
+      <p>Gemini Flash-Lite, por Firebase AI Logic. También en plan gratuito.</p>
+    </div>
+  </div>
+  <p class="fuente"><b>Más de 330 pruebas automáticas</b> cuidan la lógica. Web publicada: nekal-973b2.web.app</p>
+  <aside class="notas">
+    <p>Las herramientas se eligieron por lo que aportan y lo que cuestan.</p>
+    <p>Una sola base de código sirve para la web y el iPhone. Firebase da cuentas, base de datos y alojamiento. La IA es Gemini Flash-Lite.</p>
+    <p>Hoy todo corre en planes gratuitos, y más de 330 pruebas automáticas cuidan que la lógica no se rompa.</p>
+  </aside>
+</section>
+
+<!-- TIPO: espacio [FALTA] -->
+<section class="dp dp-falta" data-bloque="10 · Validación con usuarios" data-min="0.7">
+  <h2 class="titulo">Cómo se probó con usuarios <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Quiénes participaron y cuántos fueron.</li>
+        <li>Qué tareas se les pidió hacer en la app.</li>
+        <li>Cómo se hizo: dónde, con qué versión, cómo se registró.</li>
+        <li>Una foto o captura de las sesiones.</li>
+      </ul>
+      <p class="hay"><b>Por qué importa:</b> es el objetivo específico 4 y la pauta lo evalúa directo («involucra al usuario en desarrollo, prototipado y validación»).</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: todavía no existen las pruebas de usabilidad de la V2.)</p>
+    <p>Guion cuando exista: con quiénes probé, qué tareas les pedí y cómo lo registré.</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-min="0.8">
+  <h2 class="titulo">Qué se encontró y qué cambió <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Dos o tres hallazgos, cada uno con su número o su cita textual.</li>
+        <li>Qué se cambió en la app por cada hallazgo (antes y después).</li>
+        <li>Qué quedó pendiente.</li>
+      </ul>
+      <p class="hay"><b>Sugerencia de formato:</b> una diapositiva «cifra grande» por hallazgo y una «comparación» por cada cambio.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente.)</p>
+    <p>Guion cuando exista: qué encontré, qué cambié por eso y qué dejé para después. Con datos reales, sin adornar.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ PARTE 5 · EL PROYECTO EN EL MUNDO ═════════════ -->
+
+<section class="dp dp-seccion" data-bloque="11 · Gestión, costos y financiamiento" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose17.png" alt="Neka con un café y un teléfono">
+  <p class="parte">Parte 5 de 5</p>
+  <h2 class="titulo">El proyecto en el mundo</h2>
+  <p class="bajada">Cuánto cuesta, qué impacto tiene y cómo sigue.</p>
+  <aside class="notas">
+    <p>Para cerrar: cómo se gestionó, cuánto cuesta, qué impacto tiene y hacia dónde va.</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-min="0.4">
+  <h2 class="titulo">Planificación del trabajo <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>La carta Gantt real de lo que se hizo, con fechas.</li>
+        <li>Dónde hubo atrasos o cambios de plan, y cómo se resolvieron.</li>
+      </ul>
+      <p class="hay"><b>Lo que ya hay:</b> las versiones V0, V1 y V2, y las fases de la V2 (sistema de diseño, Espacio, Neka con IA, gamificación, amigos, estabilización). Faltan las fechas de cada una.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: falta la carta Gantt real.)</p>
+    <p>Guion: cómo organicé el trabajo, qué se movió y por qué.</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-min="0.6">
+  <h2 class="titulo">Cuánto cuesta <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Honorarios: horas de diseño y de programación.</li>
+        <li>Producción: servicios y herramientas.</li>
+        <li>Gastos operacionales: cuánto cuesta mantenerla funcionando al mes.</li>
+        <li>El total, como cifra grande.</li>
+      </ul>
+      <p class="hay"><b>Dato que ya hay:</b> hoy corre en los planes gratuitos de Firebase y de Gemini.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: faltan los costos.)</p>
+    <p>Guion: cuánto costaría hacerla si se pagara todo, y cuánto cuesta mantenerla. Hoy funciona en planes gratuitos.</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-min="0.5">
+  <h2 class="titulo">Cómo se podría financiar <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Dos o tres fuentes de financiamiento posibles.</li>
+        <li>Para cada una: qué cubre y qué pide a cambio.</li>
+        <li>Si es viable y sostenible en el tiempo, y por qué.</li>
+      </ul>
+      <p class="hay"><b>La pauta pide:</b> costos y posibles fuentes de financiamiento, viabilidad, factibilidad económica y sostenibilidad.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: faltan las fuentes de financiamiento.)</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-bloque="12 · Impacto y ética" data-min="0.8">
+  <h2 class="titulo">Impacto y variables éticas <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Datos personales: qué guarda la app, dónde, y quién los puede ver.</li>
+        <li>La IA: qué lee Neka de tu agenda y qué no puede hacer sola.</li>
+        <li>Impacto social esperado.</li>
+        <li>Variables medioambientales y económicas, si aplican.</li>
+      </ul>
+      <p class="hay"><b>Lo que ya se puede decir:</b> nada cambia sin que la persona acepte. Eso es una decisión ética de diseño, no solo de usabilidad.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: falta desarrollar impacto y ética.)</p>
+    <p>Guion: qué pasa con los datos personales, qué papel tiene la IA y qué impacto espero. Conectar con el principio «Neka propone, tú decides».</p>
+  </aside>
+</section>
+
+<section class="dp dp-tarjetas" data-bloque="13 · Proyección" data-min="0.7">
+  <h2 class="titulo">Lo que viene <span class="marca-falta">FALTA ordenar</span></h2>
+  <div class="cuerpo">
+    <div class="tarjeta"><h3>Google Calendar y Outlook</h3><p>Conectar los calendarios que la persona ya usa. En curso.</p></div>
+    <div class="tarjeta"><h3>Espacios compartidos</h3><p>Planificar con amigos.</p></div>
+    <div class="tarjeta"><h3>Neka por WhatsApp</h3><p>Hablarle sin abrir la app.</p></div>
+    <div class="tarjeta"><h3>Widget del iPhone</h3><p>El día a la vista en la pantalla de inicio.</p></div>
+    <div class="tarjeta"><h3>Resumen diario</h3><p>Un aviso con lo que viene.</p></div>
+    <div class="tarjeta"><h3>App nativa</h3><p>Publicarla como aplicación instalable.</p></div>
+  </div>
+  <aside class="notas">
+    <p>El proyecto sigue. Lo más cercano es conectar Google Calendar y Outlook, que ya está en curso.</p>
+    <p>Después: espacios compartidos con amigos, Neka por WhatsApp, un widget, un resumen diario y la app nativa.</p>
+    <p>(Pendiente: decidir cuál va primero y por qué. Estas son ideas del plan de trabajo, sin orden todavía.)</p>
+  </aside>
+</section>
+
+<section class="dp dp-falta" data-bloque="14 · Conclusiones" data-min="1">
+  <h2 class="titulo">¿Qué atributos debe tener un planificador que medie en la negociación? <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>La respuesta a la pregunta de investigación: los atributos, uno por uno.</li>
+        <li>Qué resultado respalda cada atributo (validación con usuarios).</li>
+        <li>Qué no se logró o queda abierto.</li>
+      </ul>
+      <p class="hay"><b>Punto de partida:</b> los cuatro principios de diseño son candidatos a atributos, si la validación los respalda.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas">
+    <p>(Diapositiva pendiente: faltan las conclusiones.)</p>
+    <p>Guion: volver a la pregunta de investigación y responderla de frente, con lo que mostró la validación.</p>
+  </aside>
+</section>
+
+<!-- TIPO: cierre -->
+<section class="dp dp-cierre" data-bloque="15 · Cierre" data-min="0.2">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose1.png" alt="Neka celebrando">
+  <h2 class="gracias">Gracias</h2>
+  <p class="lema">Organiza tu día. Neka te avisa si algo choca.</p>
+  <p class="datos"><b>nekal-973b2.web.app</b><br>Nicolás Arancibia de Groote · Proyecto de Título 2026</p>
+  <aside class="notas">
+    <p>Eso es Nekal. Muchas gracias. Quedo atento a sus preguntas.</p>
+  </aside>
+</section>
+
+<!-- ═════════════ RESPALDO (para las preguntas; no cuenta en los 30 minutos) ═════════════ -->
+<!-- Las diapositivas con la clase «respaldo» no entran en la numeración ni en el reparto. -->
+
+<section class="dp dp-seccion respaldo" data-bloque="Respaldo">
+  <div class="anillos"></div>
+  <img class="anillos-neka neka" src="../00_BASE/marca/Neka_Pose12.png" alt="Neka de brazos cruzados">
+  <p class="parte">Para las preguntas</p>
+  <h2 class="titulo">Respaldo</h2>
+  <p class="bajada">Glosario, detalle técnico, encuesta y referencias.</p>
+  <aside class="notas">
+    <p>Diapositivas de respaldo. Para llegar rápido a una: tecla G (ver todas) y clic.</p>
+  </aside>
+</section>
+
+<!-- TIPO: lista (definiciones) -->
+<section class="dp dp-lista respaldo">
+  <h2 class="titulo">Glosario</h2>
+  <div class="cuerpo">
+    <ul class="lista definiciones">
+      <li><b>Reorganización de la planificación</b>Ajustar tareas, prioridades y tiempos cuando aparecen cambios.</li>
+      <li><b>Estructuras temporales externas</b>Bloques de tiempo de actividades que no dependen de uno.</li>
+      <li><b>Negociación</b>Conciliar compromisos, prioridades y necesidades personales cuando distintos ámbitos compiten por el mismo tiempo.</li>
+      <li><b>Carga cognitiva de reorganización</b>El esfuerzo mental de recordar pendientes, detectar conflictos, comparar prioridades y redistribuir actividades.</li>
+    </ul>
+  </div>
+  <aside class="notas"><p>Las cuatro definiciones del glosario de la memoria.</p></aside>
+</section>
+
+<section class="dp dp-falta respaldo">
+  <h2 class="titulo">Ficha de la encuesta <span class="marca-falta">FALTA</span></h2>
+  <div class="cuerpo">
+    <div class="hueco">
+      <h3>Qué va aquí</h3>
+      <ul>
+        <li>Fechas en que se aplicó y por qué medio.</li>
+        <li>Quiénes respondieron: edades, ocupación.</li>
+        <li>Las preguntas tal como se hicieron.</li>
+      </ul>
+      <p class="hay"><b>Lo que ya hay:</b> encuesta exploratoria propia, Nekal 2026, con 48 respuestas.</p>
+    </div>
+    <img class="neka" src="../00_BASE/marca/Neka_Pose7.png" alt="">
+  </div>
+  <aside class="notas"><p>Por si preguntan por el método de la encuesta. Es exploratoria: 48 respuestas no permiten generalizar, y conviene decirlo antes de que lo digan.</p></aside>
+</section>
+
+<section class="dp dp-pasos respaldo">
+  <h2 class="titulo">Detalle: por qué un plan de Neka no crea choques</h2>
+  <div class="cuerpo">
+    <div class="paso"><h3>Lo fijo se salta</h3><p>Una clase o una visita no se mueven nunca.</p></div>
+    <div class="paso"><h3>Solo se mueve lo flexible</h3><p>Y solo si la persona lo aprueba.</p></div>
+    <div class="paso"><h3>Reglas, no otra IA</h3><p>El plan se revisa solo: no puede crear choques nuevos.</p></div>
+    <div class="paso"><h3>Si la agenda cambió</h3><p>Mientras esperabas, se avisa y se pide el plan de nuevo.</p></div>
+    <div class="paso clave"><h3>Lo que ves es lo que se aplica</h3><p>La propuesta que aceptas es exactamente la que queda.</p></div>
+    <div class="paso"><h3>Queda guardado</h3><p>Sincronizado en tu cuenta.</p></div>
+  </div>
+  <aside class="notas"><p>Por si preguntan «¿y si la IA se equivoca?». La IA propone, pero la revisión son reglas en código, y la persona acepta viendo el plan.</p></aside>
+</section>
+
+<section class="dp dp-tabla respaldo">
+  <h2 class="titulo">Detalle: las fases de la V2</h2>
+  <div class="cuerpo">
+    <table>
+      <thead><tr><th>Fase</th><th>Qué se hizo</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>Sistema de diseño</td></tr>
+        <tr><td>B</td><td>Espacio: tres vistas probadas (Tiempo, Mesas 3D y Plano)</td></tr>
+        <tr><td>D</td><td>Neka con IA</td></tr>
+        <tr><td>E</td><td>Gamificación</td></tr>
+        <tr><td>F</td><td>Amigos</td></tr>
+        <tr><td>H</td><td>Estabilización (Neka sin choques, vistas simples) y conexión con Google Calendar, en curso</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notas"><p>Las fases de la V2, de octubre a noviembre de 2026. Hay maquetas de cada fase por si piden ver el proceso.</p></aside>
+</section>
+
+<!-- TIPO: lista (referencias) -->
+<section class="dp dp-lista respaldo">
+  <h2 class="titulo">Referencias</h2>
+  <div class="cuerpo">
+    <ul class="lista">
+      <li>Clark, A. (1997). <i>Being there: Putting brain, body, and world together again.</i> MIT Press.</li>
+      <li>Cooper, A., Reimann, R., &amp; Cronin, D. (2007). <i>About face 3: The essentials of interaction design.</i> Wiley.</li>
+      <li>de Luna, S., Fredriksson, V., Påhlman, M., &amp; Källsner, P. O. (2025). <i>Boosting user retention through effective app onboarding.</i> KTH Royal Institute of Technology.</li>
+      <li>Deterding, S., Dixon, D., Khaled, R., &amp; Nacke, L. E. (2011). From game design elements to gamefulness: Defining «gamification». ACM.</li>
+      <li>Jones, W. (2008). <i>Keeping found things found.</i> Morgan Kaufmann.</li>
+      <li>Mark, G. (2023). <i>Attention span.</i> Hanover Square Press.</li>
+      <li>Norman, D. A. (2013). <i>The design of everyday things.</i> Basic Books.</li>
+      <li>Sweller, J., van Merriënboer, J. J. G., &amp; Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. <i>Educational Psychology Review, 31</i>, 261–292.</li>
+      <li>Zimmerman, B. J. (2002). Becoming a self-regulated learner: An overview. <i>Theory Into Practice, 41</i>(2), 64–70.</li>
+      <li>Referentes digitales: Google Calendar, Notion, Todoist, Motion, Reclaim, Sunsama (s. f.).</li>
+    </ul>
+  </div>
+  <aside class="notas"><p>Referencias completas, en el mismo orden que la memoria.</p></aside>
+</section>
+
+</main>
+<script src="motor/presentacion.js"></script>
+</body>
+</html>

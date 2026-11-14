@@ -1,0 +1,83 @@
+<!--
+  ESCENA 09 · PROCESO (13 s). Contenido: RELATO.md, secciones 10, 11 y 12.
+  PROVISIONAL: la caja roja punteada marca la validación con usuarios, que el
+  relato tiene como [FALTA]. Cuando existan los resultados, reemplazar ese
+  <div class="falta"> por el dato real. No inventar nada ahí.
+-->
+<template>
+  <style>
+    #e09-proceso .cabeza { position: absolute; left: 150px; top: 100px; width: 1620px; display: flex; flex-direction: column; gap: 22px; }
+    #e09-proceso .linea { position: absolute; left: 150px; top: 410px; width: 1620px; display: flex; gap: 28px; align-items: stretch; }
+    #e09-proceso .version { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 32px 36px; }
+    #e09-proceso .version.grande { flex: 1.9; background: var(--nk-primary); color: #fff; }
+    #e09-proceso .version .v { font-size: 54px; font-weight: 800; letter-spacing: -0.03em; color: var(--nk-primary); }
+    #e09-proceso .version.grande .v { color: #fff; }
+    #e09-proceso .version .q { font-size: 28px; font-weight: 600; line-height: 1.25; }
+    #e09-proceso .fases { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    #e09-proceso .fase { height: 46px; padding: 0 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.18); font-size: 22px; font-weight: 700; display: inline-flex; align-items: center; }
+    #e09-proceso .abajo { position: absolute; left: 150px; top: 812px; width: 1620px; display: flex; gap: 28px; align-items: stretch; }
+    #e09-proceso .hecho { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 26px 32px; border-radius: 28px; background: var(--nk-primary-soft); }
+    #e09-proceso .hecho .a { font-size: 30px; font-weight: 800; color: var(--nk-ink); letter-spacing: -0.01em; }
+    #e09-proceso .hecho .b { font-size: 22px; font-weight: 500; color: var(--nk-ink-secondary); line-height: 1.25; }
+    #e09-proceso .falta { flex: 1.15; font-size: 24px; }
+  </style>
+
+  <div id="e09-proceso" class="escena" data-composition-id="e09-proceso" data-width="1920" data-height="1080">
+    <div class="cabeza">
+      <div class="eyebrow t1">Proceso</div>
+      <div class="titulo t2">De un prototipo navegable<br />a una app real y funcionando.</div>
+    </div>
+
+    <div class="linea">
+      <div class="tarjeta version v0">
+        <div class="v">V0</div>
+        <div class="q">Exploración</div>
+      </div>
+      <div class="tarjeta version v1">
+        <div class="v">V1</div>
+        <div class="q">Primera app publicada en la web</div>
+      </div>
+      <div class="tarjeta version grande v2">
+        <div class="v">V2</div>
+        <div class="q">Octubre–noviembre 2026, por fases</div>
+        <div class="fases">
+          <span class="fase">Sistema de diseño</span>
+          <span class="fase">Espacio</span>
+          <span class="fase">Neka con IA</span>
+          <span class="fase">Gamificación</span>
+          <span class="fase">Amigos</span>
+          <span class="fase">Estabilización</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="abajo">
+      <div class="hecho h">
+        <div class="a">Web e iPhone</div>
+        <div class="b">Una sola base de código, con cuentas y datos en la nube.</div>
+      </div>
+      <div class="hecho h">
+        <div class="a">Más de 330 pruebas</div>
+        <div class="b">automáticas cuidan la lógica de la app.</div>
+      </div>
+      <div class="falta h">FALTA · Validación con usuarios: quiénes, cuántos, qué tareas y qué se cambió.</div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e09-proceso ";
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(S + ".t1", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.25);
+      tl.fromTo(S + ".t2", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75, ease: "power3.out" }, 0.4);
+      tl.fromTo(S + ".v0", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.65, ease: "back.out(1.3)" }, 2.4);
+      tl.fromTo(S + ".v1", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.65, ease: "back.out(1.3)" }, 3.6);
+      tl.fromTo(S + ".v2", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.65, ease: "back.out(1.3)" }, 4.8);
+      tl.fromTo(S + ".fase", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.8)", stagger: 0.18 }, 5.5);
+      tl.fromTo(S + ".h", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.5 }, 7.6);
+      tl.to(S + ".cabeza, " + S + ".linea, " + S + ".abajo", { opacity: 0, duration: 0.4, ease: "power2.in" }, 12.55);
+      window.__timelines["e09-proceso"] = tl;
+    })();
+  </script>
+</template>

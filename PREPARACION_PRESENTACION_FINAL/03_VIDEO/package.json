@@ -1,0 +1,16 @@
+{
+  "name": "nekal-video",
+  "private": true,
+  "type": "module",
+  "description": "Video del examen de título de Nekal (Hyperframes + GSAP)",
+  "scripts": {
+    "vista": "node herramientas/hf.mjs vista",
+    "revisar": "node herramientas/hf.mjs revisar",
+    "exportar": "node herramientas/hf.mjs exportar",
+    "grabar": "node herramientas/grabar.mjs",
+    "preparar": "node herramientas/preparar.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.65.0"
+  }
+}

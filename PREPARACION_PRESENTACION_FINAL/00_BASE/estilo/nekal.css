@@ -1,0 +1,63 @@
+/*
+  Estilo compartido de Nekal para láminas, presentación y video.
+  Mismos valores que front/src/styles/theme.ts (sistema de diseño de la app).
+  Si la app cambia un color, se cambia aquí y las tres piezas lo heredan.
+  Uso: <link rel="stylesheet" href="../00_BASE/estilo/nekal.css">
+*/
+
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 400; src: url("fuentes/PlusJakartaSans_400Regular.ttf") format("truetype"); }
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 500; src: url("fuentes/PlusJakartaSans_500Medium.ttf") format("truetype"); }
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 600; src: url("fuentes/PlusJakartaSans_600SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 700; src: url("fuentes/PlusJakartaSans_700Bold.ttf") format("truetype"); }
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 800; src: url("fuentes/PlusJakartaSans_800ExtraBold.ttf") format("truetype"); }
+
+:root {
+  /* Color */
+  --nk-primary: #7546EC;
+  --nk-primary-soft: #EFE7FF;
+  --nk-background: #FAF8FF;
+  --nk-surface: #FFFFFF;
+  --nk-ink: #241D38;
+  --nk-ink-secondary: #6F6683;
+  --nk-line: #EEE9F6;
+  --nk-line-strong: #948BA6;
+  --nk-danger: #B42A55;
+  --nk-danger-soft: #FCE8EF;
+  --nk-success: #2F9E77;
+  --nk-warning: #E8962E;
+  --nk-on-primary: #FFFFFF;
+  --nk-cable: #B9A6F4;
+  --nk-map-dot: #DBCEF6;
+
+  /* Mapa de tus días (heatmap), de nada a todo listo */
+  --nk-heat-0: #EEE9F6;
+  --nk-heat-1: #DCCFFB;
+  --nk-heat-2: #BBA3F6;
+  --nk-heat-3: #9773F0;
+  --nk-heat-4: #7546EC;
+
+  /* Forma */
+  --nk-radius-sm: 12px;
+  --nk-radius-md: 20px;
+  --nk-radius-lg: 26px;
+  --nk-radius-pill: 999px;
+  --nk-shadow-card: 0 6px 20px rgba(90, 51, 164, 0.08);
+  --nk-shadow-raised: 0 12px 32px rgba(40, 20, 90, 0.18);
+
+  /* Tipografía */
+  --nk-font: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Movimiento (la app usa resortes; estos son los equivalentes para CSS y GSAP) */
+  --nk-ease-gentle: cubic-bezier(0.22, 1, 0.36, 1);
+  --nk-ease-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --nk-fade: 180ms;
+}
+
+/*
+  Jerarquía de la app (en px de teléfono; en lámina y diapositiva se escala,
+  pero se mantienen pesos y espaciado entre letras):
+  título grande 26/32 peso 800, -0.6   · título 20/26 peso 700, -0.3
+  encabezado 15/20 peso 700            · cuerpo 14/20 peso 500
+  nota 12/16 peso 500
+  Títulos apretados y pesados; cuerpo en 500, nunca 400 sobre fondo lila.
+*/

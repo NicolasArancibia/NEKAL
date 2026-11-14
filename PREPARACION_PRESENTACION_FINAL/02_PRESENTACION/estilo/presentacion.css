@@ -1,0 +1,338 @@
+/*
+  Estilo de la presentación de Nekal (diapositivas de 1920 × 1080).
+  Los colores y la tipografía vienen de 00_BASE/estilo/nekal.css: no se repiten aquí.
+  Orden de este archivo:
+    1. Base y lienzo            4. Piezas sueltas (teléfono, etiquetas, Neka)
+    2. La diapositiva           5. Vistas de trabajo (notas, vista general, botones)
+    3. Tipos de diapositiva     6. Impresión / PDF
+*/
+@import url("../../00_BASE/estilo/nekal.css");
+
+/* ───────── 1. Base y lienzo ───────── */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--nk-ink);
+  font-family: var(--nk-font);
+  font-weight: 500;
+  color: var(--nk-ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+#escenario {
+  position: absolute; left: 0; top: 0;
+  width: 1920px; height: 1080px;
+  transform-origin: 0 0;
+  background: var(--nk-background);
+  overflow: hidden;
+}
+
+/* ───────── 2. La diapositiva ───────── */
+.dp {
+  position: absolute; inset: 0;
+  padding: 92px 120px 124px;
+  display: flex; flex-direction: column;
+  background: var(--nk-background);
+  opacity: 0; visibility: hidden;
+  transition: opacity 240ms var(--nk-ease-gentle), visibility 0s 240ms;
+  overflow: hidden;
+}
+.dp.activa { opacity: 1; visibility: visible; transition-delay: 0s; z-index: 1; }
+.dp > .notas { display: none; }
+.dp p, .dp h1, .dp h2, .dp h3, .dp ul, .dp ol { margin: 0; }
+.dp ul, .dp ol { padding: 0; list-style: none; }
+
+/* Textos comunes */
+.titulo {
+  font-size: 68px; line-height: 76px; font-weight: 800; letter-spacing: -2px;
+  max-width: 1500px; text-wrap: balance;
+}
+.bajada {
+  font-size: 36px; line-height: 50px; font-weight: 500; color: var(--nk-ink-secondary);
+  max-width: 1400px; margin-top: 20px !important; text-wrap: pretty;
+}
+.fuente {
+  font-size: 24px; line-height: 32px; color: var(--nk-ink-secondary);
+  margin-top: auto !important; padding-top: 24px;
+}
+.cuerpo { flex: 1; min-height: 0; margin-top: 48px; display: flex; }
+strong, b { font-weight: 800; }
+.violeta { color: var(--nk-primary); }
+
+/* Pie: lo escribe solo el motor (marca, bloque y número) */
+.pie {
+  position: absolute; left: 120px; right: 120px; bottom: 44px;
+  display: flex; align-items: center; gap: 20px;
+  font-size: 22px; line-height: 28px; font-weight: 600; color: var(--nk-ink-secondary);
+}
+.pie-marca { font-weight: 800; color: var(--nk-primary); letter-spacing: -0.4px; }
+.pie-bloque { flex: 1; }
+.pie-num { font-variant-numeric: tabular-nums; }
+.pie-num b { color: var(--nk-ink); font-weight: 700; }
+
+/* Barra de avance (solo en pantalla) */
+#avance { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--nk-primary); z-index: 5; transition: width 240ms var(--nk-ease-gentle); }
+
+/* ───────── 3. Tipos de diapositiva ───────── */
+
+/* Anillos: el «círculo del tiempo» de la app, usado como fondo */
+.anillos {
+  --anillo: var(--nk-map-dot);
+  position: absolute; width: 1500px; height: 1500px; border-radius: 50%;
+  right: -330px; top: -210px; pointer-events: none;
+  background:
+    radial-gradient(circle 13px at 980px 557px, var(--nk-primary) 96%, transparent),
+    radial-gradient(circle 10px at 672px 307px, var(--nk-warning) 96%, transparent),
+    radial-gradient(circle 10px at 327px 904px, var(--nk-success) 96%, transparent),
+    radial-gradient(circle 10px at 1160px 930px, var(--nk-cable) 96%, transparent),
+    repeating-radial-gradient(circle, transparent 0 147px, var(--anillo) 147px 150px);
+  -webkit-mask-image: radial-gradient(circle, #000 34%, transparent 68%);
+          mask-image: radial-gradient(circle, #000 34%, transparent 68%);
+}
+.anillos-neka { position: absolute; right: 190px; top: 310px; width: 460px; height: 460px; pointer-events: none; }
+
+/* Portada */
+.dp-portada { justify-content: center; }
+.dp-portada .marca { font-size: 190px; line-height: 190px; font-weight: 800; letter-spacing: -8px; color: var(--nk-primary); }
+.dp-portada .lema { font-size: 50px; line-height: 64px; font-weight: 700; letter-spacing: -1px; max-width: 980px; margin-top: 28px; text-wrap: balance; }
+.dp-portada .ficha { margin-top: 72px; font-size: 28px; line-height: 42px; color: var(--nk-ink-secondary); max-width: 980px; }
+.dp-portada .ficha b { color: var(--nk-ink); font-weight: 700; }
+
+/* Título de sección (fondo violeta) */
+.dp-seccion { background: var(--nk-primary); color: var(--nk-on-primary); justify-content: center; }
+.dp-seccion .anillos { --anillo: rgba(255, 255, 255, 0.2); }
+.dp-seccion .parte { font-size: 34px; line-height: 44px; font-weight: 600; opacity: 0.8; }
+.dp-seccion .titulo { font-size: 128px; line-height: 132px; letter-spacing: -5px; margin-top: 12px; max-width: 1100px; }
+.dp-seccion .bajada { color: var(--nk-on-primary); opacity: 0.85; max-width: 980px; font-size: 38px; margin-top: 32px !important; }
+.dp-seccion .pie, .dp-cierre .pie { color: rgba(255, 255, 255, 0.75); }
+.dp-seccion .pie-marca, .dp-seccion .pie-num b, .dp-cierre .pie-marca, .dp-cierre .pie-num b { color: var(--nk-on-primary); }
+
+/* Frase: una sola idea, enorme */
+.dp-frase { justify-content: center; }
+.dp-frase .frase { font-size: 100px; line-height: 110px; font-weight: 800; letter-spacing: -3.4px; max-width: 1560px; text-wrap: balance; }
+.dp-frase .frase.media { font-size: 76px; line-height: 90px; letter-spacing: -2.4px; }
+.dp-frase .bajada { font-size: 40px; line-height: 56px; margin-top: 44px !important; }
+.dp-frase .fuente, .dp-cifra .fuente { position: absolute; left: 120px; bottom: 100px; margin: 0 !important; padding: 0; }
+
+/* Cita */
+.dp-cita { justify-content: center; }
+.dp-cita .comillas { font-size: 200px; line-height: 130px; font-weight: 800; color: var(--nk-primary); margin: 0 0 44px -10px !important; }
+.dp-cita .cita { font-size: 112px; line-height: 122px; font-weight: 800; letter-spacing: -4px; max-width: 1450px; text-wrap: balance; }
+.dp-cita .autor { margin-top: 56px !important; font-size: 36px; line-height: 48px; color: var(--nk-ink-secondary); }
+.dp-cita .autor b { color: var(--nk-ink); font-weight: 700; }
+
+/* Cifra grande */
+.dp-cifra { justify-content: center; }
+.dp-cifra .numero { font-size: 330px; line-height: 300px; font-weight: 800; letter-spacing: -14px; color: var(--nk-primary); font-variant-numeric: tabular-nums; margin-left: -12px; }
+.dp-cifra .numero small { font-size: 0.5em; letter-spacing: -4px; margin-left: 12px; }
+.dp-cifra .que { font-size: 58px; line-height: 70px; font-weight: 700; letter-spacing: -1.4px; max-width: 1380px; margin-top: 36px; text-wrap: balance; }
+.dp-cifra .ademas { margin-top: 32px; }
+
+/* Dos o tres cifras lado a lado */
+.dp-cifras .cuerpo { align-items: center; gap: 56px; }
+.dp-cifras .cifra { flex: 1; background: var(--nk-surface); border-radius: 48px; padding: 56px 60px 60px; box-shadow: var(--nk-shadow-card); align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+.dp-cifras .numero { font-size: 210px; line-height: 200px; font-weight: 800; letter-spacing: -9px; color: var(--nk-primary); font-variant-numeric: tabular-nums; }
+.dp-cifras .numero small { font-size: 0.5em; letter-spacing: -3px; margin-left: 8px; }
+.dp-cifras .que { font-size: 40px; line-height: 52px; font-weight: 600; margin-top: 24px; text-wrap: balance; }
+.dp-cifras .cifra.apagada { background: transparent; box-shadow: none; border: 3px solid var(--nk-line); }
+.dp-cifras .cifra.apagada .numero { color: var(--nk-line-strong); }
+.dp-cifras .flecha { flex: none; font-size: 96px; font-weight: 800; color: var(--nk-cable); }
+
+/* Comparación (antes / hoy, problema / respuesta) */
+.dp-comparacion .cuerpo { gap: 40px; align-items: stretch; }
+.dp-comparacion .lado { flex: 1; border-radius: 48px; padding: 52px 56px; display: flex; flex-direction: column; gap: 22px; background: var(--nk-surface); border: 3px solid var(--nk-line); }
+.dp-comparacion .lado.fuerte { background: var(--nk-primary); border-color: var(--nk-primary); color: var(--nk-on-primary); box-shadow: var(--nk-shadow-raised); }
+.dp-comparacion .lado h3 { font-size: 52px; line-height: 60px; font-weight: 800; letter-spacing: -1.4px; text-wrap: balance; }
+.dp-comparacion .lado p, .dp-comparacion .lado li { font-size: 34px; line-height: 46px; }
+.dp-comparacion .lado:not(.fuerte) p, .dp-comparacion .lado:not(.fuerte) li { color: var(--nk-ink-secondary); }
+.dp-comparacion .lado li { padding-left: 34px; position: relative; margin-top: 12px; }
+.dp-comparacion .lado li::before { content: ""; position: absolute; left: 0; top: 17px; width: 14px; height: 14px; border-radius: 50%; background: currentColor; opacity: 0.55; }
+.dp-comparacion .lado.fuerte .etiqueta { background: rgba(255, 255, 255, 0.2); color: var(--nk-on-primary); }
+.dp-comparacion .porque { margin-top: 32px; font-size: 34px; line-height: 46px; max-width: 1560px; }
+.dp-comparacion .porque b { color: var(--nk-primary); }
+
+/* Pantalla + explicación */
+.dp-pantalla { flex-direction: row; align-items: center; gap: 96px; }
+.dp-pantalla.invertida { flex-direction: row-reverse; }
+.dp-pantalla .telefonos { display: flex; gap: 36px; flex: none; }
+.dp-pantalla .texto { flex: 1; min-width: 0; }
+.dp-pantalla .titulo { font-size: 92px; line-height: 98px; letter-spacing: -3px; }
+.dp-pantalla .puntos { margin-top: 40px; }
+.dp-pantalla .puntos li { font-size: 36px; line-height: 48px; padding-left: 40px; position: relative; margin-top: 18px; max-width: 900px; }
+.dp-pantalla .puntos li::before { content: ""; position: absolute; left: 0; top: 17px; width: 16px; height: 16px; border-radius: 50%; background: var(--nk-primary); }
+.dp-pantalla .aporte { margin-top: 44px; display: inline-block; background: var(--nk-primary-soft); color: var(--nk-primary); font-size: 32px; line-height: 42px; font-weight: 700; padding: 18px 32px; border-radius: 28px; }
+
+/* Varias pantallas en fila */
+.dp-pantallas .cuerpo { justify-content: space-between; align-items: flex-start; margin-top: 40px; }
+.dp-pantallas figure { margin: 0; width: 290px; text-align: center; }
+.dp-pantallas .telefono { width: 290px; border-width: 9px; border-radius: 44px; }
+.dp-pantallas figcaption { margin-top: 20px; font-size: 32px; line-height: 40px; font-weight: 800; letter-spacing: -0.6px; }
+
+/* Pasos (secuencia numerada) */
+.dp-pasos .cuerpo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: paso; align-content: center; }
+.dp-pasos.de-4 .cuerpo { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(470px, auto); }
+.dp-pasos .paso { counter-increment: paso; background: var(--nk-surface); border-radius: 40px; padding: 36px 40px 40px; box-shadow: var(--nk-shadow-card); }
+.dp-pasos .paso::before { content: counter(paso); display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: var(--nk-primary); color: var(--nk-on-primary); font-size: 34px; font-weight: 800; margin-bottom: 22px; }
+.dp-pasos .paso.clave { background: var(--nk-primary); color: var(--nk-on-primary); box-shadow: var(--nk-shadow-raised); }
+.dp-pasos .paso.clave::before { background: var(--nk-on-primary); color: var(--nk-primary); }
+.dp-pasos .paso h3 { font-size: 42px; line-height: 50px; font-weight: 800; letter-spacing: -0.8px; text-wrap: balance; }
+.dp-pasos .paso p { font-size: 31px; line-height: 42px; margin-top: 14px; color: var(--nk-ink-secondary); }
+.dp-pasos .paso.clave p { color: var(--nk-on-primary); opacity: 0.9; }
+
+/* Línea de tiempo (puntos unidos por un cable) */
+.dp-linea .cuerpo { align-items: center; }
+.dp-linea .linea { display: flex; width: 100%; position: relative; }
+.dp-linea .linea::before { content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 6px; border-radius: 3px; background: var(--nk-cable); }
+.dp-linea .hito { flex: 1; position: relative; padding: 76px 28px 0 0; }
+.dp-linea .hito::before { content: ""; position: absolute; left: 0; top: 0; width: 44px; height: 44px; border-radius: 50%; background: var(--nk-surface); border: 8px solid var(--nk-primary); }
+.dp-linea .hito.hoy::before { background: var(--nk-primary); box-shadow: 0 0 0 12px var(--nk-primary-soft); }
+.dp-linea .hito .cuando { font-size: 26px; line-height: 34px; font-weight: 600; color: var(--nk-ink-secondary); }
+.dp-linea .hito h3 { font-size: 44px; line-height: 52px; font-weight: 800; letter-spacing: -0.8px; margin-top: 4px; }
+.dp-linea .hito p { font-size: 30px; line-height: 41px; color: var(--nk-ink-secondary); margin-top: 10px; }
+
+/* Tabla */
+.dp-tabla .cuerpo { align-items: center; }
+.dp-tabla table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--nk-surface); border-radius: 40px; box-shadow: var(--nk-shadow-card); overflow: hidden; }
+.dp-tabla th { text-align: left; font-size: 26px; line-height: 34px; font-weight: 700; color: var(--nk-ink-secondary); padding: 26px 36px 22px; background: var(--nk-primary-soft); }
+.dp-tabla td { font-size: 30px; line-height: 40px; padding: 24px 36px; border-top: 2px solid var(--nk-line); vertical-align: top; }
+.dp-tabla td:first-child { font-weight: 800; white-space: nowrap; }
+.dp-tabla tr.destacada td { background: var(--nk-primary); color: var(--nk-on-primary); border-top-color: var(--nk-primary); }
+.dp-tabla.compacta td { font-size: 29px; line-height: 39px; padding: 22px 32px; }
+.dp-tabla.compacta td:first-child { white-space: normal; font-weight: 600; color: var(--nk-ink-secondary); }
+.dp-tabla.compacta td:nth-child(2) { font-weight: 800; }
+
+/* Tarjetas (3, 4, 5 o 6 ideas paralelas, sin orden) */
+.dp-tarjetas .cuerpo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; align-content: center; }
+.dp-tarjetas.de-4 .cuerpo { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(470px, auto); }
+.dp-tarjetas.altas .cuerpo { grid-auto-rows: minmax(520px, auto); }
+.dp-tarjetas .cuerpo > .neka { width: 100%; height: 100%; max-height: 330px; align-self: center; }
+.dp-tarjetas .tarjeta { background: var(--nk-surface); border-radius: 40px; padding: 40px; box-shadow: var(--nk-shadow-card); display: flex; flex-direction: column; gap: 14px; }
+.dp-tarjetas .tarjeta h3 { font-size: 44px; line-height: 52px; font-weight: 800; letter-spacing: -0.8px; text-wrap: balance; }
+.dp-tarjetas .tarjeta p { font-size: 31px; line-height: 42px; color: var(--nk-ink-secondary); }
+.dp-tarjetas .tarjeta .dicho { margin-top: auto !important; padding-top: 20px; font-size: 38px; line-height: 48px; font-weight: 800; letter-spacing: -0.8px; color: var(--nk-primary); }
+.dp-tarjetas .tarjeta .autor { font-size: 26px; line-height: 34px; font-weight: 600; color: var(--nk-line-strong); margin-top: auto !important; padding-top: 12px; }
+.dp-tarjetas .tarjeta.numerada { counter-increment: tarjeta; }
+.dp-tarjetas .cuerpo { counter-reset: tarjeta; }
+.dp-tarjetas .tarjeta.numerada::before { content: counter(tarjeta); display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--nk-primary-soft); color: var(--nk-primary); font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+
+/* Espacio [FALTA]: se ve a propósito, para que nadie lo olvide */
+.dp-falta .cuerpo { gap: 56px; align-items: stretch; }
+.dp-falta .hueco {
+  flex: 1; border: 5px dashed var(--nk-warning); border-radius: 48px;
+  background: color-mix(in srgb, var(--nk-warning) 9%, var(--nk-surface));
+  padding: 44px 52px; display: flex; flex-direction: column; gap: 14px;
+}
+.dp-falta .hueco h3 { font-size: 40px; line-height: 48px; font-weight: 800; letter-spacing: -0.8px; }
+.dp-falta .hueco li { font-size: 35px; line-height: 46px; padding-left: 52px; position: relative; margin-top: 12px; }
+.dp-falta .hueco li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 28px; height: 28px; border-radius: 9px; border: 4px solid var(--nk-warning); }
+.dp-falta .hay { margin-top: auto !important; padding-top: 20px; font-size: 30px; line-height: 41px; color: var(--nk-ink-secondary); }
+.dp-falta .hay b { color: var(--nk-ink); }
+.dp-falta .neka { flex: none; width: 300px; height: 300px; align-self: flex-end; }
+
+/* Video */
+.dp-video { padding: 60px 120px 110px; align-items: center; justify-content: center; }
+.dp-video video { width: 100%; height: 100%; border-radius: 40px; background: var(--nk-ink); object-fit: contain; }
+.dp-video .sin-video { display: none; }
+.dp-video.vacio video { display: none; }
+.dp-video.vacio .sin-video { display: flex; flex-direction: column; justify-content: center; gap: 20px; width: 100%; height: 100%; border-radius: 48px; background: var(--nk-ink); color: var(--nk-on-primary); padding: 80px 100px; }
+.dp-video .sin-video h2 { font-size: 110px; line-height: 116px; font-weight: 800; letter-spacing: -4px; }
+.dp-video .sin-video p { font-size: 34px; line-height: 48px; opacity: 0.8; max-width: 1200px; }
+.dp-video .sin-video code { font-family: inherit; font-weight: 800; color: var(--nk-cable); }
+
+/* Demo en vivo */
+.dp-demo { background: var(--nk-primary-soft); flex-direction: row; align-items: center; gap: 80px; }
+.dp-demo .texto { flex: 1; }
+.dp-demo .titulo { font-size: 128px; line-height: 132px; letter-spacing: -5px; color: var(--nk-primary); }
+.dp-demo .recorrido { margin-top: 44px; counter-reset: demo; }
+.dp-demo .recorrido li { counter-increment: demo; font-size: 36px; line-height: 48px; font-weight: 600; padding-left: 68px; position: relative; margin-top: 20px; }
+.dp-demo .recorrido li::before { content: counter(demo); position: absolute; left: 0; top: 0; width: 48px; height: 48px; border-radius: 50%; background: var(--nk-primary); color: var(--nk-on-primary); display: grid; place-items: center; font-size: 26px; font-weight: 800; }
+.dp-demo .plan-b { margin-top: 44px !important; font-size: 26px; line-height: 36px; color: var(--nk-ink-secondary); max-width: 900px; }
+.dp-demo .neka { width: 440px; height: 440px; flex: none; }
+
+/* Cierre */
+.dp-cierre { background: var(--nk-primary); color: var(--nk-on-primary); justify-content: center; }
+.dp-cierre .anillos { --anillo: rgba(255, 255, 255, 0.2); }
+.dp-cierre .gracias { font-size: 200px; line-height: 200px; font-weight: 800; letter-spacing: -9px; }
+.dp-cierre .lema { font-size: 46px; line-height: 60px; font-weight: 600; margin-top: 28px; max-width: 980px; opacity: 0.9; }
+.dp-cierre .datos { margin-top: 72px; font-size: 30px; line-height: 44px; opacity: 0.85; }
+.dp-cierre .datos b { font-weight: 800; opacity: 1; }
+
+/* Lista larga (solo para respaldo: referencias, glosario) */
+.dp-lista .cuerpo { display: block; margin-top: 36px; }
+.dp-lista .lista { columns: 2; column-gap: 72px; }
+.dp-lista .lista li { font-size: 25px; line-height: 35px; margin-bottom: 20px; break-inside: avoid; padding-left: 36px; text-indent: -36px; }
+.dp-lista .lista.definiciones li { font-size: 30px; line-height: 42px; margin-bottom: 32px; padding-left: 0; text-indent: 0; color: var(--nk-ink-secondary); }
+.dp-lista .lista.definiciones b { display: block; font-size: 36px; line-height: 46px; color: var(--nk-ink); }
+
+/* ───────── 4. Piezas sueltas ───────── */
+
+/* Marco de teléfono: adentro va un pantallazo real de 00_BASE/pantallas */
+.telefono {
+  width: 380px; aspect-ratio: 1170 / 2532; flex: none;
+  border: 12px solid var(--nk-ink); border-radius: 58px;
+  background: var(--nk-surface); overflow: hidden;
+  box-shadow: var(--nk-shadow-raised);
+}
+.telefono img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.telefono.falta { border-style: dashed; border-color: var(--nk-warning); box-shadow: none; background: color-mix(in srgb, var(--nk-warning) 9%, var(--nk-surface)); display: grid; place-items: center; text-align: center; padding: 28px; font-size: 28px; line-height: 38px; font-weight: 700; }
+
+/* Etiquetas */
+.etiqueta { display: inline-block; align-self: flex-start; background: var(--nk-primary-soft); color: var(--nk-primary); font-size: 26px; line-height: 34px; font-weight: 700; padding: 10px 24px; border-radius: var(--nk-radius-pill); }
+.etiqueta.gris { background: var(--nk-line); color: var(--nk-ink-secondary); }
+/* Marcas de trabajo: borrar la etiqueta cuando el contenido esté confirmado */
+.marca-falta, .marca-revisar { display: inline-block; vertical-align: middle; font-size: 22px; line-height: 30px; font-weight: 800; letter-spacing: 0; padding: 4px 16px; border-radius: var(--nk-radius-pill); white-space: nowrap; }
+.marca-falta { background: var(--nk-warning); color: var(--nk-ink); }
+.marca-revisar { background: var(--nk-danger-soft); color: var(--nk-danger); }
+
+/* Neka */
+.neka { object-fit: contain; }
+.neka-esquina { position: absolute; right: 110px; bottom: 110px; width: 300px; height: 300px; }
+
+/* ───────── 5. Vistas de trabajo ───────── */
+
+/* Botones que aparecen al mover el mouse */
+#botones { position: fixed; left: 20px; bottom: 20px; z-index: 30; display: flex; gap: 8px; opacity: 0; transition: opacity var(--nk-fade); }
+body.mouse #botones, body.modo-notas #botones, body.modo-grilla #botones { opacity: 1; }
+#botones button { font: 600 14px/20px var(--nk-font); color: var(--nk-on-primary); background: rgba(36, 29, 56, 0.86); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+#botones button:hover, #botones button:focus-visible { background: var(--nk-primary); outline: none; }
+#botones kbd { font: inherit; opacity: 0.6; margin-left: 6px; }
+
+/* Modo notas / orador */
+#orador { display: none; }
+body.modo-notas { background: #17122a; }
+body.modo-notas #orador { display: block; color: var(--nk-on-primary); }
+#orador .lado { position: fixed; right: 24px; top: 24px; width: 34vw; }
+#orador .rotulo { font-size: 14px; line-height: 20px; font-weight: 600; opacity: 0.6; margin: 0 0 8px; }
+#orador .mini { width: 34vw; height: calc(34vw * 9 / 16); position: relative; overflow: hidden; border-radius: 10px; background: var(--nk-background); color: var(--nk-ink); }
+#orador .mini .dp { inset: auto; left: 0; top: 0; width: 1920px; height: 1080px; opacity: 1; visibility: visible; transform-origin: 0 0; transition: none; }
+#orador .reloj { margin-top: 24px; font-size: 64px; line-height: 68px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+#orador .reloj.pasado { color: #ff9db8; }
+#orador .plan { font-size: 17px; line-height: 26px; opacity: 0.85; margin-top: 8px; }
+#orador .plan b { font-weight: 800; }
+#orador .ayuda { font-size: 14px; line-height: 22px; opacity: 0.55; margin-top: 16px; }
+#orador .texto { position: fixed; left: 24px; bottom: 64px; right: calc(34vw + 72px); top: calc(24px + (100vw - 34vw - 120px) * 9 / 16 + 24px); overflow: auto; font-size: clamp(18px, 1.7vw, 30px); line-height: 1.45; font-weight: 500; }
+#orador .texto p { margin: 0 0 0.6em; }
+#orador .texto .vacia { opacity: 0.5; }
+
+/* Vista general (todas las diapositivas) */
+body.modo-grilla { overflow: auto; background: #17122a; }
+body.modo-grilla #escenario { position: static; width: auto; height: auto; transform: none !important; background: none; display: flex; flex-wrap: wrap; gap: 20px; padding: 24px 24px 80px; }
+body.modo-grilla .dp { position: relative; inset: auto; width: 1920px; height: 1080px; flex: none; zoom: 0.19; opacity: 1; visibility: visible; cursor: pointer; border-radius: 40px; transition: none; }
+body.modo-grilla .dp.activa { outline: 24px solid var(--nk-warning); }
+body.modo-grilla #avance { display: none; }
+
+@media (prefers-reduced-motion: reduce) { .dp, #avance { transition: none; } }
+
+/* ───────── 6. Impresión / PDF: una diapositiva por página ───────── */
+@page { size: 1920px 1080px; margin: 0; }
+html.imprimir, html.imprimir body { height: auto; overflow: visible; background: none; }
+html.imprimir #escenario { position: static; width: 1920px; height: auto; transform: none !important; overflow: visible; }
+html.imprimir .dp { position: relative; inset: auto; width: 1920px; height: 1080px; opacity: 1; visibility: visible; transition: none; break-after: page; break-inside: avoid; }
+html.imprimir #avance, html.imprimir #botones, html.imprimir #orador { display: none !important; }
+@media print {
+  html, body { height: auto; overflow: visible; background: none; }
+  #escenario { position: static; width: 1920px; height: auto; transform: none !important; overflow: visible; }
+  .dp { position: relative; inset: auto; width: 1920px; height: 1080px; opacity: 1; visibility: visible; transition: none; break-after: page; break-inside: avoid; }
+  #avance, #botones, #orador { display: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

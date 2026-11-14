@@ -1,0 +1,58 @@
+<!--
+  ESCENA 02 · EL PROBLEMA (16 s).
+  Las cifras salen de 00_BASE/RELATO.md, sección 3 (encuesta propia, n = 48).
+  No cambiar un número sin cambiarlo primero en el relato.
+-->
+<template>
+  <style>
+    #e02-problema .cabeza { position: absolute; left: 150px; top: 118px; width: 1250px; display: flex; flex-direction: column; gap: 24px; }
+    #e02-problema .neka { position: absolute; left: 1470px; top: 70px; width: 330px; height: 330px; }
+    #e02-problema .fila { position: absolute; left: 150px; top: 520px; width: 1620px; display: flex; gap: 36px; }
+    #e02-problema .dato { flex: 1; min-height: 372px; display: flex; flex-direction: column; gap: 22px; }
+    #e02-problema .dato .texto { font-size: 31px; font-weight: 500; line-height: 1.3; color: var(--nk-ink); }
+  </style>
+
+  <div id="e02-problema" class="escena" data-composition-id="e02-problema" data-width="1920" data-height="1080">
+    <img class="neka" src="assets/base/marca/Neka_Pose14.png" alt="" />
+    <div class="cabeza">
+      <div class="eyebrow t1">El problema</div>
+      <div class="titulo t2">Los planes cambian.<br />Reorganizarlos queda en manos de la persona.</div>
+    </div>
+
+    <div class="fila">
+      <div class="tarjeta dato d1">
+        <div class="cifra">85,4&nbsp;%</div>
+        <div class="texto">modifica su planificación al menos una vez por semana.</div>
+      </div>
+      <div class="tarjeta dato d2">
+        <div class="cifra">62,5&nbsp;%</div>
+        <div class="texto">reorganiza a mano todo lo demás cuando aparece una obligación que no se puede mover.</div>
+      </div>
+      <div class="tarjeta dato d3">
+        <div class="cifra">39,6&nbsp;%</div>
+        <div class="texto">sigue usando una herramienta digital de organización. El 81,3&nbsp;% ha usado alguna.</div>
+      </div>
+    </div>
+
+    <div class="pie fuente">Fuente: encuesta exploratoria propia, Nekal 2026 (n = 48).</div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e02-problema ";
+      const tl = gsap.timeline({ paused: true });
+      const entra = (sel, t, extra = {}) => tl.fromTo(S + sel, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "power3.out", ...extra }, t);
+      entra(".t1", 0.25);
+      entra(".t2", 0.45);
+      tl.fromTo(S + ".neka", { scale: 0.7, opacity: 0, rotation: -8 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.8, ease: "back.out(1.5)" }, 0.9);
+      // Una cifra a la vez, con tiempo para leerla.
+      tl.fromTo(S + ".d1", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.3)" }, 4.0);
+      tl.fromTo(S + ".d2", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.3)" }, 7.4);
+      tl.fromTo(S + ".d3", { y: 60, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.3)" }, 10.8);
+      tl.fromTo(S + ".fuente", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 4.4);
+      tl.to(S + ".cabeza, " + S + ".fila, " + S + ".neka, " + S + ".fuente", { opacity: 0, duration: 0.4, ease: "power2.in" }, 15.55);
+      window.__timelines["e02-problema"] = tl;
+    })();
+  </script>
+</template>

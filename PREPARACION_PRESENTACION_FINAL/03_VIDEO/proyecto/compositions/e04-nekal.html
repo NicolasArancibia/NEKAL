@@ -1,0 +1,54 @@
+<!--
+  ESCENA 04 · NEKAL Y SU PRINCIPIO (9 s).
+  Principios y cifra: RELATO.md, secciones 9 y 3. Los principios están marcados
+  [REVISAR] en el relato: confirmar la redacción con Nicolás.
+-->
+<template>
+  <style>
+    #e04-nekal .caja { position: absolute; left: 150px; top: 0; width: 1150px; height: 1080px; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+    #e04-nekal .principio { font-size: 104px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.02; color: var(--nk-primary); }
+    #e04-nekal .fichas { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
+    #e04-nekal .dato { display: flex; align-items: center; gap: 28px; margin-top: 18px; }
+    #e04-nekal .dato .cifra { font-size: 84px; }
+    #e04-nekal .dato .texto { font-size: 28px; font-weight: 500; line-height: 1.3; color: var(--nk-ink-secondary); max-width: 760px; }
+    #e04-nekal .halo { position: absolute; left: 1330px; top: 280px; width: 500px; height: 500px; border-radius: 50%; background: var(--nk-primary-soft); }
+    #e04-nekal .neka { position: absolute; left: 1340px; top: 290px; width: 480px; height: 480px; }
+  </style>
+
+  <div id="e04-nekal" class="escena" data-composition-id="e04-nekal" data-width="1920" data-height="1080">
+    <div class="halo"></div>
+    <img class="neka" src="assets/base/marca/Neka_Pose15.png" alt="" />
+    <div class="caja">
+      <div class="eyebrow t1">La propuesta</div>
+      <div class="cuerpo t2"><span class="fuerte">Nekal</span> es una app de organización personal con una asistente, <span class="fuerte">Neka</span>.</div>
+      <div class="principio t3">Neka propone,<br />tú decides.</div>
+      <div class="fichas">
+        <span class="pastilla f">Lo fijo no se mueve</span>
+        <span class="pastilla f">Nada se borra solo</span>
+        <span class="pastilla f">Nada cambia sin tu sí</span>
+      </div>
+      <div class="dato t4">
+        <div class="cifra">72,9&nbsp;%</div>
+        <div class="texto">aceptaría que una herramienta digital intervenga para ayudar a reorganizar, manteniendo la decisión final. <br />Encuesta propia, n = 48.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e04-nekal ";
+      const tl = gsap.timeline({ paused: true });
+      const entra = (sel, t, extra = {}) => tl.fromTo(S + sel, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "power3.out", ...extra }, t);
+      entra(".t1", 0.25);
+      entra(".t2", 0.4);
+      tl.fromTo(S + ".halo", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.5);
+      tl.fromTo(S + ".neka", { y: 60, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.4)" }, 0.65);
+      tl.fromTo(S + ".t3", { y: 50, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, 1.5);
+      tl.fromTo(S + ".f", { y: 24, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)", stagger: 0.22 }, 2.9);
+      entra(".t4", 4.6);
+      tl.to(S + ".caja, " + S + ".neka, " + S + ".halo", { opacity: 0, duration: 0.4, ease: "power2.in" }, 8.55);
+      window.__timelines["e04-nekal"] = tl;
+    })();
+  </script>
+</template>

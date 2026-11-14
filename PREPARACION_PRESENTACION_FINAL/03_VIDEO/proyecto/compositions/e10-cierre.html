@@ -1,0 +1,42 @@
+<!--
+  ESCENA 10 · CIERRE (8 s). Nombre, autor y universidad (ficha de RELATO.md).
+  Falta el logo de la UDD: no está en 00_BASE/marca. Por ahora va el nombre escrito.
+-->
+<template>
+  <style>
+    #e10-cierre .centro { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; }
+    #e10-cierre .neka { width: 250px; height: 250px; margin-bottom: 6px; }
+    #e10-cierre .marca { font-size: 150px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; color: var(--nk-primary); }
+    #e10-cierre .frase { font-size: 44px; font-weight: 600; color: var(--nk-ink); margin-bottom: 30px; }
+    #e10-cierre .autor { font-size: 34px; font-weight: 700; }
+    #e10-cierre .web { margin-top: 26px; }
+  </style>
+
+  <div id="e10-cierre" class="escena" data-composition-id="e10-cierre" data-width="1920" data-height="1080">
+    <div class="centro">
+      <img class="neka p0" src="assets/base/marca/Neka_Pose1.png" alt="" />
+      <div class="marca p1">Nekal</div>
+      <div class="frase p2">Organiza tu día. Neka te avisa si algo choca.</div>
+      <div class="autor p3">Nicolás Arancibia de Groote</div>
+      <div class="nota p3">Proyecto de título 2026 · Diseño de Interacción Digital · Facultad de Diseño · Universidad del Desarrollo</div>
+      <div class="nota p3">Profesores guía: Mauricio Reyes y Alex Hurtado</div>
+      <div class="pastilla web p4">nekal-973b2.web.app</div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e10-cierre ";
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(S + ".p0", { y: 60, opacity: 0, scale: 0.7 }, { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "back.out(1.6)" }, 0.2);
+      tl.fromTo(S + ".p1", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.5);
+      tl.fromTo(S + ".p2", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 0.95);
+      tl.fromTo(S + ".p3", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.14 }, 1.6);
+      tl.fromTo(S + ".p4", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 2.5);
+      // Queda quieto hasta el final: el último cuadro es la portada de cierre.
+      tl.to(S + ".centro", { opacity: 1, duration: 0.1 }, 7.9);
+      window.__timelines["e10-cierre"] = tl;
+    })();
+  </script>
+</template>

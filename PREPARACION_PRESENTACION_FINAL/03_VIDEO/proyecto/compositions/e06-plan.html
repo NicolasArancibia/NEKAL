@@ -1,0 +1,75 @@
+<!--
+  ESCENA 06 · EL MOMENTO CENTRAL (23 s): algo choca → Neka propone → la persona acepta.
+  Material: assets/app/plan.mp4, grabación REAL de la app (la IA real armó el plan).
+  El clip parte en el segundo 3.6 de la grabación (data-media-start). Si se vuelve a
+  grabar, mirar assets/app/plan.json: ahí están los segundos de cada momento
+  (choque, tocar, plan, botones, aceptar, logro, final) y con esos se ajustan
+  los tiempos de las leyendas de abajo (segundo de la escena = marca − 3.6).
+-->
+<template>
+  <style>
+    #e06-plan .leyendas { height: 470px; }
+  </style>
+
+  <div id="e06-plan" class="escena" data-composition-id="e06-plan" data-width="1920" data-height="1080">
+    <div class="columna">
+      <div class="eyebrow cab">La app en uso · el momento central</div>
+      <div class="leyendas">
+        <div class="leyenda l1">
+          <div class="paso"><span class="n">1</span><span class="pastilla">Algo choca</span></div>
+          <div class="titulo mediano">Te ponen una clase que no se puede mover.</div>
+          <div class="cuerpo">Cae encima de algo tuyo. El Calendario lo marca y ofrece «Arreglar con Neka».</div>
+        </div>
+        <div class="leyenda l2">
+          <div class="paso"><span class="n">2</span><span class="pastilla">Neka lee tu agenda</span></div>
+          <div class="titulo mediano">Qué es fijo, qué es flexible, cuánto dura cada cosa.</div>
+        </div>
+        <div class="leyenda l3">
+          <div class="paso"><span class="n">3</span><span class="pastilla">Neka propone</span></div>
+          <div class="titulo mediano">Un plan dibujado en tu día.</div>
+          <div class="cuerpo">Mueve solo lo flexible. Lo fijo no se mueve. El plan se revisa solo: no puede crear choques nuevos.</div>
+        </div>
+        <div class="leyenda l4">
+          <div class="paso"><span class="n">4</span><span class="pastilla llena">Tú decides</span></div>
+          <div class="titulo mediano">Aceptar o Descartar.</div>
+          <div class="cuerpo">Nada cambia sin tu sí. Lo que ves es exactamente lo que se aplica.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="telefono">
+      <div class="pantalla">
+        <video id="e06-video" class="clip" src="assets/app/plan.mp4" data-start="0" data-duration="22.8" data-media-start="3.6"
+               data-track-index="0" muted playsinline></video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e06-plan ";
+      const tl = gsap.timeline({ paused: true });
+      const entra = (sel, t) => tl.fromTo(S + sel, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, t);
+      const sale = (sel, t) => tl.to(S + sel, { y: -24, opacity: 0, duration: 0.35, ease: "power2.in" }, t);
+      tl.set(S + ".l2, " + S + ".l3, " + S + ".l4", { opacity: 0 }, 0);
+      tl.fromTo(S + ".telefono", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.2)" }, 0);
+      tl.fromTo(S + ".cab", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.2);
+
+      entra(".l1", 0.4);  // la Agenda muestra «Choca»
+      sale(".l1", 6.4);   // toca «Arreglar con Neka» (marca tocar = 10.2)
+      entra(".l2", 6.8);  // «Neka está pensando…»
+      sale(".l2", 9.2);   // aparece la hoja del plan (marca plan = 12.5)
+      entra(".l3", 9.6);
+      sale(".l3", 16.6);  // se ven los botones (marca botones = 20.5)
+      entra(".l4", 17.0); // Aceptar → logro → agenda sin choque
+
+      // Acercamiento mientras se lee la propuesta de Neka (vuelve antes de los botones).
+      tl.to(S + ".telefono", { scale: 1.3, x: 20, y: 215, duration: 0.9, ease: "power3.inOut" }, 9.7);
+      tl.to(S + ".telefono", { scale: 1, x: 0, y: 0, duration: 0.9, ease: "power3.inOut" }, 15.4);
+
+      tl.to(S + ".columna, " + S + ".telefono", { opacity: 0, duration: 0.4, ease: "power2.in" }, 22.55);
+      window.__timelines["e06-plan"] = tl;
+    })();
+  </script>
+</template>

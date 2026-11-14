@@ -1,0 +1,35 @@
+<!--
+  ESCENA 08 · EL RESTO EN BREVE: PROGRESO Y AMIGOS (8 s).
+  Material: assets/app/perfil.mp4 (grabación real). Los amigos que se ven son
+  los de ejemplo de la app (nekalAmigos), no personas reales.
+-->
+<template>
+  <div id="e08-progreso" class="escena" data-composition-id="e08-progreso" data-width="1920" data-height="1080">
+    <div class="columna">
+      <div class="eyebrow t1">Perfil · progreso y amigos</div>
+      <div class="titulo t2">Motivación para mantener el hábito.</div>
+      <div class="cuerpo t3">Nivel, 25 logros y rating por mesa. Los amigos se agregan con un código de 6 caracteres y se ven con un perfil en corto.</div>
+    </div>
+    <div class="telefono">
+      <div class="pantalla">
+        <video id="e08-video" class="clip" src="assets/app/perfil.mp4" data-start="0" data-duration="7.9" data-media-start="1.2"
+               data-track-index="0" muted playsinline></video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e08-progreso ";
+      const tl = gsap.timeline({ paused: true });
+      const entra = (sel, t) => tl.fromTo(S + sel, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "power3.out" }, t);
+      tl.fromTo(S + ".telefono", { y: 110, opacity: 0 }, { y: 0, opacity: 1, duration: 0.85, ease: "back.out(1.2)" }, 0.05);
+      entra(".t1", 0.25);
+      entra(".t2", 0.4);
+      entra(".t3", 1.2);
+      tl.to(S + ".columna, " + S + ".telefono", { opacity: 0, duration: 0.4, ease: "power2.in" }, 7.55);
+      window.__timelines["e08-progreso"] = tl;
+    })();
+  </script>
+</template>

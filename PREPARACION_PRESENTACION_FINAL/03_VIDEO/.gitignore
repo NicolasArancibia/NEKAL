@@ -1,0 +1,7 @@
+node_modules/
+revision/
+.tmp-grabacion/
+proyecto/.hyperframes/
+proyecto/renders/
+# copia automática de 00_BASE (la rehace «npm run preparar»)
+proyecto/assets/base/

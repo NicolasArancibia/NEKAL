@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "plus jakarta sans",
+        "createdAt": "2026-11-13T19:21:10.713Z",
+        "reason": "Claude: es la tipografia del sistema de diseno de la app (front/src/styles/theme.ts); las piezas del examen deben igualarla"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-11-13T19:21:10.955Z",
+        "reason": "Claude: equivalente CSS del resorte motion.snappy de la app (theme.ts); se replica el movimiento real de Nekal"
+      }
+    ]
+  }
+}

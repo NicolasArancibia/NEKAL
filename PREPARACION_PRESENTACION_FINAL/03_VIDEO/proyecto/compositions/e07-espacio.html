@@ -1,0 +1,35 @@
+<!--
+  ESCENA 07 · EL RESTO EN BREVE: ESPACIO (7 s).
+  Material: assets/app/espacio.mp4 (grabación real). En la app las etiquetas
+  «SIN FECHA» y «Universidad» se enciman: es de la app, no del video.
+-->
+<template>
+  <div id="e07-espacio" class="escena" data-composition-id="e07-espacio" data-width="1920" data-height="1080">
+    <div class="columna">
+      <div class="eyebrow t1">Espacio · el círculo del tiempo</div>
+      <div class="titulo t2">Todo lo tuyo alrededor de «hoy».</div>
+      <div class="cuerpo t3">Hoy, mañana, la semana y lo que no tiene fecha, ordenado por mesas: Casa, Trabajo, Universidad, Personal. Responde «qué tengo y cuándo» de un vistazo.</div>
+    </div>
+    <div class="telefono">
+      <div class="pantalla">
+        <video id="e07-video" class="clip" src="assets/app/espacio.mp4" data-start="0" data-duration="6.9" data-media-start="1.4"
+               data-track-index="0" muted playsinline></video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e07-espacio ";
+      const tl = gsap.timeline({ paused: true });
+      const entra = (sel, t) => tl.fromTo(S + sel, { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "power3.out" }, t);
+      tl.fromTo(S + ".telefono", { y: 110, opacity: 0 }, { y: 0, opacity: 1, duration: 0.85, ease: "back.out(1.2)" }, 0.05);
+      entra(".t1", 0.25);
+      entra(".t2", 0.4);
+      entra(".t3", 1.2);
+      tl.to(S + ".columna, " + S + ".telefono", { opacity: 0, duration: 0.4, ease: "power2.in" }, 6.55);
+      window.__timelines["e07-espacio"] = tl;
+    })();
+  </script>
+</template>

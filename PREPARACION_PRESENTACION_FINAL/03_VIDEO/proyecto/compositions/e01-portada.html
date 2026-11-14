@@ -1,0 +1,41 @@
+<!-- ESCENA 01 · PORTADA (6 s). La universidad exige nombre del proyecto y autor. -->
+<template>
+  <style>
+    #e01-portada .centro { position: absolute; left: 150px; top: 0; height: 1080px; width: 1000px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+    #e01-portada .marca { font-size: 190px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; color: var(--nk-primary); }
+    #e01-portada .bajada { font-size: 44px; font-weight: 600; line-height: 1.25; color: var(--nk-ink); max-width: 900px; }
+    #e01-portada .autor { margin-top: 36px; font-size: 34px; font-weight: 700; }
+    #e01-portada .neka { position: absolute; left: 1180px; top: 250px; width: 560px; height: 560px; }
+    #e01-portada .halo { position: absolute; left: 1140px; top: 220px; width: 640px; height: 640px; border-radius: 50%; background: var(--nk-primary-soft); }
+  </style>
+
+  <div id="e01-portada" class="escena" data-composition-id="e01-portada" data-width="1920" data-height="1080">
+    <div class="halo"></div>
+    <img class="neka" src="assets/base/marca/Neka_Pose3.png" alt="" />
+    <div class="centro">
+      <div class="eyebrow p1">Proyecto de título 2026</div>
+      <div class="marca p2">Nekal</div>
+      <div class="bajada p3">Planificador personal que negocia contigo cuando tus planes cambian.</div>
+      <div class="autor p4">Nicolás Arancibia de Groote</div>
+      <div class="nota p4">Diseño de Interacción Digital · Facultad de Diseño · Universidad del Desarrollo</div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    (() => {
+      const S = "#e01-portada ";
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(S + ".halo", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 0.1);
+      tl.fromTo(S + ".neka", { y: 80, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "back.out(1.4)" }, 0.25);
+      tl.fromTo(S + ".p1", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+      tl.fromTo(S + ".p2", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.45);
+      tl.fromTo(S + ".p3", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 0.9);
+      tl.fromTo(S + ".p4", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.12 }, 1.4);
+      tl.to(S + ".neka", { y: -14, duration: 1.6, ease: "sine.inOut" }, 1.6);
+      tl.to(S + ".neka", { y: 0, duration: 1.6, ease: "sine.inOut" }, 3.2);
+      tl.to(S + ".centro, " + S + ".neka, " + S + ".halo", { opacity: 0, duration: 0.4, ease: "power2.in" }, 5.55);
+      window.__timelines["e01-portada"] = tl;
+    })();
+  </script>
+</template>
