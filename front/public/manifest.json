@@ -1,0 +1,20 @@
+{
+  "short_name": "Nekal",
+  "name": "Nekal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F0FA",
+  "theme_color": "#F2F0FA",
+  "icons": [
+    {
+      "src": "/icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
