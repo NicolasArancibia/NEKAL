@@ -9,9 +9,10 @@ Todo lo que se arma para el examen de título, aparte de la app. Creado el 13 de
 | Carpeta | Qué tiene |
 |---|---|
 | `00_BASE/` | Lo que comparten las tres piezas: relato del proyecto, requisitos de la universidad, estilo de Nekal y pantallazos reales de la app. **Se lee antes de tocar cualquier otra carpeta.** |
-| `01_LAMINAS/` | Plantilla de las 2 láminas verticales (HTML → PDF para imprimir). |
+| `01_LAMINAS/` | 2 láminas verticales (HTML → PDF para imprimir). Versión 1 con todo el detalle; `v2_minimal/` con poco texto y pantallas grandes. |
 | `02_PRESENTACION/` | Plantilla de diapositivas 1920×1080 para los 30 minutos de exposición (HTML → PDF). |
 | `03_VIDEO/` | Guion y prototipo del video de 1:40 a 2:00, hecho con código (Hyperframes + GSAP). |
+| `04_MEMORIA/` | Guía de cómo se hace la memoria de título (normas UDD, pauta transcrita, APA) y un índice en blanco. Sin contenido del proyecto. |
 
 ## Reglas para quien trabaje aquí
 

@@ -56,12 +56,13 @@ Máximo 200 palabras, sin referencias: pregunta de investigación, por qué impo
 
 ## Fechas (confirmar con la coordinadora)
 
-Lectura del cronograma para la sección 2026-1; el documento es confuso y las fechas pueden cambiar:
+Columna «Secciones 2026-1» del cronograma (anteproyecto en julio, examen en el verano). El documento tiene errores de fecha y puede cambiar; el detalle está en `04_MEMORIA/GUIA_MEMORIA.md` §1.4.
 
-- Lunes 23 de noviembre, 14:00 — entrega digital del abstract.
-- Mediados de diciembre — memoria final impresa y digital, formulario de divulgación.
-- Lunes 5 de enero — formulario de registro audiovisual (10 imágenes + video) y anexo de biblioteca.
+- «Lunes 15 de diciembre» — memoria final impresa y digital, evaluación docente, formulario de divulgación.
+- «Lunes 5 de enero» — formulario de registro audiovisual (10 imágenes + video) y anexo de biblioteca.
 - 29 de diciembre a 20 de enero — examen.
+
+*Corregido el 14/11:* la entrega del abstract del «Lunes 23 de noviembre» está en la columna 2026-2 (su anteproyecto), no en la nuestra. La entrega de abstract que aparece en la columna 2026-1 es la del 22 de junio (anteproyecto). En la memoria final el abstract va dentro del documento.
 
 ## Nota final del Taller de Título
 

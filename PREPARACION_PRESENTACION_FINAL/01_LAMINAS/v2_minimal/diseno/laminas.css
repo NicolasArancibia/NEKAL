@@ -1,0 +1,135 @@
+/*
+  DISEÑO DE LAS LÁMINAS DE NEKAL (versión minimal)
+  Colores y tipografía de la app: 00_BASE/estilo/nekal.css.
+
+  Idea: lámina de maqueta. Las pantallas reales son las protagonistas; el texto
+  es corto y grande. Un solo bloque violeta por lámina (la pregunta en la 1,
+  los principios en la 2) y el resto sobre el fondo lila de la app.
+
+  Medidas: la lámina mide 1000 unidades de ancho. Con 50 cm, 1 unidad = 0,5 mm:
+    texto de 16 unidades ≈ 23 pt impresos · texto de 12 ≈ 17 pt (lo más chico)
+*/
+:root {
+  --alto: 2100px;
+  --margen: 64px;
+  --tinta-suave: #4B4360;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #DCD6E8; }
+body {
+  font-family: var(--nk-font); font-weight: 500; color: var(--nk-ink);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  -webkit-font-smoothing: antialiased;
+}
+ol, ul { list-style: none; }
+strong { font-weight: 800; }
+
+.lamina {
+  width: 1000px; height: var(--alto); margin: 0 auto;
+  background: var(--nk-background);
+  display: flex; flex-direction: column; overflow: hidden; position: relative;
+}
+.cuerpo { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 0 0; }
+.cuerpo > section { flex: none; }
+
+/* ---------- Teléfono: marco oscuro con la pantalla real adentro ---------- */
+.tel {
+  width: 100%; aspect-ratio: 780 / 1688;
+  background: var(--nk-ink); padding: 3.2%; border-radius: 13% / 6%;
+  box-shadow: 0 18px 44px rgba(40, 20, 90, 0.20);
+}
+.tel img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 10.5% / 4.9%; }
+
+/* ============================ ENCABEZADO ============================ */
+.cab {
+  flex: none; display: flex; justify-content: space-between; align-items: center;
+  padding: 26px var(--margen) 24px; border-bottom: 2px solid var(--nk-line);
+}
+.cab-marca { display: flex; align-items: center; gap: 10px; }
+.cab-marca img { width: 70px; height: 70px; margin-left: -10px; }
+.cab-nombre { font-size: 40px; line-height: .9; font-weight: 800; letter-spacing: -1.8px; color: var(--nk-primary); }
+.cab-bajada { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--tinta-suave); max-width: 330px; line-height: 1.3; }
+.cab-ficha { display: flex; align-items: center; gap: 20px; text-align: right; }
+.cab-instancia { font-size: 13px; font-weight: 800; color: var(--nk-primary); }
+.cab-autor { font-size: 16px; font-weight: 800; letter-spacing: -.3px; margin-top: 2px; }
+.cab-mencion, .cab-profes { font-size: 11px; font-weight: 600; color: var(--tinta-suave); margin-top: 2px; }
+.udd { height: 56px; width: auto; }
+.udd-falta {
+  width: 96px; height: 56px; display: flex; align-items: center; justify-content: center;
+  border: 1.5px dashed var(--nk-line-strong); border-radius: var(--nk-radius-sm);
+  font-size: 10.5px; font-weight: 700; color: var(--nk-ink-secondary);
+}
+
+.titulo-chico { font-size: 15px; font-weight: 800; color: var(--nk-primary); margin-bottom: 18px; }
+
+/* ============================ LÁMINA 1 ============================ */
+.portada { display: grid; grid-template-columns: 1fr 360px; gap: 28px; padding: 0 var(--margen); align-items: center; }
+.portada h1 { font-size: 80px; line-height: .98; font-weight: 800; letter-spacing: -3.6px; }
+.portada-bajada { margin-top: 30px; font-size: 21px; line-height: 1.45; color: var(--tinta-suave); max-width: 470px; }
+.portada-visual { position: relative; padding: 0 0 60px; }
+.portada-visual .tel { position: relative; width: 340px; margin-left: auto; }
+.aro {
+  position: absolute; width: 600px; height: 600px; right: -170px; top: 150px; border-radius: 50%;
+  background: radial-gradient(circle, var(--nk-primary-soft) 0 33%, transparent 33.3%),
+              radial-gradient(circle, rgba(239, 231, 255, .65) 0 54%, transparent 54.3%),
+              radial-gradient(circle, rgba(239, 231, 255, .4) 0 72%, transparent 72.3%);
+}
+.portada-neka { position: absolute; left: -140px; bottom: -6px; width: 200px; height: 200px; }
+
+.problema { padding: 0 var(--margen); }
+.problema h2 { font-size: 48px; line-height: 1.04; font-weight: 800; letter-spacing: -1.9px; color: var(--nk-primary); }
+.problema p { margin-top: 16px; font-size: 23px; line-height: 1.4; max-width: 780px; }
+
+.cifras { padding: 0 var(--margen); }
+.cifras-fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.cifra { border-top: 4px solid var(--nk-primary); padding-top: 14px; }
+.cifra-num { font-size: 94px; line-height: .95; font-weight: 800; letter-spacing: -4.5px; white-space: nowrap; color: var(--nk-primary); }
+.cifra-num span { font-size: 44px; letter-spacing: -1px; margin-left: 4px; }
+.cifra-texto { margin-top: 12px; font-size: 17px; line-height: 1.4; }
+.fuente { margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--tinta-suave); }
+
+.pregunta { background: var(--nk-primary); color: var(--nk-on-primary); padding: 52px var(--margen) 58px; }
+.rotulo { font-size: 15px; font-weight: 800; opacity: .85; }
+.pregunta-texto { margin-top: 16px; font-size: 36px; line-height: 1.24; font-weight: 600; letter-spacing: -.9px; }
+.pregunta-texto strong { font-weight: 800; }
+
+.usuarios { padding: 0 var(--margen) 56px; }
+.usuarios-fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.usuario-cita { font-size: 28px; line-height: 1.12; font-weight: 800; letter-spacing: -.8px; }
+.usuario-nombre { margin-top: 14px; font-size: 16px; font-weight: 800; color: var(--nk-primary); }
+.usuario-texto { margin-top: 3px; font-size: 15px; line-height: 1.4; color: var(--tinta-suave); }
+
+/* ============================ LÁMINA 2 ============================ */
+.momento { padding: 0 var(--margen); }
+.momento h1 { font-size: 80px; line-height: .96; font-weight: 800; letter-spacing: -3.8px; }
+.momento-texto { margin-top: 18px; font-size: 21px; line-height: 1.4; color: var(--tinta-suave); max-width: 640px; }
+.pasos { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 46px; align-items: end; position: relative; }
+/* línea que une los tres pasos, detrás de los teléfonos */
+.pasos::before { content: ""; position: absolute; left: 10%; right: 10%; top: 44%; height: 4px; background: var(--nk-cable); border-radius: 4px; }
+.paso { position: relative; }
+.paso .tel { width: 92%; margin: 0 auto; }
+.paso-central .tel { width: 100%; box-shadow: 0 0 0 10px var(--nk-primary-soft), 0 24px 54px rgba(40, 20, 90, 0.26); }
+.paso-nombre { margin-top: 22px; display: flex; align-items: center; gap: 10px; font-size: 25px; font-weight: 800; letter-spacing: -.7px; }
+.paso-nombre span {
+  width: 34px; height: 34px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; background: var(--nk-primary-soft); color: var(--nk-primary);
+}
+.paso-central .paso-nombre { color: var(--nk-primary); }
+.paso-central .paso-nombre span { background: var(--nk-primary); color: #fff; }
+.paso-texto { margin-top: 6px; font-size: 15px; line-height: 1.4; color: var(--tinta-suave); }
+
+.app { padding: 0 var(--margen); }
+.app-fila { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.app-pantalla figcaption { margin-top: 16px; }
+.app-pantalla b { display: block; font-size: 21px; font-weight: 800; letter-spacing: -.5px; }
+.app-pantalla span { display: block; margin-top: 4px; font-size: 14px; line-height: 1.38; color: var(--tinta-suave); }
+
+.principios {
+  background: var(--nk-primary); color: var(--nk-on-primary);
+  display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center;
+  padding: 36px var(--margen) 40px 40px;
+}
+.principios-neka { width: 170px; height: 170px; }
+.principios ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.principios b { display: block; font-size: 27px; line-height: 1.04; font-weight: 800; letter-spacing: -1px; }
+.principios span { display: block; margin-top: 10px; font-size: 14px; line-height: 1.4; color: #EDE5FF; }

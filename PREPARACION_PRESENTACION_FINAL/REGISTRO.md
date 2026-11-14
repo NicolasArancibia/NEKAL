@@ -104,9 +104,53 @@ Las tres piezas se ven profesionales y coherentes entre sí, con la misma identi
 4. Las dos sesiones dijeron haber dejado una nota para las otras (`laminas.md` y una del video), pero **no están en la carpeta**. Lo útil de esas notas quedó en este registro.
 5. Cada pieza trae su propio `node_modules` (`00_BASE/herramientas` y `03_VIDEO`, 14 MB cada uno); git ya los ignora. El video y sus grabaciones pesan unos 36 MB; tenerlo en cuenta si se commitea.
 
+## Ronda 2 · 14 de noviembre de 2026 (después de Fable, Claude Opus 5.5)
+
+Pedido de Nicolás: una guía sobre cómo se hace la memoria; una segunda versión de las láminas, más minimalista; presentación y video quietos. También advirtió que la ronda 1 usa demasiada información vieja del anteproyecto y de versiones pasadas. El proyecto cambió mucho, así que las piezas deben parecerse más a una maqueta: qué es el proyecto, las pantallas y lo más importante.
+
+### 01_LAMINAS/v2_minimal — láminas minimalistas (sesión «Nekal · Plantilla de láminas», pasada a Opus)
+
+- **Salida:** `salida/nekal-minimal-1.pdf` y `-2.pdf` (50 × 105 cm) + PNG. La versión 1 queda intacta.
+- **Lámina 1:** frase de la app, qué es Nekal, el problema en dos frases, 3 cifras (85,4 %, 62,5 %, 72,9 %), la pregunta de investigación y los tres perfiles.
+- **Lámina 2:** «Neka propone. Tú decides.» en 3 teléfonos (algo choca, plan de Neka, tú aceptas), las 4 partes de la app (Resumen, Espacio, Neka, Perfil) y 3 principios.
+- **Fuera respecto de la v1:** línea de tiempo de referentes, estado del arte, marco teórico, glosario, tabla de cambios, multiagente y bloques FALTA grandes.
+- **Pantallas:** cuadros de las grabaciones reales del video, con datos limpios («Hola, Nicolás», sin las 34 atrasadas). Ya incluyen el plan de Neka con «Aceptar 1 cambio».
+- **Skill:** no pudo instalar una nueva por permisos; usó `taste-skill` y `frontend-design`.
+- **Revisión de la sesión principal:** se ve limpia y coherente. Hay que mirar dos cosas:
+  - Las pantallas miden 780 px de ancho: impresas a unos 15 cm dan cerca de 130 dpi, suficiente para mirar a un metro, pero no «alta calidad». Para la versión final conviene regrabarlas a 1170 px.
+  - En el teléfono del plan de Neka casi toda la pantalla es la grilla horaria vacía (12:00–18:00).
+  - Además, el círculo del Espacio muestra el defecto de la app con las etiquetas encimadas («SIN FECHA»/«Universidad», «Trabajo» cortado).
+
+### 04_MEMORIA — guía de la memoria (sesión nueva «Guía de la memoria de título (UDD)»)
+
+- `GUIA_MEMORIA.md`, unas 9.800 palabras. Cubre:
+  - qué es la memoria y cuánto pesa: 10 % del Taller, cerca de 3 % del título, y 1,0 si no se entrega;
+  - los plazos 2026-1;
+  - la estructura parte por parte, con lo que exige la UDD y su fuente y página;
+  - la **pauta de la memoria definitiva transcrita completa** (18 indicadores) y qué mostrar para sacar «Excelente»;
+  - aspectos formales, APA 7 frente a la norma, cómo escribirla y una lista final;
+  - preguntas para el profesor guía y las fuentes.
+- `ESTRUCTURA_PLANTILLA.md`: índice en blanco de una memoria de proyecto aplicado, con extensiones aproximadas.
+- No contiene nada de Nekal, como se pidió.
+- **Revisión de la sesión principal:** comparé la transcripción con la pauta escaneada (KIT p. 30) y coincide.
+
+### Corrección de la sesión principal
+
+En la ronda 1 dije que el abstract se entregaba el lunes 23/11. **Era un error**: esa fila del cronograma está en la columna «Secciones 2026-2». Para la sección de Nicolás (2026-1) la fecha clave es la memoria final, cerca del «Lunes 15 de diciembre». Ese día cae martes en 2026: confirmar con la coordinadora. Quedó corregido en `00_BASE/REQUISITOS_UDD.md`.
+
+### Información vieja en la ronda 1 (pendiente, sin tocar por ahora)
+
+Presentación y video se dejaron quietos por pedido de Nicolás. Cuando se retomen, aplicar el mismo criterio de la v2 de láminas. En la presentación, lo más cargado de anteproyecto son:
+
+- la línea de tiempo de referentes (diapositiva 13);
+- «Cinco ideas sostienen el proyecto» (12);
+- el bloque «qué cambió» (37–39).
+
+El relato (`00_BASE/RELATO.md` §4, §5, §10) también arrastra esa información. Conviene que Nicolás decida qué de eso sigue vigente.
+
 ## Por dónde seguir (en orden)
 
-1. **Nicolás revisa `00_BASE/RELATO.md`**: lo marcado REVISAR, la razón del cambio del Perfil, las fechas de V0 y V1, y confirma las fechas de entrega con la coordinadora. Ojo: el **abstract se entrega el lunes 23/11 a las 14:00**.
+1. **Nicolás revisa `00_BASE/RELATO.md`**: lo marcado REVISAR, la razón del cambio del Perfil, las fechas de V0 y V1, y confirma las fechas de entrega con la coordinadora (memoria final cerca del 15/12; ver ronda 2).
 2. **Unificar el material** (lo puede hacer Claude):
    - rehacer los pantallazos con datos limpios, reusando lo que hace `03_VIDEO/herramientas/grabar.mjs`;
    - sacar el pantallazo del Plan de Neka de `plan.mp4`;
