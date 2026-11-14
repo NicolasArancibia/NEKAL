@@ -130,6 +130,116 @@
       "titulo": "Atrasadas, lo importante primero",
       "explicacion": "Hoja con Importantes arriba (con entrega, urgente) y las demás debajo.",
       "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "04-primer-uso-conectar-y-tutorial.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 14,
+      "cuadro": "A",
+      "titulo": "Conectar Google Calendar",
+      "explicacion": "Pop-up al crear la cuenta; solo visual por ahora. «Ahora no» siempre visible.",
+      "estado": "propuesta (2/11/2026, sin aprobar)"
+    },
+    {
+      "archivo": "04-primer-uso-conectar-y-tutorial.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 15,
+      "cuadro": "B",
+      "titulo": "Tutorial guiado",
+      "explicacion": "La app se oscurece y se ilumina una cosa por paso (6 pasos); Saltar siempre visible; termina empujando a crear la primera cosa.",
+      "estado": "propuesta (2/11/2026, sin aprobar)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 16,
+      "cuadro": "A1",
+      "titulo": "Conecta tus cuentas",
+      "explicacion": "Al crear la cuenta: Google y Outlook como dos filas grandes; «Ahora no» siempre visible.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 17,
+      "cuadro": "A2",
+      "titulo": "Al volver de Google",
+      "explicacion": "Confirma lo traído (eventos y correo), ofrece Outlook y sigue con Continuar.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Cuentas conectadas",
+      "orden": 18,
+      "cuadro": "B1",
+      "titulo": "Ajustes → Cuentas conectadas",
+      "explicacion": "Estado de cada cuenta, destino de lo creado en Nekal (calendario «Nekal») y agregar otra.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Cuentas conectadas",
+      "orden": 19,
+      "cuadro": "B2",
+      "titulo": "Permiso vencido y desconectar",
+      "explicacion": "Botón grande para actualizar; desconectar confirma qué pasa con los eventos.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Calendario en espejo",
+      "orden": 20,
+      "cuadro": "C1",
+      "titulo": "Agenda con Google y Outlook",
+      "explicacion": "Eventos de afuera con ícono de calendario y logo de la cuenta; lo de Nekal copiado dice «en Google».",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Calendario en espejo",
+      "orden": 21,
+      "cuadro": "C2",
+      "titulo": "Detalle de un evento de afuera",
+      "explicacion": "Se edita como todo; avisa que el cambio también llega a Outlook.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 2,
+      "flujo": "Correo con Neka",
+      "orden": 22,
+      "cuadro": "D1",
+      "titulo": "Pestaña IA → Correo: solo lo importante",
+      "explicacion": "v2 (13/11): filtro del proveedor (Principal/Prioritarios) + Neka deja solo lo que pide algo, pregunta, trae fecha o se relaciona con Nekal; cada fila dice por qué y tiene una acción; el resto en «23 correos más».",
+      "estado": "propuesta v2 (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Correo con Neka",
+      "orden": 23,
+      "cuadro": "D2",
+      "titulo": "Correo abierto",
+      "explicacion": "Texto simple sin rastreo; Responder y Crear tarea abajo.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Correo con Neka",
+      "orden": 24,
+      "cuadro": "D3",
+      "titulo": "Responder con Neka",
+      "explicacion": "Indicación a Neka, borrador editable, Enviar; ofrece agendar la fecha del correo.",
+      "estado": "aprobada (13/11/2026)"
     }
   ]
 }
