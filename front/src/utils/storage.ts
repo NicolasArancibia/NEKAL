@@ -30,15 +30,9 @@ export function normalizeGroup(g: any): Group {
 // con alguna cosa en y ≠ 0 aún tiene coordenadas viejas; los que ya ordenó la
 // V2 tienen y = 0 en todas (las funciones de estructura renumeran completo).
 // Es idempotente, así que sirve igual para datos locales, respaldos y la nube.
-export function ordenarLegado<
-  T extends {
-    id: string;
-    workspaceId: string;
-    groupId: string;
-    x: number;
-    y: number;
-  },
->(items: T[]): T[] {
+export function ordenarLegado<T extends { id: string; workspaceId: string; groupId: string; x: number; y: number }>(
+  items: T[],
+): T[] {
   const porContenedor = new Map<string, T[]>();
   for (const i of items) {
     const k = `${i.workspaceId}|${i.groupId}`;
@@ -51,9 +45,7 @@ export function ordenarLegado<
         .sort((a, b) => a.y - b.y || a.x - b.x)
         .forEach((i, n) => orden.set(i.id, n));
   return orden.size
-    ? items.map((i) =>
-        orden.has(i.id) ? { ...i, x: orden.get(i.id)!, y: 0 } : i,
-      )
+    ? items.map((i) => (orden.has(i.id) ? { ...i, x: orden.get(i.id)!, y: 0 } : i))
     : items;
 }
 
@@ -205,10 +197,7 @@ export function readBackup(text: string): AppData {
       typeof g.parentId !== "string" ||
       !REPEATS.includes(g.repeat) ||
       !Array.isArray(g.repeatDays) ||
-      g.repeatDays.some(
-        (n: unknown) =>
-          !Number.isInteger(n) || (n as number) < 0 || (n as number) > 6,
-      ) ||
+      g.repeatDays.some((n: unknown) => !Number.isInteger(n) || (n as number) < 0 || (n as number) > 6) ||
       new Set(g.repeatDays).size !== g.repeatDays.length ||
       typeof g.repeatStart !== "string" ||
       (g.repeatStart && !/^\d{4}-\d{2}-\d{2}$/.test(g.repeatStart))
