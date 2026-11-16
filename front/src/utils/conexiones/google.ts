@@ -1,6 +1,13 @@
 import { Platform } from "react-native";
 import { leerVuelta, permisosGoogle, urlGoogle } from "./pase";
 import type { PaseGoogle, Permisos } from "./tipos";
+import type { Item } from "../model";
+import {
+  cuerpoGoogle,
+  desdeGoogle,
+  EventoFuera,
+  limitesVentana,
+} from "./eventos";
 
 // Único archivo que habla con Google (spec H3_CONEXIONES §4.1). Solo web: Expo Go no puede volver de Google.
 const CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -96,4 +103,121 @@ export async function olvidarGoogle(correo: string): Promise<void> {
   } catch {
     // Si no se pudo revocar, el pase igual vence solo en una hora.
   }
+}
+
+// ── Calendario (V2/H4) ─────────────────────────────────────────────────────
+export type CalendarioFuera = {
+  id: string;
+  nombre: string;
+  soloLectura: boolean;
+  esNekal: boolean;
+};
+const CAL = "https://www.googleapis.com/calendar/v3";
+
+// 401 = pase vencido («pase»); otro error = «red».
+async function pedir(token: string, url: string, init: RequestInit = {}) {
+  const r = await fetch(url, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (r.status === 401) throw new Error("pase");
+  return r;
+}
+async function json(token: string, url: string, init?: RequestInit) {
+  const r = await pedir(token, url, init);
+  if (!r.ok) throw new Error("red");
+  return r.json();
+}
+
+export async function calendariosGoogle(token: string): Promise<CalendarioFuera[]> {
+  const out: CalendarioFuera[] = [];
+  let pagina = "";
+  do {
+    const q = new URLSearchParams({ maxResults: "250" });
+    if (pagina) q.set("pageToken", pagina);
+    const r = await json(token, `${CAL}/users/me/calendarList?${q}`);
+    for (const c of r.items ?? [])
+      if (c.selected || c.primary)
+        out.push({
+          id: c.id,
+          nombre: c.summary ?? "",
+          soloLectura: c.accessRole !== "owner" && c.accessRole !== "writer",
+          esNekal: c.summary === "Nekal" && c.accessRole === "owner",
+        });
+    pagina = r.nextPageToken ?? "";
+  } while (pagina);
+  return out;
+}
+
+export async function eventosGoogle(
+  token: string,
+  cals: CalendarioFuera[],
+  ahora: number,
+): Promise<EventoFuera[]> {
+  const { desde, hasta } = limitesVentana(ahora);
+  const out: EventoFuera[] = [];
+  for (const cal of cals) {
+    let pagina = "";
+    do {
+      const q = new URLSearchParams({
+        singleEvents: "true",
+        timeMin: desde,
+        timeMax: hasta,
+        maxResults: "2500",
+      });
+      if (pagina) q.set("pageToken", pagina);
+      const r = await json(
+        token,
+        `${CAL}/calendars/${encodeURIComponent(cal.id)}/events?${q}`,
+      );
+      for (const e of r.items ?? []) {
+        const ev = desdeGoogle(e, cal.id, cal.soloLectura);
+        if (ev) out.push(ev);
+      }
+      pagina = r.nextPageToken ?? "";
+    } while (pagina);
+  }
+  return out;
+}
+
+export async function crearCalendarioNekalGoogle(token: string): Promise<string> {
+  const r = await json(token, `${CAL}/calendars`, {
+    method: "POST",
+    body: JSON.stringify({ summary: "Nekal" }),
+  });
+  return r.id;
+}
+
+export async function guardarEventoGoogle(
+  token: string,
+  cal: string,
+  i: Item,
+  idExterno?: string,
+): Promise<EventoFuera> {
+  const base = `${CAL}/calendars/${encodeURIComponent(cal)}/events`;
+  const r = await json(
+    token,
+    idExterno ? `${base}/${encodeURIComponent(idExterno)}` : base,
+    { method: idExterno ? "PATCH" : "POST", body: JSON.stringify(cuerpoGoogle(i)) },
+  );
+  const ev = desdeGoogle(r, cal, false);
+  if (!ev) throw new Error("red");
+  return ev;
+}
+
+// Ya no existe (404/410) cuenta como borrado.
+export async function borrarEventoGoogle(
+  token: string,
+  cal: string,
+  idExterno: string,
+): Promise<void> {
+  const r = await pedir(
+    token,
+    `${CAL}/calendars/${encodeURIComponent(cal)}/events/${encodeURIComponent(idExterno)}`,
+    { method: "DELETE" },
+  );
+  if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("red");
 }

@@ -3,6 +3,14 @@ import type {
   AccountInfo,
   IPublicClientApplication,
 } from "@azure/msal-browser";
+import type { Item } from "../model";
+import type { CalendarioFuera } from "./google";
+import {
+  cuerpoGraph,
+  desdeGraph,
+  EventoFuera,
+  limitesVentana,
+} from "./eventos";
 
 // Único archivo que habla con Microsoft (spec H3_CONEXIONES §4.2). Solo web; MSAL se carga a demanda.
 const CLIENT_ID = process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID ?? "";
@@ -115,4 +123,116 @@ export async function olvidarMicrosoft(correo: string): Promise<void> {
   const account = cuentaDe(pca, correo);
   // Solo se borra de este dispositivo; no cierra la sesión de Microsoft en el navegador.
   if (account) await pca.clearCache({ account });
+}
+
+// ── Calendario (V2/H4) ─────────────────────────────────────────────────────
+const GRAPH = "https://graph.microsoft.com/v1.0";
+// Horas en UTC y cuerpos en texto (sin HTML ni rastreo).
+const PREFER = 'outlook.timezone="UTC", outlook.body-content-type="text"';
+const CAMPOS =
+  "id,subject,location,bodyPreview,start,end,isAllDay,changeKey,lastModifiedDateTime,isCancelled";
+
+// 401 = pase vencido («pase»); otro error = «red».
+async function pedirGraph(token: string, url: string, init: RequestInit = {}) {
+  const r = await fetch(url, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Prefer: PREFER,
+    },
+  });
+  if (r.status === 401) throw new Error("pase");
+  return r;
+}
+async function jsonGraph(token: string, url: string, init?: RequestInit) {
+  const r = await pedirGraph(token, url, init);
+  if (!r.ok) throw new Error("red");
+  return r.json();
+}
+
+export async function calendariosGraph(
+  token: string,
+): Promise<CalendarioFuera[]> {
+  const r = await jsonGraph(token, `${GRAPH}/me/calendars?$top=100`);
+  return (r.value ?? []).map((c: any) => ({
+    id: c.id,
+    nombre: c.name ?? "",
+    soloLectura: c.canEdit === false,
+    esNekal: c.name === "Nekal" && c.canEdit !== false,
+  }));
+}
+
+export async function eventosGraph(
+  token: string,
+  cals: CalendarioFuera[],
+  ahora: number,
+): Promise<EventoFuera[]> {
+  const { desde, hasta } = limitesVentana(ahora);
+  const out: EventoFuera[] = [];
+  for (const cal of cals) {
+    const q = new URLSearchParams({
+      startDateTime: desde,
+      endDateTime: hasta,
+      $top: "200",
+      $select: CAMPOS,
+    });
+    let url: string = `${GRAPH}/me/calendars/${encodeURIComponent(cal.id)}/calendarView?${q}`;
+    while (url) {
+      const r = await jsonGraph(token, url);
+      for (const e of r.value ?? []) {
+        const ev = desdeGraph(e, cal.id, cal.soloLectura);
+        if (ev) out.push(ev);
+      }
+      url = r["@odata.nextLink"] ?? "";
+    }
+  }
+  return out;
+}
+
+export async function crearCalendarioNekalGraph(token: string): Promise<string> {
+  const r = await jsonGraph(token, `${GRAPH}/me/calendars`, {
+    method: "POST",
+    body: JSON.stringify({ name: "Nekal" }),
+  });
+  return r.id;
+}
+
+const zonaLocal = () =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+
+export async function guardarEventoGraph(
+  token: string,
+  cal: string,
+  i: Item,
+  idExterno?: string,
+): Promise<EventoFuera> {
+  const r = await jsonGraph(
+    token,
+    idExterno
+      ? `${GRAPH}/me/events/${encodeURIComponent(idExterno)}`
+      : `${GRAPH}/me/calendars/${encodeURIComponent(cal)}/events`,
+    {
+      method: idExterno ? "PATCH" : "POST",
+      body: JSON.stringify(cuerpoGraph(i, zonaLocal())),
+    },
+  );
+  const ev = desdeGraph(r, cal, false);
+  if (!ev) throw new Error("red");
+  return ev;
+}
+
+// Ya no existe (404) cuenta como borrado. `cal` no hace falta en Graph; se
+// recibe para que las dos cuentas se usen igual.
+export async function borrarEventoGraph(
+  token: string,
+  _cal: string,
+  idExterno: string,
+): Promise<void> {
+  const r = await pedirGraph(
+    token,
+    `${GRAPH}/me/events/${encodeURIComponent(idExterno)}`,
+    { method: "DELETE" },
+  );
+  if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("red");
 }
