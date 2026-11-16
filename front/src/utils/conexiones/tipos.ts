@@ -6,7 +6,25 @@ export type Cuenta = {
   nombre: string;
   desde: string;
 };
-export type Conexiones = { cuentas: Cuenta[]; ofrecido: boolean };
+export type Conexiones = {
+  cuentas: Cuenta[];
+  ofrecido: boolean;
+  // Correo de la cuenta donde se copia lo creado en Nekal ("" = no copiar).
+  destinoNekal: string;
+};
+// De dónde viene un ítem del espejo (spec H3 §5.2). `firma`: los campos
+// espejados la última vez que ambos lados quedaron iguales.
+export type Origen = {
+  proveedor: Proveedor;
+  cuenta: string;
+  calendario: string;
+  idExterno: string;
+  version: string;
+  firma: string;
+  creadoEn: "fuera" | "nekal";
+  diaCompleto: boolean;
+  soloLectura: boolean;
+};
 export type PaseGoogle = { token: string; vence: number; scopes: string[] };
 export type Permisos = { calendario: boolean; correo: boolean };
 export type Vuelta =

@@ -113,17 +113,23 @@ test("conexiones: agregar sin duplicar", () => {
   assert.equal(c.cuentas[0].desde, "2026-11-14T10:00:00.000Z");
   c = est.agregarCuenta(c, cuenta("microsoft", "a@b.cl"));
   assert.equal(c.cuentas.length, 2);
-  assert.deepEqual(est.CONEXIONES_VACIAS, { cuentas: [], ofrecido: false });
+  assert.deepEqual(est.CONEXIONES_VACIAS, {
+    cuentas: [],
+    ofrecido: false,
+    destinoNekal: "",
+  });
 });
 
 test("conexiones: quitar", () => {
   const c = {
     cuentas: [cuenta("google", "a@b.cl"), cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
+    destinoNekal: "a@b.cl",
   };
   assert.deepEqual(est.quitarCuenta(c, "google", "a@b.cl"), {
     cuentas: [cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
+    destinoNekal: "a@b.cl",
   });
 });
 
@@ -138,7 +144,11 @@ test("conexiones: normalizar", () => {
     ],
     ofrecido: true,
   });
-  assert.deepEqual(r, { cuentas: [cuenta("google", "a@b.cl")], ofrecido: true });
+  assert.deepEqual(r, {
+    cuentas: [cuenta("google", "a@b.cl")],
+    ofrecido: true,
+    destinoNekal: "",
+  });
   const muchas = Array.from({ length: 8 }, (_, i) => cuenta("google", `${i}@b.cl`));
   assert.equal(est.normalizarConexiones({ cuentas: muchas, ofrecido: false }).cuentas.length, 6);
 });
@@ -183,4 +193,39 @@ test("conexiones: tras un intento silencioso que pide un toque, se reintenta con
   assert.equal(est.trasVuelta("necesita_toque", false), "mostrar");
   assert.equal(est.trasVuelta("cancelado", true), "mostrar");
   assert.equal(est.trasVuelta(undefined, true), "mostrar");
+});
+
+// V2/H4: espejo del calendario.
+const ORIGEN = {
+  proveedor: "google",
+  cuenta: "a@b.cl",
+  calendario: "primary",
+  idExterno: "ev1",
+  version: '"1"',
+  firma: "[]",
+  creadoEn: "fuera",
+  diaCompleto: false,
+  soloLectura: false,
+};
+
+test("espejo: destino al conectar y desconectar", () => {
+  let c = est.agregarCuenta(est.CONEXIONES_VACIAS, cuenta("google", "a"));
+  assert.equal(c.destinoNekal, "a");
+  c = est.agregarCuenta(c, cuenta("microsoft", "b"));
+  assert.equal(c.destinoNekal, "a");
+  c = est.quitarCuenta(c, "google", "a");
+  assert.equal(c.destinoNekal, "b");
+  c = est.quitarCuenta(c, "microsoft", "b");
+  assert.equal(c.destinoNekal, "");
+  assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
+});
+
+test("espejo: origen mal formado", () => {
+  assert.deepEqual(est.normalizarOrigen(ORIGEN), ORIGEN);
+  assert.equal(est.normalizarOrigen({ ...ORIGEN, proveedor: "yahoo" }), undefined);
+  assert.equal(est.normalizarOrigen({ ...ORIGEN, creadoEn: "x" }), undefined);
+  assert.equal(est.normalizarOrigen({ ...ORIGEN, diaCompleto: "si" }), undefined);
+  const { firma, ...sinFirma } = ORIGEN;
+  assert.equal(est.normalizarOrigen(sinFirma), undefined);
+  assert.equal(est.normalizarOrigen(undefined), undefined);
 });

@@ -302,6 +302,15 @@ export function validateRecords(records: Records): AppData {
         bound(s.title, 1000);
       }
       value.dependencies.forEach((v: string) => bound(v, 200));
+      if (value.origen && typeof value.origen === "object")
+        for (const k of [
+          "cuenta",
+          "calendario",
+          "idExterno",
+          "version",
+          "firma",
+        ])
+          if (typeof value.origen[k] === "string") bound(value.origen[k], 1000);
     }
     if (collection === "attachments") {
       bound(value.name, 1000);
@@ -326,6 +335,7 @@ export function validateRecords(records: Records): AppData {
     if (path === "settings/conexiones") {
       if (!Array.isArray(value.cuentas) || value.cuentas.length > 6)
         throw new Error("Máximo 6 cuentas conectadas.");
+      bound(value.destinoNekal ?? "", 320);
       for (const c of value.cuentas) {
         bound(c?.correo, 320);
         bound(c?.nombre, 320);

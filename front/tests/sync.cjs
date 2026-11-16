@@ -220,14 +220,46 @@ console.log(
         },
       ],
       ofrecido: true,
+      destinoNekal: "a@b.cl",
     },
   };
   const recs = recordsOf(conCuentas);
   assert.deepEqual(Object.keys(recs["settings/conexiones"]).sort(), [
     "cuentas",
+    "destinoNekal",
     "ofrecido",
   ]);
   assert.deepEqual(dataOf(recs).conexiones, conCuentas.conexiones);
   assert.deepEqual(validateRecords(recs).conexiones, conCuentas.conexiones);
   console.log("OK sync: conexiones va y vuelve");
+}
+// V2/H4: un ítem con origen (espejo) va y vuelve.
+{
+  const origen = {
+    proveedor: "microsoft",
+    cuenta: "a@b.cl",
+    calendario: "cal1",
+    idExterno: "AAMk1",
+    version: "ck1",
+    firma: "[]",
+    creadoEn: "fuera",
+    diaCompleto: true,
+    soloLectura: false,
+  };
+  const conOrigen = saveItem(emptyData(), {
+    ...newItem("general", "Evento"),
+    id: "ext",
+    title: "Clase",
+    scheduledAt: new Date(2030, 4, 2, 0, 0).toISOString(),
+    startDate: "2030-05-01",
+    duration: 1440,
+    origen,
+  });
+  const recs = recordsOf(conOrigen);
+  assert.deepEqual(recs["items/ext"].origen, origen);
+  assert.deepEqual(dataOf(recs).items[0].origen, origen);
+  assert.deepEqual(validateRecords(recs).items[0].origen, origen);
+  const malo = { ...recs, "items/ext": { ...recs["items/ext"], origen: { ...origen, proveedor: "yahoo" } } };
+  assert.equal(validateRecords(malo).items[0].origen, undefined);
+  console.log("OK sync: ítem con origen va y vuelve");
 }

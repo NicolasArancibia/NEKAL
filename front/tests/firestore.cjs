@@ -170,13 +170,41 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
       ofrecido: true,
     });
     await invalid("settings/conexiones", { cuentas: [], ofrecido: "si" });
+    await invalid("settings/conexiones", { cuentas: [], ofrecido: true });
+    // V2/H4: ítems con origen (espejo de calendario).
+    const origenH4 = {
+      proveedor: "google",
+      cuenta: "a@b.cl",
+      calendario: "primary",
+      idExterno: "ev1",
+      version: '"1"',
+      firma: "[]",
+      creadoEn: "fuera",
+      diaCompleto: false,
+      soloLectura: false,
+    };
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: { ...origenH4, token: "x" },
+    });
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: { ...origenH4, proveedor: "yahoo" },
+    });
     const conCuentas = {
       ...dataOf(snap.records),
-      conexiones: { cuentas: [cuentaH3], ofrecido: true },
+      conexiones: { cuentas: [cuentaH3], ofrecido: true, destinoNekal: "a@b.cl" },
+      items: dataOf(snap.records).items.map((i) =>
+        i.id === "task" ? { ...i, origen: origenH4 } : i,
+      ),
     };
     await a.commit(snap, operation(dataOf(snap.records), conCuentas));
     snap = await a.read();
     assert.deepEqual(dataOf(snap.records).conexiones, conCuentas.conexiones);
+    assert.deepEqual(
+      dataOf(snap.records).items.find((i) => i.id === "task").origen,
+      origenH4,
+    );
     console.log("OK Firestore: cuentas conectadas");
     // V2/F: códigos, amistades y tarjetas (spec F §5).
     const carol = env.authenticatedContext("carol").firestore();

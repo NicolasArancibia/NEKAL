@@ -1,4 +1,4 @@
-import type { Conexiones } from "./conexiones/tipos";
+import type { Conexiones, Origen } from "./conexiones/tipos";
 
 export const TYPES = [
   "Nota",
@@ -50,6 +50,8 @@ export type Item = {
   x: number;
   y: number;
   deletedAt: string;
+  // Espejo de Google/Outlook (V2/H4). Sin el campo, el ítem es solo de Nekal.
+  origen?: Origen;
 };
 // Área de vida de una mesa (spec E §5). Sin el campo, se usa la sugerida por el nombre.
 export type Area =
@@ -176,7 +178,7 @@ export const emptyData = (): AppData => ({
   rewards: [],
   messages: [],
   logros: [],
-  conexiones: { cuentas: [], ofrecido: false },
+  conexiones: { cuentas: [], ofrecido: false, destinoNekal: "" },
   workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
   profile: { name: "", roles: "" },
   preferences: {
