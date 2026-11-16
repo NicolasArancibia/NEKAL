@@ -45,6 +45,8 @@ const build = spawnSync(
     "src/utils/conexiones/tipos.ts",
     "src/utils/conexiones/pase.ts",
     "src/utils/conexiones/estado.ts",
+    "src/utils/conexiones/eventos.ts",
+    "src/utils/conexiones/espejo.ts",
     "--outDir",
     ".test-build",
     "--module",
