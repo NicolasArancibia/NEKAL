@@ -118,6 +118,22 @@ export function desdeGraph(
   };
 }
 
+// Motivo legible de un error de Google o Graph, para mostrarlo en Ajustes
+// (código y mensaje del servicio; nunca el pase).
+export function detalleDeError(estado: number, cuerpo: string): string {
+  let codigo = "",
+    mensaje = "";
+  try {
+    const e = JSON.parse(cuerpo)?.error;
+    codigo = typeof e?.code === "string" ? e.code : String(e?.status ?? "");
+    mensaje = typeof e?.message === "string" ? e.message : "";
+  } catch {
+    // No era JSON: queda solo el número.
+  }
+  const base = codigo ? `red ${estado} · ${codigo}` : `red ${estado}`;
+  return (mensaje ? `${base}: ${mensaje}` : base).slice(0, 160);
+}
+
 export function firmaDe(f: {
   title: string;
   scheduledAt: string;

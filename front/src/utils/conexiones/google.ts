@@ -6,6 +6,7 @@ import {
   cambiosGoogle,
   cuerpoGoogle,
   desdeGoogle,
+  detalleDeError,
   EventoFuera,
   limitesVentana,
 } from "./eventos";
@@ -126,7 +127,7 @@ async function pedir(token: string, url: string, init: RequestInit = {}) {
 }
 async function json(token: string, url: string, init?: RequestInit) {
   const r = await pedir(token, url, init);
-  if (!r.ok) throw new Error("red");
+  if (!r.ok) throw new Error(detalleDeError(r.status, await r.text()));
   return r.json();
 }
 
@@ -140,7 +141,8 @@ export async function calendariosGoogle(
     if (pagina) q.set("pageToken", pagina);
     const r = await json(token, `${CAL}/users/me/calendarList?${q}`);
     for (const c of r.items ?? [])
-      if (c.selected || c.primary)
+      // El calendario «Nekal» siempre: si se oculta en Google, lo de Nekal no se pierde.
+      if (c.selected || c.primary || (c.summary === "Nekal" && c.accessRole === "owner"))
         out.push({
           id: c.id,
           nombre: c.summary ?? "",
@@ -211,7 +213,7 @@ export async function guardarEventoGoogle(
     { method: idExterno ? "PATCH" : "POST", body: JSON.stringify(cuerpo) },
   );
   const ev = desdeGoogle(r, cal, false);
-  if (!ev) throw new Error("red");
+  if (!ev) throw new Error("red: Google respondió sin fecha");
   return ev;
 }
 
@@ -226,5 +228,6 @@ export async function borrarEventoGoogle(
     `${CAL}/calendars/${encodeURIComponent(cal)}/events/${encodeURIComponent(idExterno)}`,
     { method: "DELETE" },
   );
-  if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("red");
+  if (!r.ok && r.status !== 404 && r.status !== 410)
+    throw new Error(detalleDeError(r.status, await r.text()));
 }

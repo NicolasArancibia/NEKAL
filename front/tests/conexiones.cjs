@@ -116,7 +116,7 @@ test("conexiones: agregar sin duplicar", () => {
   assert.deepEqual(est.CONEXIONES_VACIAS, {
     cuentas: [],
     ofrecido: false,
-    destinoNekal: "",
+    destinos: [],
   });
 });
 
@@ -124,12 +124,12 @@ test("conexiones: quitar", () => {
   const c = {
     cuentas: [cuenta("google", "a@b.cl"), cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "google:a@b.cl",
+    destinos: ["google:a@b.cl"],
   };
   assert.deepEqual(est.quitarCuenta(c, "google", "a@b.cl"), {
     cuentas: [cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "microsoft:a@b.cl",
+    destinos: ["microsoft:a@b.cl"],
   });
 });
 
@@ -147,7 +147,7 @@ test("conexiones: normalizar", () => {
   assert.deepEqual(r, {
     cuentas: [cuenta("google", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "google:a@b.cl",
+    destinos: ["google:a@b.cl"],
   });
   const muchas = Array.from({ length: 8 }, (_, i) => cuenta("google", `${i}@b.cl`));
   assert.equal(est.normalizarConexiones({ cuentas: muchas, ofrecido: false }).cuentas.length, 6);
@@ -211,15 +211,15 @@ const ORIGEN = {
 test("espejo: destino al conectar y desconectar", () => {
   // El mismo correo puede ser de Google y de Outlook: el destino es «proveedor:correo».
   let c = est.agregarCuenta(est.CONEXIONES_VACIAS, cuenta("google", "a"));
-  assert.equal(c.destinoNekal, "google:a");
+  assert.deepEqual(c.destinos, ["google:a"]);
   c = est.agregarCuenta(c, cuenta("microsoft", "a"));
-  assert.equal(c.destinoNekal, "google:a");
+  assert.deepEqual(c.destinos, ["google:a"]);
   assert.equal(est.claveCuenta(c.cuentas[1]), "microsoft:a");
   c = est.quitarCuenta(c, "google", "a");
-  assert.equal(c.destinoNekal, "microsoft:a");
+  assert.deepEqual(c.destinos, ["microsoft:a"]);
   c = est.quitarCuenta(c, "microsoft", "a");
-  assert.equal(c.destinoNekal, "");
-  assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
+  assert.deepEqual(c.destinos, []);
+  assert.deepEqual(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinos, []);
 });
 
 test("espejo: origen mal formado", () => {
@@ -359,9 +359,9 @@ test("espejo: campos y cuerpos", () => {
 
 test("espejo: datos de H3 sin destino eligen la primera cuenta; vacío es «No copiar»", () => {
   const h3 = { cuentas: [cuenta("google", "a"), cuenta("microsoft", "a")], ofrecido: true };
-  assert.equal(est.normalizarConexiones(h3).destinoNekal, "google:a");
-  assert.equal(est.normalizarConexiones({ ...h3, destinoNekal: "" }).destinoNekal, "");
-  assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
+  assert.deepEqual(est.normalizarConexiones(h3).destinos, ["google:a"]);
+  assert.deepEqual(est.normalizarConexiones({ ...h3, destinoNekal: "" }).destinos, []);
+  assert.deepEqual(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinos, []);
 });
 
 const esp = require("../.test-build/conexiones/espejo.js");
@@ -409,7 +409,7 @@ const propio = (extra = {}) => ({
   duration: 60,
   ...extra,
 });
-const sinDestino = { cuentas: [CUENTA], ofrecido: true, destinoNekal: "" };
+const sinDestino = { cuentas: [CUENTA], ofrecido: true, destinos: [] };
 
 test("espejo: importar y reconectar dos veces sin duplicar", () => {
   const eventos = [
@@ -535,12 +535,12 @@ test("espejo: borrado en Nekal se borra afuera y después se suelta el origen", 
   assert.equal(p.fuera.length, 1);
   assert.equal(p.fuera[0].tipo, "borrar");
   assert.equal(esp.hayCambiosLocales(borrado, sinDestino, AHORA), true);
-  const d3 = esp.aplicarResultados(borrado, [
+  const d3 = esp.aplicarResultados(borrado, CUENTA, [
     { itemId: id, ok: true, origen: null },
   ]);
   assert.equal(d3.items[0].origen, undefined);
   assert.equal(vacio(plan(d3, [])), 0);
-  const conError = esp.aplicarResultados(borrado, [
+  const conError = esp.aplicarResultados(borrado, CUENTA, [
     { itemId: id, ok: false, error: "red" },
   ]);
   assert.deepEqual(conError, borrado);
@@ -576,11 +576,11 @@ test("espejo: lo creado en Nekal se copia solo si corresponde", () => {
     p.fuera.map((a) => [a.tipo, a.itemId]),
     [["crear", "t1"]],
   );
-  const conDestino = { ...sinDestino, destinoNekal: "google:a@b.cl" };
+  const conDestino = { ...sinDestino, destinos: ["google:a@b.cl"] };
   assert.equal(esp.hayCambiosLocales(data, conDestino, AHORA), true);
   assert.equal(esp.hayCambiosLocales(data, sinDestino, AHORA), false);
   const origen = { ...ORIGEN, idExterno: "n1", creadoEn: "nekal" };
-  const d2 = esp.aplicarResultados(data, [{ itemId: "t1", ok: true, origen }]);
+  const d2 = esp.aplicarResultados(data, CUENTA, [{ itemId: "t1", ok: true, origen }]);
   assert.deepEqual(d2.items[0].origen, origen);
   assert.equal(plan(d2, [], { copiarAqui: true }).fuera.length, 0);
 });
@@ -764,4 +764,180 @@ test("revisión H4: si afuera no dejan editar (403), vuelve a como está allá",
   const p = plan(m.leer(), [evento("e1")]);
   assert.equal(p.actualizarEnNekal.length, 1);
   assert.equal(p.fuera.length, 0);
+});
+
+// ── Varios destinos (prueba real 16/11: Google, Outlook, ambos o ninguno) ──
+const OUTLOOK = cuenta("microsoft", "c@d.cl");
+const copiaComo = (o, item, extra = {}) =>
+  evento(o.idExterno, {
+    calendario: o.calendario,
+    version: o.version,
+    titulo: item.title,
+    inicio: item.scheduledAt,
+    ...extra,
+  });
+const pasada = (cta, m, red, copiarAqui = true, extra = {}) =>
+  sinc.sincronizarCuenta(cta, { ...m, red, copiarAqui, ahora: AHORA, ...extra });
+
+test("destinos: normalizar la lista, datos viejos y «No copiar»", () => {
+  const dos = { cuentas: [cuenta("google", "a"), cuenta("microsoft", "a")], ofrecido: true };
+  assert.deepEqual(
+    est.normalizarConexiones({ ...dos, destinos: ["google:a", "microsoft:a", 3, "google:a"] }).destinos,
+    ["google:a", "microsoft:a"],
+  );
+  assert.deepEqual(est.normalizarConexiones({ ...dos, destinos: [] }).destinos, []);
+  assert.deepEqual(est.normalizarConexiones({ ...dos, destinoNekal: "microsoft:a" }).destinos, ["microsoft:a"]);
+  assert.deepEqual(est.normalizarConexiones({ ...dos, destinoNekal: "" }).destinos, []);
+  assert.deepEqual(est.normalizarConexiones(dos).destinos, ["google:a"]);
+  assert.equal("destinoNekal" in est.normalizarConexiones({ ...dos, destinoNekal: "" }), false);
+});
+
+test("destinos: reconectar no cambia la elección; desconectar la saca de la lista", () => {
+  let c = est.agregarCuenta(est.CONEXIONES_VACIAS, cuenta("google", "a"));
+  c = est.agregarCuenta(c, cuenta("microsoft", "a"));
+  assert.deepEqual(c.destinos, ["google:a"]);
+  // «No copiar» sobrevive a la vuelta de «Actualizar Google».
+  c = est.agregarCuenta({ ...c, destinos: [] }, cuenta("google", "a"));
+  assert.deepEqual(c.destinos, []);
+  const ambos = { ...c, destinos: ["google:a", "microsoft:a"] };
+  assert.deepEqual(est.quitarCuenta(ambos, "google", "a").destinos, ["microsoft:a"]);
+  assert.deepEqual(est.quitarCuenta(c, "google", "a").destinos, []);
+});
+
+test("destinos: lo creado en Nekal va a Google y a Outlook, y cada copia sigue al ítem", async () => {
+  const m = memoria({ ...mod.emptyData(), items: [propio({ id: "t1" })] });
+  const g = redFalsa();
+  const o = redFalsa();
+  assert.equal(await pasada(CUENTA, m, g), "ok");
+  assert.equal(await pasada(OUTLOOK, m, o), "ok");
+  let t1 = m.leer().items[0];
+  assert.equal(t1.origen.proveedor, "google");
+  assert.equal(t1.copias.length, 1);
+  assert.equal(t1.copias[0].proveedor, "microsoft");
+  assert.equal(t1.copias[0].cuenta, "c@d.cl");
+  assert.equal(t1.copias[0].creadoEn, "nekal");
+
+  // Las copias vuelven como eventos: nada que hacer en ninguno.
+  g.eventos = [copiaComo(t1.origen, t1)];
+  o.eventos = [copiaComo(t1.copias[0], t1)];
+  g.llamadas = [];
+  o.llamadas = [];
+  await pasada(CUENTA, m, g);
+  await pasada(OUTLOOK, m, o);
+  assert.deepEqual([g.llamadas, o.llamadas], [[], []]);
+  assert.equal(m.leer().items.length, 1);
+
+  // Mover en Nekal (o que Neka lo mueva): cambia en los dos.
+  m.change((d) => ({
+    ...d,
+    items: d.items.map((i) => ({ ...i, scheduledAt: new Date(2026, 10, 18, 19, 0).toISOString() })),
+  }));
+  await pasada(CUENTA, m, g);
+  await pasada(OUTLOOK, m, o);
+  assert.deepEqual(g.llamadas, [["guardar", "calN", "t1", "nuevo-t1"]]);
+  assert.deepEqual(o.llamadas, [["guardar", "calN", "t1", "nuevo-t1"]]);
+
+  // Borrar en Nekal: se borra en los dos y el ítem queda sin enlaces.
+  t1 = m.leer().items[0];
+  g.eventos = [copiaComo(t1.origen, t1)];
+  o.eventos = [copiaComo(t1.copias[0], t1)];
+  g.llamadas = [];
+  o.llamadas = [];
+  m.change((d) => mod.deleteItem(d, "t1"));
+  await pasada(CUENTA, m, g);
+  await pasada(OUTLOOK, m, o);
+  assert.deepEqual(g.llamadas, [["borrar", "calN", "nuevo-t1"]]);
+  assert.deepEqual(o.llamadas, [["borrar", "calN", "nuevo-t1"]]);
+  t1 = m.leer().items[0];
+  assert.equal(t1.origen, undefined);
+  assert.equal(t1.copias, undefined);
+});
+
+test("destinos: un cambio hecho en Google llega también a la copia de Outlook", async () => {
+  const m = memoria({ ...mod.emptyData(), items: [propio({ id: "t1" })] });
+  const g = redFalsa();
+  const o = redFalsa();
+  await pasada(CUENTA, m, g);
+  await pasada(OUTLOOK, m, o);
+  const t1 = m.leer().items[0];
+  g.eventos = [copiaComo(t1.origen, t1, { titulo: "Estudiar cálculo", version: "v10", actualizado: "2030-01-01T00:00:00.000Z" })];
+  o.eventos = [copiaComo(t1.copias[0], t1)];
+  g.llamadas = [];
+  o.llamadas = [];
+  await pasada(CUENTA, m, g);
+  assert.equal(m.leer().items[0].title, "Estudiar cálculo");
+  await pasada(OUTLOOK, m, o);
+  assert.deepEqual(g.llamadas, []);
+  assert.deepEqual(o.llamadas, [["guardar", "calN", "t1", "nuevo-t1"]]);
+});
+
+test("destinos: lo que ya está en Google se copia a Outlook; lo importado de Google no", () => {
+  const importado = importar([evento("e1")]);
+  const t = propio({ id: "t1" });
+  const enGoogle = { ...ORIGEN, idExterno: "n1", creadoEn: "nekal", firma: esp.firmaDeItem(t) };
+  const conCopia = { ...importado, items: [...importado.items, { ...t, origen: enGoogle }] };
+  const p = esp.planDeSincronizacion({
+    data: conCopia, eventos: [], cuenta: OUTLOOK, calendarioNekal: null, copiarAqui: true, ahora: AHORA,
+  });
+  assert.deepEqual(p.fuera.map((a) => [a.tipo, a.itemId]), [["crear", "t1"]]);
+  const conexiones = { cuentas: [CUENTA, OUTLOOK], ofrecido: true, destinos: ["microsoft:c@d.cl"] };
+  assert.equal(esp.hayCambiosLocales(conCopia, conexiones, AHORA), true);
+  assert.equal(esp.hayCambiosLocales(conCopia, { ...conexiones, destinos: ["google:a@b.cl"] }, AHORA), false);
+});
+
+test("destinos: la copia de Outlook que ya existe se vincula aunque el ítem ya esté en Google", () => {
+  const t = propio({ id: "t1", origen: { ...ORIGEN, idExterno: "n1", creadoEn: "nekal" } });
+  const data = { ...mod.emptyData(), items: [t] };
+  const enOutlook = evento("o1", { calendario: "calO", titulo: t.title, inicio: t.scheduledAt });
+  const p = esp.planDeSincronizacion({
+    data, eventos: [enOutlook], cuenta: OUTLOOK, calendarioNekal: "calO", copiarAqui: true, ahora: AHORA,
+  });
+  assert.equal(p.vincular.length, 1);
+  assert.equal(p.crearEnNekal.length, 0);
+  assert.equal(p.fuera.length, 0);
+  const d2 = esp.aplicarEnNekal(data, OUTLOOK, p, AHORA);
+  assert.equal(d2.items[0].origen.idExterno, "n1");
+  assert.equal(d2.items[0].copias[0].idExterno, "o1");
+});
+
+test("destinos: desconectar una cuenta suelta solo su copia", () => {
+  const og = { ...ORIGEN, idExterno: "n1", creadoEn: "nekal" };
+  const oo = { ...ORIGEN, proveedor: "microsoft", cuenta: "c@d.cl", idExterno: "o1", creadoEn: "nekal" };
+  const data = { ...mod.emptyData(), items: [propio({ id: "t1", origen: og, copias: [oo] })] };
+  const sinOutlook = esp.soltarCuenta(data, OUTLOOK, AHORA).items[0];
+  assert.deepEqual(sinOutlook.origen, og);
+  assert.equal(sinOutlook.copias, undefined);
+  assert.equal(sinOutlook.deletedAt, "");
+  const sinGoogle = esp.soltarCuenta(data, CUENTA, AHORA).items[0];
+  assert.deepEqual(sinGoogle.origen, oo);
+  assert.equal(sinGoogle.copias, undefined);
+  assert.equal(sinGoogle.deletedAt, "");
+});
+
+test("destinos: si Outlook falla se avisa el motivo (sin pases)", async () => {
+  const m = memoria({ ...mod.emptyData(), items: [propio({ id: "t1" })] });
+  const o = redFalsa({ falla: "guardar", error: "red 400 · ErrorInvalidRequest: Bad body" });
+  const fallos = [];
+  assert.equal(await pasada(OUTLOOK, m, o, true, { fallo: (d) => fallos.push(d) }), "ok");
+  assert.deepEqual(fallos, ["red 400 · ErrorInvalidRequest: Bad body"]);
+  const sinLeer = redFalsa();
+  sinLeer.leerCalendarios = async () => {
+    throw new Error("red 403 · ErrorAccessDenied: x");
+  };
+  const f2 = [];
+  assert.equal(await pasada(OUTLOOK, m, sinLeer, true, { fallo: (d) => f2.push(d) }), "red");
+  assert.deepEqual(f2, ["red 403 · ErrorAccessDenied: x"]);
+});
+
+test("destinos: el detalle de un error de Google o Graph", () => {
+  assert.equal(
+    ev.detalleDeError(400, JSON.stringify({ error: { code: "ErrorInvalidRequest", message: "Bad" } })),
+    "red 400 · ErrorInvalidRequest: Bad",
+  );
+  assert.equal(
+    ev.detalleDeError(400, JSON.stringify({ error: { code: 400, status: "INVALID_ARGUMENT", message: "x" } })),
+    "red 400 · INVALID_ARGUMENT: x",
+  );
+  assert.equal(ev.detalleDeError(500, "<html>"), "red 500");
+  assert.ok(ev.detalleDeError(400, JSON.stringify({ error: { code: "A", message: "m".repeat(500) } })).length <= 160);
 });

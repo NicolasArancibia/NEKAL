@@ -73,9 +73,12 @@ type Ctx = {
   desconectar: (c: Cuenta) => Promise<void>;
   marcarOfrecido: () => void;
   limpiarUltima: () => void;
-  // Dónde se copia lo creado en Nekal: «proveedor:correo» o "" (no copiar).
-  destino: string;
-  elegirDestino: (clave: string) => void;
+  // Dónde se copia lo creado en Nekal: claves «proveedor:correo» (vacía = no copiar).
+  destinos: string[];
+  alternarDestino: (clave: string) => void;
+  noCopiar: () => void;
+  // Por qué falló la última pasada con cada cuenta (clave → motivo); se reintenta sola.
+  fallos: Record<string, string>;
 };
 const Contexto = createContext<Ctx | null>(null);
 const CLAVE_ORIGEN = "nekal:conexion:origen";
@@ -209,6 +212,7 @@ export function ConexionesProvider({
   const [ultima, setUltima] = useState<UltimaConexion | null>(null);
   const [ejemplo, setEjemplo] = useState<CuentaVista[] | null>(null);
   const [forzar, setForzar] = useState(false);
+  const [fallos, setFallos] = useState<Record<string, string>>({});
   const recogida = useRef(false);
   const corriendo = useRef(false);
   const dataRef = useRef(data);
@@ -291,15 +295,23 @@ export function ConexionesProvider({
       return;
     corriendo.current = true;
     try {
-      const { cuentas: todas, destinoNekal } = dataRef.current.conexiones;
-      for (const c of todas)
+      const { cuentas: todas, destinos } = dataRef.current.conexiones;
+      for (const c of todas) {
+        let fallo = "";
         await sincronizarCuenta(c, {
           leer: () => dataRef.current,
           change,
           red: RED[c.proveedor],
-          copiarAqui: claveCuenta(c) === destinoNekal,
+          copiarAqui: destinos.includes(claveCuenta(c)),
           ahora: Date.now(),
+          fallo: (d) => (fallo = fallo || d),
         });
+        setFallos((f) =>
+          (f[claveCuenta(c)] ?? "") === fallo
+            ? f
+            : { ...f, [claveCuenta(c)]: fallo },
+        );
+      }
     } finally {
       corriendo.current = false;
       recalcular();
@@ -445,12 +457,23 @@ export function ConexionesProvider({
       }));
     },
     limpiarUltima: () => setUltima(null),
-    destino: data.conexiones.destinoNekal,
-    elegirDestino: (clave) =>
-      change((d) => ({
-        ...d,
-        conexiones: { ...d.conexiones, destinoNekal: clave },
-      })),
+    destinos: data.conexiones.destinos,
+    alternarDestino: (clave) =>
+      change((d) => {
+        const ya = d.conexiones.destinos;
+        return {
+          ...d,
+          conexiones: {
+            ...d.conexiones,
+            destinos: ya.includes(clave)
+              ? ya.filter((x) => x !== clave)
+              : [...ya, clave],
+          },
+        };
+      }),
+    noCopiar: () =>
+      change((d) => ({ ...d, conexiones: { ...d.conexiones, destinos: [] } })),
+    fallos,
   };
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

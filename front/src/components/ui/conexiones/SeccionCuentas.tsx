@@ -51,6 +51,11 @@ export default function SeccionCuentas() {
               }}
               onActualizar={() => c.actualizar(cuenta)}
             />
+            {!!c.fallos[clave] && (
+              <Txt variant="caption" tone="danger">
+                {`No se pudo sincronizar con ${nombre}; se reintenta solo. Motivo: ${c.fallos[clave]}`}
+              </Txt>
+            )}
             {abierta === clave &&
               (confirmar ? (
                 <View style={{ gap: space.sm }}>
@@ -114,20 +119,20 @@ export default function SeccionCuentas() {
                   key={claveCuenta(cuenta)}
                   title={repetido ? `${nombre} · ${cuenta.correo}` : nombre}
                   accessibilityLabel={`Copiar a ${nombre}, ${cuenta.correo}`}
-                  selected={c.destino === claveCuenta(cuenta)}
-                  onPress={() => c.elegirDestino(claveCuenta(cuenta))}
+                  selected={c.destinos.includes(claveCuenta(cuenta))}
+                  onPress={() => c.alternarDestino(claveCuenta(cuenta))}
                 />
               );
             })}
             <Chip
               title="No copiar"
-              selected={c.destino === ""}
-              onPress={() => c.elegirDestino("")}
+              selected={c.destinos.length === 0}
+              onPress={c.noCopiar}
             />
           </View>
           <Txt variant="caption" tone="secondary">
-            Se guarda en un calendario llamado «Nekal», separado de tus otros
-            eventos.
+            Puedes elegir más de una. En cada cuenta se guarda en un calendario
+            llamado «Nekal», separado de tus otros eventos.
           </Txt>
         </View>
       )}

@@ -220,13 +220,13 @@ console.log(
         },
       ],
       ofrecido: true,
-      destinoNekal: "google:a@b.cl",
+      destinos: ["google:a@b.cl"],
     },
   };
   const recs = recordsOf(conCuentas);
   assert.deepEqual(Object.keys(recs["settings/conexiones"]).sort(), [
     "cuentas",
-    "destinoNekal",
+    "destinos",
     "ofrecido",
   ]);
   assert.deepEqual(dataOf(recs).conexiones, conCuentas.conexiones);

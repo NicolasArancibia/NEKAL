@@ -4,17 +4,19 @@ import type { Origen } from "../../../utils/conexiones/tipos";
 import { Txt } from "../base";
 import LogoCuenta, { NOMBRE_PROVEEDOR } from "./LogoCuenta";
 
-// Texto corto de origen para filas (Agenda): «Google», «Outlook» o «en Google» si es una copia.
-export function textoOrigen(o: Origen | undefined): string {
-  if (!o) return "";
-  const nombre = NOMBRE_PROVEEDOR[o.proveedor];
-  return o.creadoEn === "fuera" ? nombre : `en ${nombre}`;
+// Texto corto de origen para filas (Agenda): «Google», «Outlook» o, si son
+// copias de algo creado en Nekal, «en Google y Outlook».
+export function textoOrigen(lista: Origen[]): string {
+  if (!lista.length) return "";
+  if (lista[0].creadoEn === "fuera") return NOMBRE_PROVEEDOR[lista[0].proveedor];
+  const nombres = [...new Set(lista.map((o) => NOMBRE_PROVEEDOR[o.proveedor]))];
+  return `en ${nombres.join(" y ")}`;
 }
 
-// Arriba del editor de un ítem del espejo (maqueta H/05 C2).
-export default function AvisoOrigen({ origen }: { origen: Origen }) {
-  const nombre = NOMBRE_PROVEEDOR[origen.proveedor];
-  const de = origen.creadoEn === "fuera" ? "De" : "Copiado en";
+// Arriba del editor de un ítem del espejo (maqueta H/05 C2): una línea por cuenta.
+export default function AvisoOrigen({ enlaces }: { enlaces: Origen[] }) {
+  const origen = enlaces[0];
+  const nombre = textoOrigen(enlaces).replace(/^en /, "");
   return (
     <View
       style={{
@@ -26,19 +28,22 @@ export default function AvisoOrigen({ origen }: { origen: Origen }) {
         borderColor: color.line,
       }}
     >
-      <View
-        style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}
-      >
-        <LogoCuenta proveedor={origen.proveedor} chico />
-        <Txt
-          variant="callout"
-          tone="secondary"
-          numberOfLines={1}
-          style={{ flex: 1 }}
+      {enlaces.map((o) => (
+        <View
+          key={`${o.proveedor}:${o.cuenta}`}
+          style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}
         >
-          {`${de} ${nombre} · ${origen.cuenta}`}
-        </Txt>
-      </View>
+          <LogoCuenta proveedor={o.proveedor} chico />
+          <Txt
+            variant="callout"
+            tone="secondary"
+            numberOfLines={1}
+            style={{ flex: 1 }}
+          >
+            {`${o.creadoEn === "fuera" ? "De" : "Copiado en"} ${NOMBRE_PROVEEDOR[o.proveedor]} · ${o.cuenta}`}
+          </Txt>
+        </View>
+      ))}
       <Txt variant="callout">
         {origen.soloLectura
           ? `Solo lectura: los cambios vuelven a como está en ${nombre}.`

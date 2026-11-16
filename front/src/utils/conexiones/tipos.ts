@@ -9,8 +9,8 @@ export type Cuenta = {
 export type Conexiones = {
   cuentas: Cuenta[];
   ofrecido: boolean;
-  // Correo de la cuenta donde se copia lo creado en Nekal ("" = no copiar).
-  destinoNekal: string;
+  // Cuentas («proveedor:correo») donde se copia lo creado en Nekal; vacía = no copiar.
+  destinos: string[];
 };
 // De dónde viene un ítem del espejo (spec H3 §5.2). `firma`: los campos
 // espejados la última vez que ambos lados quedaron iguales.

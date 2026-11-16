@@ -9,6 +9,7 @@ import {
   cambiosGraph,
   cuerpoGraph,
   desdeGraph,
+  detalleDeError,
   EventoFuera,
   limitesVentana,
 } from "./eventos";
@@ -150,7 +151,7 @@ async function pedirGraph(token: string, url: string, init: RequestInit = {}) {
 }
 async function jsonGraph(token: string, url: string, init?: RequestInit) {
   const r = await pedirGraph(token, url, init);
-  if (!r.ok) throw new Error("red");
+  if (!r.ok) throw new Error(detalleDeError(r.status, await r.text()));
   return r.json();
 }
 
@@ -226,7 +227,7 @@ export async function guardarEventoGraph(
     },
   );
   const ev = desdeGraph(r, cal, false);
-  if (!ev) throw new Error("red");
+  if (!ev) throw new Error("red: Outlook respondió sin fecha");
   return ev;
 }
 
@@ -242,5 +243,6 @@ export async function borrarEventoGraph(
     `${GRAPH}/me/events/${encodeURIComponent(idExterno)}`,
     { method: "DELETE" },
   );
-  if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("red");
+  if (!r.ok && r.status !== 404 && r.status !== 410)
+    throw new Error(detalleDeError(r.status, await r.text()));
 }

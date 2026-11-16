@@ -31,10 +31,31 @@ export type ResultadoFuera =
 export const firmaDeItem = (i: Item) =>
   firmaDe({ ...i, diaCompleto: !!i.origen?.diaCompleto });
 
-const deLaCuenta = (i: Item, c: Cuenta) =>
-  !!i.origen &&
-  i.origen.proveedor === c.proveedor &&
-  i.origen.cuenta === c.correo;
+// Un ítem se enlaza con a lo más un evento por cuenta: `origen` (lo importado,
+// o la primera copia) y `copias` (lo creado en Nekal copiado a más cuentas).
+export const enlaces = (i: Item): Origen[] => [
+  ...(i.origen ? [i.origen] : []),
+  ...(i.copias ?? []),
+];
+const claveEnlace = (o: Origen) => `${o.proveedor}:${o.cuenta}`;
+const enlaceDe = (i: Item, clave: string) =>
+  enlaces(i).find((o) => claveEnlace(o) === clave);
+const importado = (i: Item) => i.origen?.creadoEn === "fuera";
+
+// Pone, cambia o quita (`null`) el enlace de una cuenta sin tocar los demás.
+function ponerEnlace(i: Item, clave: string, nuevo: Origen | null): Item {
+  const { origen: _o, copias: _c, ...resto } = i;
+  const lista = enlaces(i);
+  const pos = lista.findIndex((o) => claveEnlace(o) === clave);
+  if (pos >= 0) lista.splice(pos, 1, ...(nuevo ? [nuevo] : []));
+  else if (nuevo) lista.push(nuevo);
+  const [primero, ...demas] = lista;
+  return {
+    ...resto,
+    ...(primero && { origen: primero }),
+    ...(demas.length > 0 && { copias: demas }),
+  };
+}
 
 function enVentanaDe(ahora: number) {
   const { desde, hasta } = limitesVentana(ahora);
@@ -44,13 +65,15 @@ function enVentanaDe(ahora: number) {
     Date.parse(fecha) < Date.parse(hasta);
 }
 
-// Lo propio que se copia al calendario «Nekal»: con hora, no rutina, no Nota/Idea, en ventana.
-function copiables(d: AppData, ahora: number): Item[] {
+// Lo propio que se copia al calendario «Nekal» de una cuenta: con hora, no
+// rutina, no Nota/Idea, en ventana y sin copia en esa cuenta todavía.
+function copiables(d: AppData, ahora: number, clave: string): Item[] {
   const rutinas = new Set(d.groups.filter((g) => g.repeat).map((g) => g.id));
   const enVentana = enVentanaDe(ahora);
   return d.items.filter(
     (i) =>
-      !i.origen &&
+      !importado(i) &&
+      !enlaceDe(i, clave) &&
       !i.deletedAt &&
       !!i.scheduledAt &&
       !passive(i) &&
@@ -72,8 +95,9 @@ export function planDeSincronizacion(o: {
   const vivos = new Map(
     o.eventos.filter((e) => !e.cancelado).map((e) => [e.id, e]),
   );
-  const propios = data.items.filter((i) => deLaCuenta(i, cuenta));
-  const conocidos = new Set(propios.map((i) => i.origen!.idExterno));
+  const clave = claveCuenta(cuenta);
+  const propios = data.items.filter((i) => enlaceDe(i, clave));
+  const conocidos = new Set(propios.map((i) => enlaceDe(i, clave)!.idExterno));
   const p: PlanEspejo = {
     crearEnNekal: [],
     actualizarEnNekal: [],
@@ -92,7 +116,8 @@ export function planDeSincronizacion(o: {
       e.calendario === o.calendarioNekal
         ? data.items.find(
             (i) =>
-              !i.origen &&
+              !importado(i) &&
+              !enlaceDe(i, clave) &&
               !i.deletedAt &&
               !usados.has(i.id) &&
               i.title === titulo &&
@@ -111,7 +136,7 @@ export function planDeSincronizacion(o: {
     a.createdAt === b.createdAt ? (a.id < b.id ? -1 : 1) : a.createdAt < b.createdAt ? -1 : 1,
   )) {
     if (i.deletedAt) continue;
-    const id = i.origen!.idExterno;
+    const id = enlaceDe(i, clave)!.idExterno;
     if (primero.has(id)) p.duplicados.push(i.id);
     else primero.set(id, i);
   }
@@ -119,7 +144,7 @@ export function planDeSincronizacion(o: {
 
   for (const i of propios) {
     if (repetidos.has(i.id)) continue;
-    const origen = i.origen!;
+    const origen = enlaceDe(i, clave)!;
     if (i.deletedAt) {
       if (!origen.soloLectura)
         p.fuera.push({ tipo: "borrar", itemId: i.id, origen });
@@ -142,7 +167,7 @@ export function planDeSincronizacion(o: {
   }
 
   if (o.copiarAqui)
-    for (const i of copiables(data, o.ahora))
+    for (const i of copiables(data, o.ahora, clave))
       if (!usados.has(i.id))
         p.fuera.push({ tipo: "crear", itemId: i.id, cuerpo: i });
   return p;
@@ -175,31 +200,33 @@ export function aplicarEnNekal(
   ahora: number,
 ): AppData {
   const cuando = new Date(ahora).toISOString();
+  const clave = claveCuenta(cuenta);
+  // El enlace nuevo guarda la firma del ítem ya con ese enlace puesto.
+  const enlazar = (i: Item, o: Origen) =>
+    ponerEnlace(i, clave, {
+      ...o,
+      firma: firmaDeItem(ponerEnlace(i, clave, o)),
+    });
   const cambios = new Map<string, (i: Item) => Item>();
   for (const { itemId, evento } of p.actualizarEnNekal)
-    cambios.set(itemId, (i) => {
-      const nuevo = { ...i, ...camposDeEvento(evento) };
-      const origen = origenDe(cuenta, evento, i.origen!.creadoEn, "");
-      return {
-        ...nuevo,
-        origen: { ...origen, firma: firmaDeItem({ ...nuevo, origen }) },
-      };
-    });
+    cambios.set(itemId, (i) =>
+      enlazar(
+        { ...i, ...camposDeEvento(evento) },
+        origenDe(cuenta, evento, enlaceDe(i, clave)!.creadoEn, ""),
+      ),
+    );
   for (const { itemId, evento } of p.vincular)
-    cambios.set(itemId, (i) => {
-      const origen = origenDe(cuenta, evento, "nekal", "");
-      return {
-        ...i,
-        origen: { ...origen, firma: firmaDeItem({ ...i, origen }) },
-      };
-    });
+    cambios.set(itemId, (i) =>
+      enlazar(i, origenDe(cuenta, evento, "nekal", "")),
+    );
   // Lo que ya no está afuera (o está repetido) va a la papelera sin origen:
   // así nunca se pide borrarlo afuera (un calendario oculto no se pierde).
+  // Las copias en otras cuentas sí se borran en la próxima pasada (espejo).
   for (const id of [...p.aPapelera, ...p.duplicados])
-    cambios.set(id, (i) => {
-      const { origen: _, ...sinOrigen } = i;
-      return { ...sinOrigen, deletedAt: i.deletedAt || cuando };
-    });
+    cambios.set(id, (i) => ({
+      ...ponerEnlace(i, clave, null),
+      deletedAt: i.deletedAt || cuando,
+    }));
 
   const nuevos = p.crearEnNekal.map((e) => {
     const base: Item = {
@@ -222,7 +249,12 @@ export function aplicarEnNekal(
   };
 }
 
-export function aplicarResultados(d: AppData, r: ResultadoFuera[]): AppData {
+export function aplicarResultados(
+  d: AppData,
+  cuenta: Cuenta,
+  r: ResultadoFuera[],
+): AppData {
+  const clave = claveCuenta(cuenta);
   const listos = new Map(
     r
       .filter((x) => x.ok)
@@ -233,10 +265,7 @@ export function aplicarResultados(d: AppData, r: ResultadoFuera[]): AppData {
     ...d,
     items: d.items.map((i) => {
       if (!listos.has(i.id)) return i;
-      const origen = listos.get(i.id);
-      if (origen) return { ...i, origen };
-      const { origen: _, ...sinOrigen } = i;
-      return sinOrigen;
+      return ponerEnlace(i, clave, listos.get(i.id) ?? null);
     }),
   };
 }
@@ -248,17 +277,18 @@ export function hayCambiosLocales(
   ahora: number,
 ): boolean {
   const claves = new Set(conexiones.cuentas.map(claveCuenta));
-  const conOrigen = d.items.some((i) => {
-    if (!i.origen) return false;
-    if (!claves.has(`${i.origen.proveedor}:${i.origen.cuenta}`)) return false;
-    if (i.deletedAt) return !i.origen.soloLectura;
-    return firmaDeItem(i) !== i.origen.firma;
-  });
+  const conEnlace = d.items.some((i) =>
+    enlaces(i).some((o) => {
+      if (!claves.has(claveEnlace(o))) return false;
+      if (i.deletedAt) return !o.soloLectura;
+      return firmaDeItem(i) !== o.firma;
+    }),
+  );
   return (
-    conOrigen ||
-    (!!conexiones.destinoNekal &&
-      claves.has(conexiones.destinoNekal) &&
-      copiables(d, ahora).length > 0)
+    conEnlace ||
+    conexiones.destinos.some(
+      (c) => claves.has(c) && copiables(d, ahora, c).length > 0,
+    )
   );
 }
 
@@ -269,10 +299,11 @@ export function soltarCuenta(d: AppData, cuenta: Cuenta, ahora: number): AppData
   return {
     ...d,
     items: d.items.map((i) => {
-      if (!deLaCuenta(i, cuenta)) return i;
-      // Sin origen: al reconectar, nada de esto se borra afuera.
-      const { origen, ...propio } = i;
-      return origen!.creadoEn === "fuera"
+      const o = enlaceDe(i, claveCuenta(cuenta));
+      if (!o) return i;
+      // Sin ese enlace: al reconectar, nada de esto se borra afuera.
+      const propio = ponerEnlace(i, claveCuenta(cuenta), null);
+      return o.creadoEn === "fuera"
         ? { ...propio, deletedAt: i.deletedAt || cuando }
         : propio;
     }),

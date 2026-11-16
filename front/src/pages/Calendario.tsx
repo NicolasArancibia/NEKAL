@@ -15,6 +15,7 @@ import {
 } from "../utils/model";
 import { atrasadas, esExterno, timedItems } from "../utils/espacio";
 import { textoOrigen } from "../components/ui/conexiones/AvisoOrigen";
+import { enlaces } from "../utils/conexiones/espejo";
 import { agenda } from "../utils/agenda";
 import { hhmm, timeOn } from "../utils/neka";
 import { useNeka } from "../utils/NekaContext";
@@ -312,7 +313,7 @@ export default function Calendario({
                         esExterno(f.item)
                           ? ""
                           : (mesaDe(f.item.workspaceId)?.name ?? ""),
-                        textoOrigen(f.item.origen),
+                        textoOrigen(enlaces(f.item)),
                       ]
                         .filter(Boolean)
                         .join(" · ")}

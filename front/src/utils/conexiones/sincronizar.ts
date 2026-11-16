@@ -32,6 +32,8 @@ export type RedCalendario = {
 export type ResultadoPasada = "ok" | "pase" | "red";
 
 const esPase = (e: unknown) => (e as Error)?.message === "pase";
+const motivo = (e: unknown) =>
+  String((e as Error)?.message ?? e).slice(0, 160);
 
 export async function sincronizarCuenta(
   cuenta: Cuenta,
@@ -41,6 +43,8 @@ export async function sincronizarCuenta(
     red: RedCalendario;
     copiarAqui: boolean;
     ahora: number;
+    // Por qué falló algo con esta cuenta (para Ajustes); se reintenta solo.
+    fallo?: (detalle: string) => void;
   },
 ): Promise<ResultadoPasada> {
   const { red, ahora } = o;
@@ -51,7 +55,9 @@ export async function sincronizarCuenta(
     cals = await red.leerCalendarios(token);
     eventos = await red.leerEventos(token, cals, ahora);
   } catch (e) {
-    return esPase(e) ? "pase" : "red";
+    if (esPase(e)) return "pase";
+    o.fallo?.(motivo(e));
+    return "red";
   }
   let calNekal = cals.find((c) => c.esNekal)?.id ?? null;
   const plan = planDeSincronizacion({
@@ -125,10 +131,11 @@ export async function sincronizarCuenta(
         });
         continue;
       }
+      o.fallo?.(motivo(e));
       resultados.push({ itemId: a.itemId, ok: false, error: "red" });
     }
   }
   if (resultados.some((r) => r.ok))
-    o.change((d) => aplicarResultados(d, resultados));
+    o.change((d) => aplicarResultados(d, cuenta, resultados));
   return estado;
 }

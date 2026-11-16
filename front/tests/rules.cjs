@@ -558,6 +558,6 @@ test("respaldo sin conexiones", () => {
   assert.deepEqual(readBackup(JSON.stringify(viejo)).conexiones, {
     cuentas: [],
     ofrecido: false,
-    destinoNekal: "",
+    destinos: [],
   });
 });

@@ -11,7 +11,7 @@ export const claveCuenta = (c: Pick<Cuenta, "proveedor" | "correo">) =>
 export const CONEXIONES_VACIAS: Conexiones = {
   cuentas: [],
   ofrecido: false,
-  destinoNekal: "",
+  destinos: [],
 };
 
 const texto = (v: unknown, n: number) =>
@@ -27,6 +27,20 @@ function cuentaValida(v: any): Cuenta | null {
   return { proveedor: v.proveedor, correo, nombre, desde };
 }
 
+function destinosDe(c: any, cuentas: Cuenta[]): string[] {
+  if (Array.isArray(c.destinos))
+    return [
+      ...new Set<string>(c.destinos.filter((d: unknown) => !!texto(d, 320))),
+    ].slice(0, MAX_CUENTAS);
+  // Antes había un solo destino (`destinoNekal`, "" = «No copiar»); sin
+  // ninguno de los dos (datos de H3) va a la primera cuenta.
+  if (c.destinoNekal !== undefined) {
+    const uno = texto(c.destinoNekal, 320);
+    return uno ? [uno] : [];
+  }
+  return cuentas[0] ? [claveCuenta(cuentas[0])] : [];
+}
+
 export function normalizarConexiones(v: unknown): Conexiones {
   const c = v as any;
   if (!c || typeof c !== "object" || !Array.isArray(c.cuentas))
@@ -38,13 +52,7 @@ export function normalizarConexiones(v: unknown): Conexiones {
   return {
     cuentas,
     ofrecido: c.ofrecido === true,
-    // Sin el campo (datos de H3) queda la primera cuenta; "" es «No copiar».
-    destinoNekal:
-      c.destinoNekal === undefined
-        ? cuentas[0]
-          ? claveCuenta(cuentas[0])
-          : ""
-        : (texto(c.destinoNekal, 320) ?? ""),
+    destinos: destinosDe(c, cuentas),
   };
 }
 
@@ -83,13 +91,18 @@ const misma = (a: Cuenta, proveedor: Proveedor, correo: string) =>
   a.proveedor === proveedor && a.correo === correo;
 
 
+// La primera cuenta recibe lo creado en Nekal; las demás se eligen en Ajustes.
+// Volver a conectar (por ejemplo, «Actualizar») no cambia lo elegido.
 export function agregarCuenta(c: Conexiones, nueva: Cuenta): Conexiones {
-  const destinoNekal = c.destinoNekal || claveCuenta(nueva);
   const vieja = c.cuentas.find((a) => misma(a, nueva.proveedor, nueva.correo));
-  if (!vieja) return { ...c, destinoNekal, cuentas: [...c.cuentas, nueva] };
+  if (!vieja)
+    return {
+      ...c,
+      destinos: c.cuentas.length ? c.destinos : [claveCuenta(nueva)],
+      cuentas: [...c.cuentas, nueva],
+    };
   return {
     ...c,
-    destinoNekal,
     cuentas: c.cuentas.map((a) =>
       a === vieja ? { ...nueva, desde: vieja.desde } : a,
     ),
@@ -102,13 +115,14 @@ export function quitarCuenta(
   correo: string,
 ): Conexiones {
   const cuentas = c.cuentas.filter((a) => !misma(a, proveedor, correo));
-  // Si se fue la cuenta destino, lo de Nekal pasa a la siguiente (si queda).
-  const destinoNekal = cuentas.some((a) => claveCuenta(a) === c.destinoNekal)
-    ? c.destinoNekal
-    : cuentas[0]
-      ? claveCuenta(cuentas[0])
-      : "";
-  return { ...c, cuentas, destinoNekal };
+  const clave = claveCuenta({ proveedor, correo });
+  const quedan = c.destinos.filter((d) => d !== clave);
+  // Si era el único destino, lo de Nekal pasa a la siguiente cuenta (si queda).
+  const destinos =
+    c.destinos.includes(clave) && !quedan.length && cuentas[0]
+      ? [claveCuenta(cuentas[0])]
+      : quedan;
+  return { ...c, cuentas, destinos };
 }
 
 export type EstadoCuenta =

@@ -52,6 +52,8 @@ export type Item = {
   deletedAt: string;
   // Espejo de Google/Outlook (V2/H4). Sin el campo, el ítem es solo de Nekal.
   origen?: Origen;
+  // Más copias de lo creado en Nekal, una por cuenta (Google y Outlook a la vez).
+  copias?: Origen[];
 };
 // Área de vida de una mesa (spec E §5). Sin el campo, se usa la sugerida por el nombre.
 export type Area =
@@ -178,7 +180,7 @@ export const emptyData = (): AppData => ({
   rewards: [],
   messages: [],
   logros: [],
-  conexiones: { cuentas: [], ofrecido: false, destinoNekal: "" },
+  conexiones: { cuentas: [], ofrecido: false, destinos: [] },
   workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
   profile: { name: "", roles: "" },
   preferences: {

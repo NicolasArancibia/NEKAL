@@ -302,15 +302,18 @@ export function validateRecords(records: Records): AppData {
         bound(s.title, 1000);
       }
       value.dependencies.forEach((v: string) => bound(v, 200));
-      if (value.origen && typeof value.origen === "object")
-        for (const k of [
-          "cuenta",
-          "calendario",
-          "idExterno",
-          "version",
-          "firma",
-        ])
-          if (typeof value.origen[k] === "string") bound(value.origen[k], 1000);
+      if (value.copias !== undefined && (!Array.isArray(value.copias) || value.copias.length > 5))
+        throw new Error("Un ítem tiene demasiadas copias en otras cuentas.");
+      for (const o of [value.origen, ...(value.copias ?? [])])
+        if (o && typeof o === "object")
+          for (const k of [
+            "cuenta",
+            "calendario",
+            "idExterno",
+            "version",
+            "firma",
+          ])
+            if (typeof o[k] === "string") bound(o[k], 1000);
     }
     if (collection === "attachments") {
       bound(value.name, 1000);
@@ -335,7 +338,9 @@ export function validateRecords(records: Records): AppData {
     if (path === "settings/conexiones") {
       if (!Array.isArray(value.cuentas) || value.cuentas.length > 6)
         throw new Error("Máximo 6 cuentas conectadas.");
-      bound(value.destinoNekal ?? "", 320);
+      if (!Array.isArray(value.destinos) || value.destinos.length > 6)
+        throw new Error("Máximo 6 destinos para lo creado en Nekal.");
+      value.destinos.forEach((d: string) => bound(d, 320));
       for (const c of value.cuentas) {
         bound(c?.correo, 320);
         bound(c?.nombre, 320);
