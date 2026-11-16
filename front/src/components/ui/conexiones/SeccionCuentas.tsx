@@ -6,7 +6,8 @@ import { useConexiones } from "../../../utils/ConexionesContext";
 import { googleDisponible } from "../../../utils/conexiones/google";
 import { microsoftDisponible } from "../../../utils/conexiones/microsoft";
 import { useApp } from "../../../utils/AppContext";
-import { Button, Txt } from "../base";
+import { claveCuenta } from "../../../utils/conexiones/estado";
+import { Button, Chip, Txt } from "../base";
 import FilaCuenta from "./FilaCuenta";
 import { NOMBRE_PROVEEDOR } from "./LogoCuenta";
 
@@ -94,6 +95,41 @@ export default function SeccionCuentas() {
         <Txt tone="danger" accessibilityRole="alert">
           {error}
         </Txt>
+      )}
+      {c.cuentas.length > 0 && (
+        <View style={{ gap: space.sm }}>
+          <Txt variant="callout" weight={700} tone="secondary">
+            Lo que creas en Nekal va a
+          </Txt>
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
+          >
+            {c.cuentas.map((cuenta) => {
+              const nombre = NOMBRE_PROVEEDOR[cuenta.proveedor];
+              const repetido =
+                c.cuentas.filter((x) => x.proveedor === cuenta.proveedor)
+                  .length > 1;
+              return (
+                <Chip
+                  key={claveCuenta(cuenta)}
+                  title={repetido ? `${nombre} · ${cuenta.correo}` : nombre}
+                  accessibilityLabel={`Copiar a ${nombre}, ${cuenta.correo}`}
+                  selected={c.destino === claveCuenta(cuenta)}
+                  onPress={() => c.elegirDestino(claveCuenta(cuenta))}
+                />
+              );
+            })}
+            <Chip
+              title="No copiar"
+              selected={c.destino === ""}
+              onPress={() => c.elegirDestino("")}
+            />
+          </View>
+          <Txt variant="caption" tone="secondary">
+            Se guarda en un calendario llamado «Nekal», separado de tus otros
+            eventos.
+          </Txt>
+        </View>
       )}
       <Txt variant="callout" weight={700} tone="secondary">
         {c.cuentas.length ? "Agregar otra" : "Conectar"}
