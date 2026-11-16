@@ -147,7 +147,7 @@ test("conexiones: normalizar", () => {
   assert.deepEqual(r, {
     cuentas: [cuenta("google", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "",
+    destinoNekal: "google:a@b.cl",
   });
   const muchas = Array.from({ length: 8 }, (_, i) => cuenta("google", `${i}@b.cl`));
   assert.equal(est.normalizarConexiones({ cuentas: muchas, ofrecido: false }).cuentas.length, 6);
@@ -355,4 +355,11 @@ test("espejo: campos y cuerpos", () => {
   const { desde, hasta } = ev.limitesVentana(new Date(2026, 10, 16, 15, 0).getTime());
   assert.equal(desde, medianoche(2026, 11, 2));
   assert.equal(hasta, medianoche(2027, 1, 15));
+});
+
+test("espejo: datos de H3 sin destino eligen la primera cuenta; vacío es «No copiar»", () => {
+  const h3 = { cuentas: [cuenta("google", "a"), cuenta("microsoft", "a")], ofrecido: true };
+  assert.equal(est.normalizarConexiones(h3).destinoNekal, "google:a");
+  assert.equal(est.normalizarConexiones({ ...h3, destinoNekal: "" }).destinoNekal, "");
+  assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
 });
