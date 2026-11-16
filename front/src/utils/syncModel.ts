@@ -1,5 +1,6 @@
 import { AppData, emptyData, uid, Reward } from "./model";
 import { normalizeGroup, ordenarLegado, readBackup } from "./storage";
+import { normalizarConexiones } from "./conexiones/estado";
 
 export type Value = Record<string, any>;
 export type Records = Record<string, Value>;
@@ -65,6 +66,7 @@ export function recordsOf(data: AppData): Records {
   out["settings/profile"] = data.profile;
   const { notifications, ...preferences } = data.preferences;
   out["settings/preferences"] = preferences;
+  out["settings/conexiones"] = data.conexiones;
   return out;
 }
 export function dataOf(records: Records, notifications = false): AppData {
@@ -96,6 +98,8 @@ export function dataOf(records: Records, notifications = false): AppData {
     else if (path === "settings/profile") data.profile = value as any;
     else if (path === "settings/preferences")
       data.preferences = { ...value, notifications } as any;
+    else if (path === "settings/conexiones")
+      data.conexiones = normalizarConexiones(value);
   }
   data.items = ordenarLegado(data.items);
   return data;
@@ -318,6 +322,15 @@ export function validateRecords(records: Records): AppData {
     if (collection === "messages") {
       bound(value.text, 100000);
       if (value.plan !== undefined) bound(value.plan, 500);
+    }
+    if (path === "settings/conexiones") {
+      if (!Array.isArray(value.cuentas) || value.cuentas.length > 6)
+        throw new Error("Máximo 6 cuentas conectadas.");
+      for (const c of value.cuentas) {
+        bound(c?.correo, 320);
+        bound(c?.nombre, 320);
+        bound(c?.desde, 40);
+      }
     }
     if (path === "settings/profile") {
       bound(value.name, 500);

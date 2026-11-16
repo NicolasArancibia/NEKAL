@@ -42,6 +42,9 @@ const build = spawnSync(
     "src/utils/amigos/tarjeta.ts",
     "src/utils/amigos/amistades.ts",
     "src/utils/amigos/ejemplo.ts",
+    "src/utils/conexiones/tipos.ts",
+    "src/utils/conexiones/pase.ts",
+    "src/utils/conexiones/estado.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -91,4 +94,5 @@ require("./estabilidad.cjs");
 require("./vistas.cjs");
 require("./progreso.cjs");
 require("./amigos.cjs");
+require("./conexiones.cjs");
 require("./styles.cjs");

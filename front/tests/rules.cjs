@@ -553,3 +553,10 @@ test("datos: crearMesa con área", () => {
   const sin = est.crearMesa(m.emptyData(), "Casa", "#948BA6", "C");
   assert.deepEqual(Object.keys(sin.data.workspaces[1]), ["id", "name", "color"]);
 });
+test("respaldo sin conexiones", () => {
+  const { conexiones, ...viejo } = m.emptyData();
+  assert.deepEqual(readBackup(JSON.stringify(viejo)).conexiones, {
+    cuentas: [],
+    ofrecido: false,
+  });
+});

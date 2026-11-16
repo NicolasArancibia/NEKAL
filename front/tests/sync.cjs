@@ -206,3 +206,28 @@ console.log(
   console.error(e);
   process.exitCode = 1;
 });
+// V2/H3: cuentas conectadas como settings/conexiones, sin pases.
+{
+  const conCuentas = {
+    ...emptyData(),
+    conexiones: {
+      cuentas: [
+        {
+          proveedor: "google",
+          correo: "a@b.cl",
+          nombre: "Sofía",
+          desde: "2026-11-14T10:00:00.000Z",
+        },
+      ],
+      ofrecido: true,
+    },
+  };
+  const recs = recordsOf(conCuentas);
+  assert.deepEqual(Object.keys(recs["settings/conexiones"]).sort(), [
+    "cuentas",
+    "ofrecido",
+  ]);
+  assert.deepEqual(dataOf(recs).conexiones, conCuentas.conexiones);
+  assert.deepEqual(validateRecords(recs).conexiones, conCuentas.conexiones);
+  console.log("OK sync: conexiones va y vuelve");
+}
