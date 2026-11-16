@@ -220,7 +220,7 @@ console.log(
         },
       ],
       ofrecido: true,
-      destinoNekal: "a@b.cl",
+      destinoNekal: "google:a@b.cl",
     },
   };
   const recs = recordsOf(conCuentas);

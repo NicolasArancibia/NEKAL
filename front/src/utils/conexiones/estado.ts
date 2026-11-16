@@ -72,8 +72,12 @@ export function normalizarOrigen(v: unknown): Origen | undefined {
 const misma = (a: Cuenta, proveedor: Proveedor, correo: string) =>
   a.proveedor === proveedor && a.correo === correo;
 
+// Identifica una cuenta: el mismo correo puede estar en Google y en Outlook.
+export const claveCuenta = (c: Pick<Cuenta, "proveedor" | "correo">) =>
+  `${c.proveedor}:${c.correo}`;
+
 export function agregarCuenta(c: Conexiones, nueva: Cuenta): Conexiones {
-  const destinoNekal = c.destinoNekal || nueva.correo;
+  const destinoNekal = c.destinoNekal || claveCuenta(nueva);
   const vieja = c.cuentas.find((a) => misma(a, nueva.proveedor, nueva.correo));
   if (!vieja) return { ...c, destinoNekal, cuentas: [...c.cuentas, nueva] };
   return {
@@ -92,9 +96,11 @@ export function quitarCuenta(
 ): Conexiones {
   const cuentas = c.cuentas.filter((a) => !misma(a, proveedor, correo));
   // Si se fue la cuenta destino, lo de Nekal pasa a la siguiente (si queda).
-  const destinoNekal = cuentas.some((a) => a.correo === c.destinoNekal)
+  const destinoNekal = cuentas.some((a) => claveCuenta(a) === c.destinoNekal)
     ? c.destinoNekal
-    : (cuentas[0]?.correo ?? "");
+    : cuentas[0]
+      ? claveCuenta(cuentas[0])
+      : "";
   return { ...c, cuentas, destinoNekal };
 }
 

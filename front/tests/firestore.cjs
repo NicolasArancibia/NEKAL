@@ -193,7 +193,7 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
     });
     const conCuentas = {
       ...dataOf(snap.records),
-      conexiones: { cuentas: [cuentaH3], ofrecido: true, destinoNekal: "a@b.cl" },
+      conexiones: { cuentas: [cuentaH3], ofrecido: true, destinoNekal: "google:a@b.cl" },
       items: dataOf(snap.records).items.map((i) =>
         i.id === "task" ? { ...i, origen: origenH4 } : i,
       ),

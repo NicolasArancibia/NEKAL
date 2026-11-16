@@ -124,12 +124,12 @@ test("conexiones: quitar", () => {
   const c = {
     cuentas: [cuenta("google", "a@b.cl"), cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "a@b.cl",
+    destinoNekal: "google:a@b.cl",
   };
   assert.deepEqual(est.quitarCuenta(c, "google", "a@b.cl"), {
     cuentas: [cuenta("microsoft", "a@b.cl")],
     ofrecido: true,
-    destinoNekal: "a@b.cl",
+    destinoNekal: "microsoft:a@b.cl",
   });
 });
 
@@ -209,13 +209,15 @@ const ORIGEN = {
 };
 
 test("espejo: destino al conectar y desconectar", () => {
+  // El mismo correo puede ser de Google y de Outlook: el destino es «proveedor:correo».
   let c = est.agregarCuenta(est.CONEXIONES_VACIAS, cuenta("google", "a"));
-  assert.equal(c.destinoNekal, "a");
-  c = est.agregarCuenta(c, cuenta("microsoft", "b"));
-  assert.equal(c.destinoNekal, "a");
+  assert.equal(c.destinoNekal, "google:a");
+  c = est.agregarCuenta(c, cuenta("microsoft", "a"));
+  assert.equal(c.destinoNekal, "google:a");
+  assert.equal(est.claveCuenta(c.cuentas[1]), "microsoft:a");
   c = est.quitarCuenta(c, "google", "a");
-  assert.equal(c.destinoNekal, "b");
-  c = est.quitarCuenta(c, "microsoft", "b");
+  assert.equal(c.destinoNekal, "microsoft:a");
+  c = est.quitarCuenta(c, "microsoft", "a");
   assert.equal(c.destinoNekal, "");
   assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
 });
