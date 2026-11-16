@@ -43,7 +43,11 @@ export function linea(d: AppData, i: Item): string {
       .filter(Boolean)
       .join(" · ") || "sin fecha";
   const prioridad = i.priority === "media" ? "" : ` · prioridad ${i.priority}`;
-  return `- [${i.id}] ${i.type} «${i.title}» · ${cuando} · ${i.duration} min · ${i.flexible ? "flexible" : "fija"} · ${i.status}${prioridad} · ${donde}`;
+  // Espejo (V2/H4): de dónde viene, para que Neka lo trate como fijo.
+  const origen = i.origen
+    ? `${i.origen.diaCompleto ? " · todo el día" : ""} · de ${i.origen.proveedor === "google" ? "Google" : "Outlook"}`
+    : "";
+  return `- [${i.id}] ${i.type} «${i.title}» · ${cuando} · ${i.duration} min · ${i.flexible ? "flexible" : "fija"} · ${i.status}${prioridad} · ${donde}${origen}`;
 }
 
 export function enVentana(i: Item, now: number): boolean {

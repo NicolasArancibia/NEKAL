@@ -1,4 +1,4 @@
-import { estaAtrasada, timedItems } from "./espacio";
+import { estaAtrasada, ocupaTiempo, timedItems } from "./espacio";
 import { AppData, Item, activeItems, localDay, passive } from "./model";
 export type Conflict = {
   id: string;
@@ -9,7 +9,11 @@ export type Conflict = {
 const end = (i: Item) => Date.parse(i.scheduledAt) + i.duration * 60000;
 export function findConflicts(data: AppData, now = Date.now()): Conflict[] {
   const items = timedItems(data).filter(
-    (i) => !passive(i) && i.status !== "completado" && !estaAtrasada(i, now),
+    (i) =>
+      !passive(i) &&
+      i.status !== "completado" &&
+      !estaAtrasada(i, now) &&
+      ocupaTiempo(i),
   );
   const result: Conflict[] = [];
   for (let a = 0; a < items.length; a++) {
@@ -97,7 +101,11 @@ export function proposeSlot(
   if (!item || passive(item) || !item.flexible || item.status === "completado")
     return null;
   const others = timedItems(data).filter(
-    (i) => i.id !== id && !passive(i) && i.status !== "completado",
+    (i) =>
+      i.id !== id &&
+      !passive(i) &&
+      i.status !== "completado" &&
+      ocupaTiempo(i),
   );
   let earliest = Math.max(now, Date.parse(`${item.startDate}T00:00:00`));
   for (const id of item.dependencies) {
@@ -167,7 +175,11 @@ export function buscarHueco(
   now = Date.now(),
 ): string | null {
   const others = timedItems(data).filter(
-    (i) => i.id !== o.ignorar && !passive(i) && i.status !== "completado",
+    (i) =>
+      i.id !== o.ignorar &&
+      !passive(i) &&
+      i.status !== "completado" &&
+      ocupaTiempo(i),
   );
   const desde = Math.max(o.desde ?? now, now);
   return primerHueco(
@@ -203,6 +215,7 @@ export function correrDesde(
         !passive(i) &&
         i.status !== "completado" &&
         !!i.scheduledAt &&
+        ocupaTiempo(i) &&
         localDay(new Date(i.scheduledAt)) === dia &&
         end(i) > desde,
     )

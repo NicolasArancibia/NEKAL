@@ -35,11 +35,16 @@ export function diasHasta(fecha: string, now: number) {
 // de calendario. Lo sin fecha no vence; Nota e Idea no son de tiempo. Derivada:
 // no se guarda nada, y reprogramar o completar la devuelve a la vista normal.
 export const ATRASO_DIAS = 2;
+// Espejo (V2/H4): lo importado de Google/Outlook es un evento ajeno, no una tarea
+// tuya: nunca queda «atrasado». Un día completo (feriado, viaje) no ocupa horas.
+export const esExterno = (i: Item) => i.origen?.creadoEn === "fuera";
+export const ocupaTiempo = (i: Item) => !i.origen?.diaCompleto;
 export function estaAtrasada(i: Item, now: number): boolean {
   const f = fechaDe(i);
   return (
     !!f &&
     !i.deletedAt &&
+    !esExterno(i) &&
     !passive(i) &&
     i.status !== "completado" &&
     diasHasta(f, now) < -ATRASO_DIAS
