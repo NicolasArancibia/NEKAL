@@ -12,6 +12,8 @@ import type { Cuenta, Proveedor } from "./conexiones/tipos";
 import {
   agregarCuenta,
   estadoCuenta,
+  ofrecerHoja,
+  trasVuelta,
   quitarCuenta,
   type EstadoCuenta,
 } from "./conexiones/estado";
@@ -56,6 +58,18 @@ type Ctx = {
 const Contexto = createContext<Ctx | null>(null);
 const CLAVE_ORIGEN = "nekal:conexion:origen";
 
+const CLAVE_SILENCIOSO = "nekal:google:silencioso";
+// Correo del «Actualizar» silencioso en curso (vacío si no hubo).
+function leerSilencioso(): string {
+  try {
+    const v = sessionStorage.getItem(CLAVE_SILENCIOSO) ?? "";
+    sessionStorage.removeItem(CLAVE_SILENCIOSO);
+    return v;
+  } catch {
+    return "";
+  }
+}
+
 function leerOrigen(): Origen {
   try {
     const o = sessionStorage.getItem(CLAVE_ORIGEN);
@@ -88,7 +102,7 @@ export function ConexionesProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { data, change, user, guest } = useApp();
+  const { data, change, user, guest, cloudStatus } = useApp();
   const disponible =
     !!user && !guest && (googleDisponible || microsoftDisponible);
   const [estados, setEstados] = useState<Record<string, EstadoCuenta>>({});
@@ -97,6 +111,10 @@ export function ConexionesProvider({
   const [forzar, setForzar] = useState(false);
   const recogida = useRef(false);
   const cuentas = data.conexiones.cuentas;
+  // Clave estable: cada sincronización recrea la lista aunque no cambie.
+  const claveCuentas = cuentas
+    .map((c) => `${c.proveedor}:${c.correo}`)
+    .join("|");
 
   const recalcular = useCallback(async () => {
     const ahora = Date.now();
@@ -122,7 +140,7 @@ export function ConexionesProvider({
       }
     }
     setEstados(nuevos);
-  }, [cuentas]);
+  }, [claveCuentas]);
 
   // La vuelta de Google o Microsoft llega una sola vez, al cargar la página.
   useEffect(() => {
@@ -134,6 +152,13 @@ export function ConexionesProvider({
       const r = g ?? m;
       if (!r) return;
       const proveedor: Proveedor = g ? "google" : "microsoft";
+      const silencioso = leerSilencioso();
+      if (
+        !r.ok &&
+        proveedor === "google" &&
+        trasVuelta(r.error, !!silencioso) === "reintentar"
+      )
+        return iniciarGoogle({ loginHint: silencioso });
       const origen = leerOrigen();
       if (r.ok) {
         const { correo, nombre } = r.cuenta;
@@ -205,7 +230,12 @@ export function ConexionesProvider({
         ...c,
         estado: estados[`${c.proveedor}:${c.correo}`] ?? "activar_aqui",
       })),
-    ofrecer: forzar || (disponible && !data.conexiones.ofrecido),
+    ofrecer: ofrecerHoja({
+      disponible,
+      ofrecido: data.conexiones.ofrecido,
+      estadoNube: cloudStatus,
+      forzar,
+    }),
     ultima,
     conectar: (p, origen) => {
       recordarOrigen(origen);
@@ -217,9 +247,14 @@ export function ConexionesProvider({
     },
     actualizar: (c) => {
       recordarOrigen("ajustes");
-      if (c.proveedor === "google")
+      if (c.proveedor === "google") {
+        try {
+          sessionStorage.setItem(CLAVE_SILENCIOSO, c.correo);
+        } catch {
+          // Sin sessionStorage, si Google pide un toque se mostrará el aviso.
+        }
         iniciarGoogle({ loginHint: c.correo, silencioso: true });
-      else actualizarMicrosoft(c.correo).catch(() => undefined);
+      } else actualizarMicrosoft(c.correo).catch(() => undefined);
     },
     desconectar: async (c) => {
       if (c.proveedor === "google") await olvidarGoogle(c.correo);

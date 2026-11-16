@@ -159,3 +159,28 @@ test("conexiones: estado", () => {
   assert.equal(est.TEXTO_ESTADO.falta_correo, "Falta permiso de correo");
   assert.equal(est.TEXTO_ESTADO.activa, "Activa");
 });
+
+test("conexiones: ofrecer la hoja solo tras la primera sincronización", () => {
+  const nube = require("../.test-build/estadosNube.js");
+  const o = (extra) =>
+    est.ofrecerHoja({
+      disponible: true,
+      ofrecido: false,
+      estadoNube: "Sincronizado",
+      forzar: false,
+      ...extra,
+    });
+  assert.equal(o({}), true);
+  assert.equal(o({ estadoNube: nube.CONECTANDO }), false);
+  assert.equal(o({ estadoNube: nube.SINCRONIZANDO }), false);
+  assert.equal(o({ ofrecido: true }), false);
+  assert.equal(o({ disponible: false }), false);
+  assert.equal(o({ disponible: false, ofrecido: true, forzar: true }), true);
+});
+
+test("conexiones: tras un intento silencioso que pide un toque, se reintenta con la pantalla de Google", () => {
+  assert.equal(est.trasVuelta("necesita_toque", true), "reintentar");
+  assert.equal(est.trasVuelta("necesita_toque", false), "mostrar");
+  assert.equal(est.trasVuelta("cancelado", true), "mostrar");
+  assert.equal(est.trasVuelta(undefined, true), "mostrar");
+});

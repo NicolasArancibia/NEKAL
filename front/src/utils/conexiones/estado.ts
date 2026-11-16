@@ -1,4 +1,5 @@
 import type { Conexiones, Cuenta, Proveedor } from "./tipos";
+import { CONECTANDO, SINCRONIZANDO } from "../estadosNube";
 
 // Lista de cuentas conectadas (spec H3_CONEXIONES §5.2) y su estado en este dispositivo.
 const MAX_CUENTAS = 6;
@@ -73,4 +74,27 @@ export function estadoCuenta(o: {
   if (!o.tienePase) return "activar_aqui";
   if (o.vence !== null && o.vence - o.ahora <= MARGEN_MS) return "actualizar";
   return o.correoPermitido ? "activa" : "falta_correo";
+}
+
+// La hoja «Conecta tus cuentas» espera la primera sincronización: en un
+// dispositivo nuevo los datos locales todavía no saben si ya se ofreció.
+export function ofrecerHoja(o: {
+  disponible: boolean;
+  ofrecido: boolean;
+  estadoNube: string;
+  forzar: boolean;
+}): boolean {
+  if (o.forzar) return true;
+  const esperando =
+    o.estadoNube === CONECTANDO || o.estadoNube === SINCRONIZANDO;
+  return o.disponible && !o.ofrecido && !esperando;
+}
+
+// Un «Actualizar» silencioso de Google que vuelve pidiendo un toque se reintenta
+// con la pantalla de Google, en vez de quedar en «Toca para actualizar» para siempre.
+export function trasVuelta(
+  error: string | undefined,
+  eraSilencioso: boolean,
+): "reintentar" | "mostrar" {
+  return error === "necesita_toque" && eraSilencioso ? "reintentar" : "mostrar";
 }

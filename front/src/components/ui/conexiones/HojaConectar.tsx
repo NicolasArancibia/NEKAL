@@ -70,7 +70,8 @@ function FilaProveedor({
 export default function HojaConectar() {
   const c = useConexiones();
   const hojas = useHojasAbiertas();
-  const vuelta = c.ultima?.origen === "inicio" ? c.ultima : null;
+  // Tras una redirección la app recarga en el Resumen: la vuelta se muestra aquí venga de donde venga.
+  const vuelta = c.ultima;
   const [mostrar, setMostrar] = useState(false);
   // Entra solo sin otras hojas; una vez a la vista, su propia cuenta no la esconde.
   const visible = !!vuelta || (c.ofrecer && (mostrar || hojas === 0));

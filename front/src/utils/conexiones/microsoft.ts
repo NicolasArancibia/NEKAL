@@ -20,6 +20,9 @@ export type ResultadoMicrosoft =
   | { ok: false; error: "cancelado" | "red" };
 
 let cliente: Promise<IPublicClientApplication> | null = null;
+// AccessTokenAndRefreshToken: sin iframe oculto (cargaría toda la app); si el
+// refresh token venció, la cuenta pasa a «Toca para actualizar».
+const SOLO_CACHE_Y_REFRESH = 2;
 function msal(): Promise<IPublicClientApplication> {
   if (!cliente)
     cliente = import("@azure/msal-browser").then(async (m) => {
@@ -82,8 +85,13 @@ export async function paseMicrosoft(correo: string): Promise<string | null> {
     const pca = await msal();
     const account = cuentaDe(pca, correo);
     if (!account) return null;
-    return (await pca.acquireTokenSilent({ scopes: SCOPES, account }))
-      .accessToken;
+    return (
+      await pca.acquireTokenSilent({
+        scopes: SCOPES,
+        account,
+        cacheLookupPolicy: SOLO_CACHE_Y_REFRESH,
+      })
+    ).accessToken;
   } catch {
     // InteractionRequiredAuthError u otro: hace falta un toque.
     return null;
