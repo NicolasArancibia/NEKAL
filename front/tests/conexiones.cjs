@@ -363,3 +363,242 @@ test("espejo: datos de H3 sin destino eligen la primera cuenta; vacío es «No c
   assert.equal(est.normalizarConexiones({ ...h3, destinoNekal: "" }).destinoNekal, "");
   assert.equal(est.normalizarConexiones({ cuentas: [], ofrecido: true }).destinoNekal, "");
 });
+
+const esp = require("../.test-build/conexiones/espejo.js");
+const mod = require("../.test-build/model.js");
+const AHORA = new Date(2026, 10, 16, 10, 0).getTime();
+const CUENTA = cuenta("google", "a@b.cl");
+const evento = (id, extra = {}) => ({
+  id,
+  calendario: "primary",
+  titulo: "Evento " + id,
+  inicio: new Date(2026, 10, 20, 10, 0).toISOString(),
+  minutos: 60,
+  diaCompleto: false,
+  lugar: "",
+  descripcion: "",
+  version: "v1",
+  actualizado: "2026-11-15T12:00:00.000Z",
+  soloLectura: false,
+  cancelado: false,
+  ...extra,
+});
+const plan = (data, eventos, extra = {}) =>
+  esp.planDeSincronizacion({
+    data,
+    eventos,
+    cuenta: CUENTA,
+    calendarioNekal: null,
+    copiarAqui: false,
+    ahora: AHORA,
+    ...extra,
+  });
+const vacio = (p) =>
+  p.crearEnNekal.length +
+  p.actualizarEnNekal.length +
+  p.vincular.length +
+  p.aPapelera.length +
+  p.fuera.length;
+const importar = (eventos, data = mod.emptyData()) =>
+  esp.aplicarEnNekal(data, CUENTA, plan(data, eventos), AHORA);
+const propio = (extra = {}) => ({
+  ...mod.newItem("general", "Tarea"),
+  title: "Estudiar",
+  scheduledAt: new Date(2026, 10, 18, 17, 0).toISOString(),
+  startDate: "2026-11-16",
+  duration: 60,
+  ...extra,
+});
+const sinDestino = { cuentas: [CUENTA], ofrecido: true, destinoNekal: "" };
+
+test("espejo: importar y reconectar dos veces sin duplicar", () => {
+  const eventos = [
+    evento("e1"),
+    evento("e2", { diaCompleto: true, minutos: 1440 }),
+  ];
+  const d1 = importar(eventos);
+  assert.equal(d1.items.length, 2);
+  const i = d1.items.find((x) => x.origen.idExterno === "e1");
+  assert.equal(i.type, "Evento");
+  assert.equal(i.flexible, false);
+  assert.equal(i.countsForScore, false);
+  assert.equal(i.workspaceId, "general");
+  assert.deepEqual(i.origen, {
+    proveedor: "google",
+    cuenta: "a@b.cl",
+    calendario: "primary",
+    idExterno: "e1",
+    version: "v1",
+    firma: ev.firmaDe({ ...i, diaCompleto: false }),
+    creadoEn: "fuera",
+    diaCompleto: false,
+    soloLectura: false,
+  });
+  assert.equal(
+    d1.items.find((x) => x.origen.idExterno === "e2").origen.diaCompleto,
+    true,
+  );
+  assert.equal(vacio(plan(d1, eventos)), 0);
+  const d2 = importar(eventos, importar(eventos, d1));
+  assert.equal(d2.items.length, 2);
+});
+
+test("espejo: cambio afuera llega a Nekal sin tocar updatedAt", () => {
+  const d1 = importar([evento("e1")]);
+  const antes = d1.items[0];
+  const nuevo = evento("e1", {
+    version: "v2",
+    inicio: new Date(2026, 10, 20, 15, 0).toISOString(),
+  });
+  const p = plan(d1, [nuevo]);
+  assert.equal(p.actualizarEnNekal.length, 1);
+  const d2 = esp.aplicarEnNekal(d1, CUENTA, p, AHORA);
+  const i = d2.items[0];
+  assert.equal(i.scheduledAt, nuevo.inicio);
+  assert.equal(i.origen.version, "v2");
+  assert.equal(i.origen.firma, ev.firmaDe({ ...i, diaCompleto: false }));
+  assert.equal(i.updatedAt, antes.updatedAt);
+  assert.equal(vacio(plan(d2, [nuevo])), 0);
+});
+
+test("espejo: lo que mueve Neka (sin updatedAt) se envía afuera", () => {
+  const d1 = importar([evento("e1")]);
+  const movido = {
+    ...d1,
+    items: d1.items.map((i) => ({
+      ...i,
+      scheduledAt: new Date(2026, 10, 20, 16, 0).toISOString(),
+    })),
+  };
+  const p = plan(movido, [evento("e1")]);
+  assert.equal(p.fuera.length, 1);
+  assert.equal(p.fuera[0].tipo, "actualizar");
+  assert.equal(p.fuera[0].cuerpo.scheduledAt, movido.items[0].scheduledAt);
+  assert.equal(esp.hayCambiosLocales(movido, sinDestino, AHORA), true);
+  assert.equal(esp.hayCambiosLocales(d1, sinDestino, AHORA), false);
+});
+
+test("espejo: cambio en ambos lados gana el más reciente", () => {
+  const d1 = importar([evento("e1")]);
+  const local = (updatedAt) => ({
+    ...d1,
+    items: d1.items.map((i) => ({ ...i, title: "Local", updatedAt })),
+  });
+  const afuera = (actualizado) =>
+    evento("e1", { version: "v2", titulo: "Afuera", actualizado });
+  const p1 = plan(local("2026-11-16T12:00:00.000Z"), [
+    afuera("2026-11-16T11:00:00.000Z"),
+  ]);
+  assert.equal(p1.fuera[0]?.tipo, "actualizar");
+  assert.equal(p1.actualizarEnNekal.length, 0);
+  const p2 = plan(local("2026-11-16T10:00:00.000Z"), [
+    afuera("2026-11-16T11:00:00.000Z"),
+  ]);
+  assert.equal(p2.actualizarEnNekal.length, 1);
+  assert.equal(p2.fuera.length, 0);
+});
+
+test("espejo: solo lectura vuelve a como está afuera", () => {
+  const d1 = importar([evento("e1", { soloLectura: true })]);
+  const editado = {
+    ...d1,
+    items: d1.items.map((i) => ({ ...i, title: "Cambiado" })),
+  };
+  const p = plan(editado, [evento("e1", { soloLectura: true })]);
+  assert.equal(p.fuera.length, 0);
+  assert.equal(p.actualizarEnNekal.length, 1);
+  assert.equal(
+    esp.aplicarEnNekal(editado, CUENTA, p, AHORA).items[0].title,
+    "Evento e1",
+  );
+});
+
+test("espejo: borrado afuera va a la papelera; fuera de la ventana no se toca", () => {
+  const lejos = evento("e9", {
+    inicio: new Date(2027, 2, 1, 10, 0).toISOString(),
+  });
+  const d1 = importar([evento("e1"), lejos]);
+  const p = plan(d1, [evento("e1", { cancelado: true })]);
+  assert.equal(p.aPapelera.length, 1);
+  const d2 = esp.aplicarEnNekal(d1, CUENTA, p, AHORA);
+  assert.ok(d2.items.find((i) => i.origen.idExterno === "e1").deletedAt);
+  assert.equal(d2.items.find((i) => i.origen.idExterno === "e9").deletedAt, "");
+});
+
+test("espejo: borrado en Nekal se borra afuera y después se suelta el origen", () => {
+  const d1 = importar([evento("e1")]);
+  const id = d1.items[0].id;
+  const borrado = mod.deleteItem(d1, id);
+  const p = plan(borrado, [evento("e1")]);
+  assert.equal(p.fuera.length, 1);
+  assert.equal(p.fuera[0].tipo, "borrar");
+  assert.equal(esp.hayCambiosLocales(borrado, sinDestino, AHORA), true);
+  const d3 = esp.aplicarResultados(borrado, [
+    { itemId: id, ok: true, origen: null },
+  ]);
+  assert.equal(d3.items[0].origen, undefined);
+  assert.equal(vacio(plan(d3, [])), 0);
+  const conError = esp.aplicarResultados(borrado, [
+    { itemId: id, ok: false, error: "red" },
+  ]);
+  assert.deepEqual(conError, borrado);
+  const ro = importar([evento("e2", { soloLectura: true })]);
+  const roBorrado = mod.deleteItem(ro, ro.items[0].id);
+  assert.equal(
+    plan(roBorrado, [evento("e2", { soloLectura: true })]).fuera.length,
+    0,
+  );
+  assert.equal(esp.hayCambiosLocales(roBorrado, sinDestino, AHORA), false);
+});
+
+test("espejo: lo creado en Nekal se copia solo si corresponde", () => {
+  const rutina = mod.newGroup("Gimnasio", "general", {
+    repeat: "diario",
+    repeatStart: "2026-11-16",
+  });
+  const data = {
+    ...mod.emptyData(),
+    groups: [rutina],
+    items: [
+      propio({ id: "t1" }),
+      propio({ id: "t2", groupId: rutina.id }),
+      propio({ id: "t3", type: "Nota", scheduledAt: "" }),
+      propio({ id: "t4", scheduledAt: new Date(2027, 3, 1, 10, 0).toISOString() }),
+      propio({ id: "t5", scheduledAt: "" }),
+      propio({ id: "t6", deletedAt: "2026-11-16T09:00:00.000Z" }),
+    ],
+  };
+  assert.equal(plan(data, []).fuera.length, 0);
+  const p = plan(data, [], { copiarAqui: true });
+  assert.deepEqual(
+    p.fuera.map((a) => [a.tipo, a.itemId]),
+    [["crear", "t1"]],
+  );
+  const conDestino = { ...sinDestino, destinoNekal: "google:a@b.cl" };
+  assert.equal(esp.hayCambiosLocales(data, conDestino, AHORA), true);
+  assert.equal(esp.hayCambiosLocales(data, sinDestino, AHORA), false);
+  const origen = { ...ORIGEN, idExterno: "n1", creadoEn: "nekal" };
+  const d2 = esp.aplicarResultados(data, [{ itemId: "t1", ok: true, origen }]);
+  assert.deepEqual(d2.items[0].origen, origen);
+  assert.equal(plan(d2, [], { copiarAqui: true }).fuera.length, 0);
+});
+
+test("espejo: un evento del calendario Nekal se vincula con su tarea en vez de importarse", () => {
+  const t = propio({ id: "t1", title: "Estudiar" });
+  const data = { ...mod.emptyData(), items: [t] };
+  const copia = evento("n1", {
+    calendario: "calN",
+    titulo: "Estudiar",
+    inicio: t.scheduledAt,
+  });
+  const extra = { calendarioNekal: "calN", copiarAqui: true };
+  const p = plan(data, [copia], extra);
+  assert.equal(p.crearEnNekal.length, 0);
+  assert.equal(p.vincular.length, 1);
+  assert.equal(p.fuera.length, 0);
+  const d2 = esp.aplicarEnNekal(data, CUENTA, p, AHORA);
+  assert.equal(d2.items.length, 1);
+  assert.equal(d2.items[0].origen.creadoEn, "nekal");
+  assert.equal(d2.items[0].origen.idExterno, "n1");
+  assert.equal(vacio(plan(d2, [copia], extra)), 0);
+});
