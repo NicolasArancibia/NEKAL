@@ -518,11 +518,13 @@ test("espejo: borrado afuera va a la papelera; fuera de la ventana no se toca", 
     inicio: new Date(2027, 2, 1, 10, 0).toISOString(),
   });
   const d1 = importar([evento("e1"), lejos]);
+  const id1 = d1.items.find((i) => i.origen.idExterno === "e1").id;
+  const id9 = d1.items.find((i) => i.origen.idExterno === "e9").id;
   const p = plan(d1, [evento("e1", { cancelado: true })]);
   assert.equal(p.aPapelera.length, 1);
   const d2 = esp.aplicarEnNekal(d1, CUENTA, p, AHORA);
-  assert.ok(d2.items.find((i) => i.origen.idExterno === "e1").deletedAt);
-  assert.equal(d2.items.find((i) => i.origen.idExterno === "e9").deletedAt, "");
+  assert.ok(d2.items.find((i) => i.id === id1).deletedAt);
+  assert.equal(d2.items.find((i) => i.id === id9).deletedAt, "");
 });
 
 test("espejo: borrado en Nekal se borra afuera y después se suelta el origen", () => {
@@ -692,4 +694,74 @@ test("espejo: desconectar manda lo importado a la papelera y suelta lo copiado",
   assert.equal(d.items.find((i) => i.id === "t1").origen, undefined);
   assert.equal(d.items.find((i) => i.id === "t1").deletedAt, "");
   assert.deepEqual(d.items.find((i) => i.id === "t2").origen, otraCuenta.origen);
+});
+
+// ── Arreglos de la revisión de H4 ──────────────────────────────────────────
+test("revisión H4: desconectar y reconectar nunca borra eventos de afuera", () => {
+  const d1 = importar([evento("e1"), evento("e2")]);
+  const suelto = esp.soltarCuenta(d1, CUENTA, AHORA);
+  assert.ok(suelto.items.every((i) => i.deletedAt && i.origen === undefined));
+  const p = plan(suelto, [evento("e1"), evento("e2")]);
+  assert.equal(p.fuera.filter((a) => a.tipo === "borrar").length, 0);
+  assert.equal(p.crearEnNekal.length, 2);
+});
+
+test("revisión H4: un evento que deja de llegar va a la papelera sin borrarse afuera", () => {
+  const d1 = importar([evento("e1")]);
+  const id = d1.items[0].id;
+  const d2 = esp.aplicarEnNekal(d1, CUENTA, plan(d1, []), AHORA);
+  const i = d2.items.find((x) => x.id === id);
+  assert.ok(i.deletedAt);
+  assert.equal(i.origen, undefined);
+  assert.equal(plan(d2, [evento("e1")]).fuera.length, 0);
+});
+
+test("revisión H4: el espejo espera la primera sincronización con la nube", () => {
+  const nube = require("../.test-build/estadosNube.js");
+  assert.equal(est.esperandoNube(nube.CONECTANDO), true);
+  assert.equal(est.esperandoNube(nube.SINCRONIZANDO), true);
+  assert.equal(est.esperandoNube("Sincronizado"), false);
+});
+
+test("revisión H4: un cambio solo de título no toca el inicio ni el fin afuera", () => {
+  const viaje = {
+    title: "Viaje a Chiloé",
+    scheduledAt: new Date(2026, 10, 21).toISOString(),
+    duration: 1440,
+    location: "",
+    origen: { diaCompleto: true },
+  };
+  const firma = ev.firmaDe({ ...viaje, title: "Viaje", diaCompleto: true });
+  assert.deepEqual(ev.cambiosGoogle(viaje, firma), { summary: "Viaje a Chiloé" });
+  assert.deepEqual(ev.cambiosGraph(viaje, firma, "America/Santiago"), {
+    subject: "Viaje a Chiloé",
+  });
+  const movido = { ...viaje, scheduledAt: new Date(2026, 10, 22).toISOString() };
+  const firmaMovido = ev.firmaDe({ ...viaje, diaCompleto: true });
+  assert.deepEqual(ev.cambiosGoogle(movido, firmaMovido).start, { date: "2026-11-22" });
+  assert.deepEqual(ev.cambiosGoogle(viaje, "basura"), ev.cuerpoGoogle(viaje));
+});
+
+test("revisión H4: dos ítems con el mismo evento quedan en uno", () => {
+  const d1 = importar([evento("e1")]);
+  const copia = { ...d1.items[0], id: "copia", createdAt: "2030-01-01T00:00:00.000Z" };
+  const doble = { ...d1, items: [...d1.items, copia] };
+  const p = plan(doble, [evento("e1")]);
+  assert.deepEqual(p.duplicados, ["copia"]);
+  const d2 = esp.aplicarEnNekal(doble, CUENTA, p, AHORA);
+  const c = d2.items.find((i) => i.id === "copia");
+  assert.ok(c.deletedAt);
+  assert.equal(c.origen, undefined);
+  assert.equal(vacio(plan(d2, [evento("e1")])), 0);
+});
+
+test("revisión H4: si afuera no dejan editar (403), vuelve a como está allá", async () => {
+  const d1 = importar([evento("e1")]);
+  const m = memoria({ ...d1, items: d1.items.map((i) => ({ ...i, title: "Cambiado", updatedAt: "2030-01-01T00:00:00.000Z" })) });
+  const red = redFalsa({ eventos: [evento("e1")], falla: "guardar", error: "prohibido" });
+  assert.equal(await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: false, ahora: AHORA }), "ok");
+  assert.equal(m.leer().items[0].origen.soloLectura, true);
+  const p = plan(m.leer(), [evento("e1")]);
+  assert.equal(p.actualizarEnNekal.length, 1);
+  assert.equal(p.fuera.length, 0);
 });

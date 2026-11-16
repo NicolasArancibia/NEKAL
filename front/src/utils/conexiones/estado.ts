@@ -134,6 +134,11 @@ export function estadoCuenta(o: {
 
 // La hoja «Conecta tus cuentas» espera la primera sincronización: en un
 // dispositivo nuevo los datos locales todavía no saben si ya se ofreció.
+// Antes del primer intercambio con Firebase los datos locales pueden estar
+// viejos o vacíos (dispositivo nuevo): ni la hoja ni el espejo deben actuar.
+export const esperandoNube = (estadoNube: string) =>
+  estadoNube === CONECTANDO || estadoNube === SINCRONIZANDO;
+
 export function ofrecerHoja(o: {
   disponible: boolean;
   ofrecido: boolean;

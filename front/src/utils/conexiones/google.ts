@@ -3,6 +3,7 @@ import { leerVuelta, permisosGoogle, urlGoogle } from "./pase";
 import type { CalendarioFuera, PaseGoogle, Permisos } from "./tipos";
 import type { Item } from "../model";
 import {
+  cambiosGoogle,
   cuerpoGoogle,
   desdeGoogle,
   EventoFuera,
@@ -119,6 +120,8 @@ async function pedir(token: string, url: string, init: RequestInit = {}) {
     },
   });
   if (r.status === 401) throw new Error("pase");
+  // Sin permiso para cambiar ese evento (por ejemplo, no eres quien lo organiza).
+  if (r.status === 403) throw new Error("prohibido");
   return r;
 }
 async function json(token: string, url: string, init?: RequestInit) {
@@ -127,7 +130,9 @@ async function json(token: string, url: string, init?: RequestInit) {
   return r.json();
 }
 
-export async function calendariosGoogle(token: string): Promise<CalendarioFuera[]> {
+export async function calendariosGoogle(
+  token: string,
+): Promise<CalendarioFuera[]> {
   const out: CalendarioFuera[] = [];
   let pagina = "";
   do {
@@ -178,7 +183,9 @@ export async function eventosGoogle(
   return out;
 }
 
-export async function crearCalendarioNekalGoogle(token: string): Promise<string> {
+export async function crearCalendarioNekalGoogle(
+  token: string,
+): Promise<string> {
   const r = await json(token, `${CAL}/calendars`, {
     method: "POST",
     body: JSON.stringify({ summary: "Nekal" }),
@@ -191,12 +198,17 @@ export async function guardarEventoGoogle(
   cal: string,
   i: Item,
   idExterno?: string,
+  firmaAnterior?: string,
 ): Promise<EventoFuera> {
   const base = `${CAL}/calendars/${encodeURIComponent(cal)}/events`;
+  const cuerpo =
+    idExterno && firmaAnterior
+      ? cambiosGoogle(i, firmaAnterior)
+      : cuerpoGoogle(i);
   const r = await json(
     token,
     idExterno ? `${base}/${encodeURIComponent(idExterno)}` : base,
-    { method: idExterno ? "PATCH" : "POST", body: JSON.stringify(cuerpoGoogle(i)) },
+    { method: idExterno ? "PATCH" : "POST", body: JSON.stringify(cuerpo) },
   );
   const ev = desdeGoogle(r, cal, false);
   if (!ev) throw new Error("red");

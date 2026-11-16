@@ -19,6 +19,7 @@ import { RedCalendario, sincronizarCuenta } from "./conexiones/sincronizar";
 import {
   agregarCuenta,
   claveCuenta,
+  esperandoNube,
   estadoCuenta,
   ofrecerHoja,
   trasVuelta,
@@ -212,6 +213,8 @@ export function ConexionesProvider({
   const corriendo = useRef(false);
   const dataRef = useRef(data);
   dataRef.current = data;
+  const nubeRef = useRef(cloudStatus);
+  nubeRef.current = cloudStatus;
   const cuentas = data.conexiones.cuentas;
   // Clave estable: cada sincronización recrea la lista aunque no cambie.
   const claveCuentas = cuentas
@@ -280,7 +283,12 @@ export function ConexionesProvider({
 
   // Una pasada del espejo por cada cuenta con pase (spec H3 §7), de a una.
   const sincronizar = useCallback(async () => {
-    if (!disponible || corriendo.current) return;
+    if (
+      !disponible ||
+      corriendo.current ||
+      esperandoNube(nubeRef.current)
+    )
+      return;
     corriendo.current = true;
     try {
       const { cuentas: todas, destinoNekal } = dataRef.current.conexiones;
@@ -352,6 +360,7 @@ export function ConexionesProvider({
           actualizarEnNekal: [],
           vincular: [],
           aPapelera: [],
+          duplicados: [],
           fuera: [],
         });
         change((d) =>

@@ -183,6 +183,49 @@ export function cuerpoGoogle(i: Espejable): object {
   };
 }
 
+// La firma anterior dice qué campos cambió Nekal; si no se puede leer, va todo.
+function cambiados(i: Espejable, firmaAnterior: string) {
+  try {
+    const [t, ini, dur, lugar, dia] = JSON.parse(firmaAnterior);
+    return {
+      titulo: t !== i.title,
+      lugar: lugar !== i.location,
+      hora:
+        ini !== i.scheduledAt ||
+        dur !== i.duration ||
+        dia !== !!i.origen?.diaCompleto,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function cambiosGoogle(i: Espejable, firmaAnterior: string): object {
+  const c = cambiados(i, firmaAnterior);
+  const todo = cuerpoGoogle(i) as Record<string, unknown>;
+  if (!c) return todo;
+  return {
+    ...(c.titulo && { summary: todo.summary }),
+    ...(c.lugar && { location: todo.location }),
+    ...(c.hora && { start: todo.start, end: todo.end }),
+  };
+}
+
+export function cambiosGraph(
+  i: Espejable,
+  firmaAnterior: string,
+  zona: string,
+): object {
+  const c = cambiados(i, firmaAnterior);
+  const todo = cuerpoGraph(i, zona) as Record<string, unknown>;
+  if (!c) return todo;
+  return {
+    ...(c.titulo && { subject: todo.subject }),
+    ...(c.lugar && { location: todo.location }),
+    ...(c.hora && { start: todo.start, end: todo.end, isAllDay: todo.isAllDay }),
+  };
+}
+
 export function cuerpoGraph(i: Espejable, zona: string): object {
   if (i.origen?.diaCompleto) {
     const dia = diaLocal(new Date(i.scheduledAt));

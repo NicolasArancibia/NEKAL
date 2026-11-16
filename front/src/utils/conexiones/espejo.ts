@@ -20,6 +20,8 @@ export type PlanEspejo = {
   actualizarEnNekal: { itemId: string; evento: EventoFuera }[];
   vincular: { itemId: string; evento: EventoFuera }[];
   aPapelera: string[];
+  // Ítems repetidos del mismo evento (dos dispositivos lo importaron a la vez).
+  duplicados: string[];
   fuera: AccionFuera[];
 };
 export type ResultadoFuera =
@@ -77,6 +79,7 @@ export function planDeSincronizacion(o: {
     actualizarEnNekal: [],
     vincular: [],
     aPapelera: [],
+    duplicados: [],
     fuera: [],
   };
 
@@ -102,7 +105,20 @@ export function planDeSincronizacion(o: {
     } else p.crearEnNekal.push(e);
   }
 
+  // Si dos ítems vivos apuntan al mismo evento, queda el más antiguo.
+  const primero = new Map<string, Item>();
+  for (const i of [...propios].sort((a, b) =>
+    a.createdAt === b.createdAt ? (a.id < b.id ? -1 : 1) : a.createdAt < b.createdAt ? -1 : 1,
+  )) {
+    if (i.deletedAt) continue;
+    const id = i.origen!.idExterno;
+    if (primero.has(id)) p.duplicados.push(i.id);
+    else primero.set(id, i);
+  }
+  const repetidos = new Set(p.duplicados);
+
   for (const i of propios) {
+    if (repetidos.has(i.id)) continue;
     const origen = i.origen!;
     if (i.deletedAt) {
       if (!origen.soloLectura)
@@ -177,8 +193,13 @@ export function aplicarEnNekal(
         origen: { ...origen, firma: firmaDeItem({ ...i, origen }) },
       };
     });
-  for (const id of p.aPapelera)
-    cambios.set(id, (i) => ({ ...i, deletedAt: cuando }));
+  // Lo que ya no está afuera (o está repetido) va a la papelera sin origen:
+  // así nunca se pide borrarlo afuera (un calendario oculto no se pierde).
+  for (const id of [...p.aPapelera, ...p.duplicados])
+    cambios.set(id, (i) => {
+      const { origen: _, ...sinOrigen } = i;
+      return { ...sinOrigen, deletedAt: i.deletedAt || cuando };
+    });
 
   const nuevos = p.crearEnNekal.map((e) => {
     const base: Item = {
@@ -249,10 +270,11 @@ export function soltarCuenta(d: AppData, cuenta: Cuenta, ahora: number): AppData
     ...d,
     items: d.items.map((i) => {
       if (!deLaCuenta(i, cuenta)) return i;
-      if (i.origen!.creadoEn === "fuera")
-        return { ...i, deletedAt: i.deletedAt || cuando };
-      const { origen: _, ...propio } = i;
-      return propio;
+      // Sin origen: al reconectar, nada de esto se borra afuera.
+      const { origen, ...propio } = i;
+      return origen!.creadoEn === "fuera"
+        ? { ...propio, deletedAt: i.deletedAt || cuando }
+        : propio;
     }),
   };
 }

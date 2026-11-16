@@ -6,6 +6,7 @@ import type {
 import type { Item } from "../model";
 import type { CalendarioFuera } from "./tipos";
 import {
+  cambiosGraph,
   cuerpoGraph,
   desdeGraph,
   EventoFuera,
@@ -143,6 +144,8 @@ async function pedirGraph(token: string, url: string, init: RequestInit = {}) {
     },
   });
   if (r.status === 401) throw new Error("pase");
+  // Sin permiso para cambiar ese evento (por ejemplo, no eres quien lo organiza).
+  if (r.status === 403) throw new Error("prohibido");
   return r;
 }
 async function jsonGraph(token: string, url: string, init?: RequestInit) {
@@ -206,7 +209,12 @@ export async function guardarEventoGraph(
   cal: string,
   i: Item,
   idExterno?: string,
+  firmaAnterior?: string,
 ): Promise<EventoFuera> {
+  const cuerpo =
+    idExterno && firmaAnterior
+      ? cambiosGraph(i, firmaAnterior, zonaLocal())
+      : cuerpoGraph(i, zonaLocal());
   const r = await jsonGraph(
     token,
     idExterno
@@ -214,7 +222,7 @@ export async function guardarEventoGraph(
       : `${GRAPH}/me/calendars/${encodeURIComponent(cal)}/events`,
     {
       method: idExterno ? "PATCH" : "POST",
-      body: JSON.stringify(cuerpoGraph(i, zonaLocal())),
+      body: JSON.stringify(cuerpo),
     },
   );
   const ev = desdeGraph(r, cal, false);

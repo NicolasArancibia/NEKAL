@@ -25,6 +25,7 @@ export type RedCalendario = {
     cal: string,
     i: Item,
     idExterno?: string,
+    firmaAnterior?: string,
   ) => Promise<EventoFuera>;
   borrar: (token: string, cal: string, idExterno: string) => Promise<void>;
 };
@@ -82,6 +83,7 @@ export async function sincronizarCuenta(
           a.origen.calendario,
           a.cuerpo,
           a.origen.idExterno,
+          a.origen.firma,
         );
         resultados.push({
           itemId: a.itemId,
@@ -113,6 +115,15 @@ export async function sincronizarCuenta(
       if (esPase(e)) {
         estado = "pase";
         break;
+      }
+      // Afuera no dejan cambiarlo: pasa a solo lectura y vuelve a como está allá.
+      if ((e as Error)?.message === "prohibido" && a.tipo !== "crear") {
+        resultados.push({
+          itemId: a.itemId,
+          ok: true,
+          origen: { ...a.origen, soloLectura: true, version: "" },
+        });
+        continue;
       }
       resultados.push({ itemId: a.itemId, ok: false, error: "red" });
     }
