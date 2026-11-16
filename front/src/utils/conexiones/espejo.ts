@@ -240,3 +240,19 @@ export function hayCambiosLocales(
       copiables(d, ahora).length > 0)
   );
 }
+
+// Desconectar (spec §8): lo importado de esa cuenta va a la papelera (sigue
+// intacto afuera) y lo creado en Nekal pierde el origen y se queda.
+export function soltarCuenta(d: AppData, cuenta: Cuenta, ahora: number): AppData {
+  const cuando = new Date(ahora).toISOString();
+  return {
+    ...d,
+    items: d.items.map((i) => {
+      if (!deLaCuenta(i, cuenta)) return i;
+      if (i.origen!.creadoEn === "fuera")
+        return { ...i, deletedAt: i.deletedAt || cuando };
+      const { origen: _, ...propio } = i;
+      return propio;
+    }),
+  };
+}

@@ -602,3 +602,94 @@ test("espejo: un evento del calendario Nekal se vincula con su tarea en vez de i
   assert.equal(d2.items[0].origen.idExterno, "n1");
   assert.equal(vacio(plan(d2, [copia], extra)), 0);
 });
+
+const sinc = require("../.test-build/conexiones/sincronizar.js");
+// Red falsa: un calendario «primary» con eventos en memoria y lo que se pide afuera.
+function redFalsa(o = {}) {
+  const r = {
+    llamadas: [],
+    calendarios: [{ id: "primary", nombre: "Yo", soloLectura: false, esNekal: false }],
+    eventos: o.eventos ?? [],
+    token: async () => (o.sinPase ? null : "T"),
+    leerCalendarios: async () => r.calendarios,
+    leerEventos: async () => r.eventos,
+    crearCalendarioNekal: async () => {
+      r.llamadas.push("crearCalendario");
+      r.calendarios.push({ id: "calN", nombre: "Nekal", soloLectura: false, esNekal: true });
+      return "calN";
+    },
+    guardar: async (_t, cal, i, id) => {
+      if (o.falla === "guardar") throw new Error(o.error ?? "red");
+      r.llamadas.push(["guardar", cal, i.id, id ?? null]);
+      return evento(id ?? "nuevo-" + i.id, { calendario: cal, version: "v9", titulo: i.title, inicio: i.scheduledAt });
+    },
+    borrar: async (_t, cal, id) => {
+      r.llamadas.push(["borrar", cal, id]);
+    },
+  };
+  return r;
+}
+function memoria(data) {
+  let d = data;
+  return { leer: () => d, change: (f) => { d = f(d); } };
+}
+
+test("sincronizar: importa y copia lo de Nekal al calendario «Nekal» (lo crea si falta)", async () => {
+  const m = memoria({ ...mod.emptyData(), items: [propio({ id: "t1" })] });
+  const red = redFalsa({ eventos: [evento("e1")] });
+  const r = await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: true, ahora: AHORA });
+  assert.equal(r, "ok");
+  assert.deepEqual(red.llamadas, ["crearCalendario", ["guardar", "calN", "t1", null]]);
+  const d = m.leer();
+  assert.equal(d.items.length, 2);
+  const t1 = d.items.find((i) => i.id === "t1");
+  assert.equal(t1.origen.creadoEn, "nekal");
+  assert.equal(t1.origen.calendario, "calN");
+  assert.equal(t1.origen.idExterno, "nuevo-t1");
+  assert.equal(t1.origen.firma, esp.firmaDeItem(t1));
+  // Segunda pasada: el calendario ya existe y la copia vuelve como evento → nada nuevo.
+  red.eventos = [evento("e1"), evento("nuevo-t1", { calendario: "calN", version: "v9", titulo: t1.title, inicio: t1.scheduledAt })];
+  red.llamadas = [];
+  assert.equal(await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: true, ahora: AHORA }), "ok");
+  assert.deepEqual(red.llamadas, []);
+  assert.equal(m.leer().items.length, 2);
+});
+
+test("sincronizar: sin pase no toca nada", async () => {
+  const m = memoria(mod.emptyData());
+  const red = redFalsa({ sinPase: true, eventos: [evento("e1")] });
+  assert.equal(await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: true, ahora: AHORA }), "pase");
+  assert.equal(m.leer().items.length, 0);
+});
+
+test("sincronizar: si el pase vence a mitad, lo importado queda y avisa «pase»", async () => {
+  const m = memoria({ ...mod.emptyData(), items: [propio({ id: "t1" })] });
+  const red = redFalsa({ eventos: [evento("e1")], falla: "guardar", error: "pase" });
+  red.calendarios.push({ id: "calN", nombre: "Nekal", soloLectura: false, esNekal: true });
+  assert.equal(await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: true, ahora: AHORA }), "pase");
+  assert.equal(m.leer().items.length, 2);
+  assert.equal(m.leer().items.find((i) => i.id === "t1").origen, undefined);
+});
+
+test("sincronizar: un error de red en una acción no frena las demás", async () => {
+  const d1 = importar([evento("e1")]);
+  const borrado = mod.deleteItem(d1, d1.items[0].id);
+  const m = memoria({ ...borrado, items: [...borrado.items, propio({ id: "t1" })] });
+  const red = redFalsa({ eventos: [evento("e1")], falla: "guardar" });
+  red.calendarios.push({ id: "calN", nombre: "Nekal", soloLectura: false, esNekal: true });
+  assert.equal(await sinc.sincronizarCuenta(CUENTA, { ...m, red, copiarAqui: true, ahora: AHORA }), "ok");
+  assert.deepEqual(red.llamadas, [["borrar", "primary", "e1"]]);
+  assert.equal(m.leer().items.find((i) => i.id === d1.items[0].id).origen, undefined);
+  assert.equal(m.leer().items.find((i) => i.id === "t1").origen, undefined);
+});
+
+test("espejo: desconectar manda lo importado a la papelera y suelta lo copiado", () => {
+  const d1 = importar([evento("e1")]);
+  const copiado = propio({ id: "t1", origen: { ...ORIGEN, idExterno: "n1", creadoEn: "nekal" } });
+  const otraCuenta = propio({ id: "t2", origen: { ...ORIGEN, cuenta: "otra@b.cl" } });
+  const d = esp.soltarCuenta({ ...d1, items: [...d1.items, copiado, otraCuenta] }, CUENTA, AHORA);
+  assert.ok(d.items[0].deletedAt);
+  assert.equal(d.items.find((i) => i.id === "t1").origen, undefined);
+  assert.equal(d.items.find((i) => i.id === "t1").deletedAt, "");
+  assert.deepEqual(d.items.find((i) => i.id === "t2").origen, otraCuenta.origen);
+});

@@ -4,7 +4,7 @@ import type {
   IPublicClientApplication,
 } from "@azure/msal-browser";
 import type { Item } from "../model";
-import type { CalendarioFuera } from "./google";
+import type { CalendarioFuera } from "./tipos";
 import {
   cuerpoGraph,
   desdeGraph,

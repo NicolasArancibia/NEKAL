@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { leerVuelta, permisosGoogle, urlGoogle } from "./pase";
-import type { PaseGoogle, Permisos } from "./tipos";
+import type { CalendarioFuera, PaseGoogle, Permisos } from "./tipos";
 import type { Item } from "../model";
 import {
   cuerpoGoogle,
@@ -106,12 +106,7 @@ export async function olvidarGoogle(correo: string): Promise<void> {
 }
 
 // ── Calendario (V2/H4) ─────────────────────────────────────────────────────
-export type CalendarioFuera = {
-  id: string;
-  nombre: string;
-  soloLectura: boolean;
-  esNekal: boolean;
-};
+export type { CalendarioFuera } from "./tipos";
 const CAL = "https://www.googleapis.com/calendar/v3";
 
 // 401 = pase vencido («pase»); otro error = «red».

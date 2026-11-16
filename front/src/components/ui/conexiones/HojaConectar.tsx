@@ -132,7 +132,7 @@ export default function HojaConectar() {
     pose = 1;
     titulo = `${nombre} conectado`;
     texto =
-      "Tu cuenta quedó lista. Pronto Neka traerá tus eventos y tu correo.";
+      "Traje tus eventos de las próximas semanas. Neka ya los tiene en cuenta.";
     filas = [
       <FilaProveedor
         key="ok"

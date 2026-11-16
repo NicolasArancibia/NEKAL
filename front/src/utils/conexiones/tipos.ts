@@ -25,6 +25,13 @@ export type Origen = {
   diaCompleto: boolean;
   soloLectura: boolean;
 };
+// Un calendario de la cuenta. `esNekal`: el calendario «Nekal» propio, donde va lo creado en Nekal.
+export type CalendarioFuera = {
+  id: string;
+  nombre: string;
+  soloLectura: boolean;
+  esNekal: boolean;
+};
 export type PaseGoogle = { token: string; vence: number; scopes: string[] };
 export type Permisos = { calendario: boolean; correo: boolean };
 export type Vuelta =
