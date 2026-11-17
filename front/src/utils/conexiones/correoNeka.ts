@@ -199,6 +199,27 @@ function cuando(s: string, ahora: number): string {
   return `${dia.getDate()} ${MESES[dia.getMonth()]}`;
 }
 
+// Hora de la fila: hoy «09:12», «ayer», esta semana «vie», si no «2 nov».
+export function horaCorreo(fecha: string, ahora: number): string {
+  const f = new Date(fecha);
+  if (!Number.isFinite(f.getTime())) return "";
+  const n = Math.round(
+    (aLas(new Date(ahora), 12).getTime() - aLas(f, 12).getTime()) / DIA_MS,
+  );
+  if (n <= 0) return horaLocal(f);
+  if (n === 1) return "ayer";
+  if (n < 7) return DIAS[f.getDay()].slice(0, 3);
+  return `${f.getDate()} ${MESES[f.getMonth()]}`;
+}
+
+// La cita que ofrece el borrador: «sábado 21 a las 17:00».
+export function textoInicio(inicio: string): string {
+  const v = validar(inicio);
+  if (!v) return "";
+  const dia = `${DIAS[v.fecha.getDay()]} ${v.fecha.getDate()}`;
+  return v.hora ? `${dia} a las ${horaLocal(v.fecha)}` : dia;
+}
+
 export function textoRazon(c: Clase, ahora: number): string {
   const f = c.fecha ? cuando(c.fecha, ahora) : "";
   switch (c.razon) {

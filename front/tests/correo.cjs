@@ -512,3 +512,13 @@ test("bandeja: una cuenta falla y la otra se ve", async () => {
   assert.deepEqual(sinPermiso.llamadas, []);
   assert.equal(b.principales.length, 1);
 });
+
+test("correo Neka: hora corta de la fila y fecha de la cita", () => {
+  assert.equal(cn.horaCorreo(new Date(2026, 10, 17, 9, 12).toISOString(), AHORA), "09:12");
+  assert.equal(cn.horaCorreo(new Date(2026, 10, 16, 20, 0).toISOString(), AHORA), "ayer");
+  assert.equal(cn.horaCorreo(new Date(2026, 10, 13, 8, 0).toISOString(), AHORA), "vie");
+  assert.equal(cn.horaCorreo(new Date(2026, 10, 2, 8, 0).toISOString(), AHORA), "2 nov");
+  assert.equal(cn.textoInicio("2026-11-21T17:00"), "sábado 21 a las 17:00");
+  assert.equal(cn.textoInicio("2026-12-01"), "martes 1");
+  assert.equal(cn.textoInicio("nada"), "");
+});
