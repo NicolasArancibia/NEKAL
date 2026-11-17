@@ -170,13 +170,67 @@ const { emptyData, newItem, saveItem } = require("../.test-build/model");
       ofrecido: true,
     });
     await invalid("settings/conexiones", { cuentas: [], ofrecido: "si" });
+    await invalid("settings/conexiones", { cuentas: [], ofrecido: true });
+    // Destinos de lo creado en Nekal: lista de hasta 6 (antes, un texto).
+    await invalid("settings/conexiones", { cuentas: [], ofrecido: true, destinoNekal: "" });
+    await invalid("settings/conexiones", { cuentas: [], ofrecido: true, destinos: "google:a" });
+    await invalid("settings/conexiones", {
+      cuentas: [],
+      ofrecido: true,
+      destinos: Array.from({ length: 7 }, (_, i) => `google:${i}`),
+    });
+    // V2/H4: ítems con origen (espejo de calendario).
+    const origenH4 = {
+      proveedor: "google",
+      cuenta: "a@b.cl",
+      calendario: "primary",
+      idExterno: "ev1",
+      version: '"1"',
+      firma: "[]",
+      creadoEn: "fuera",
+      diaCompleto: false,
+      soloLectura: false,
+    };
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: { ...origenH4, token: "x" },
+    });
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: { ...origenH4, proveedor: "yahoo" },
+    });
+    // Copias en más cuentas (Google y Outlook a la vez): solo junto a un origen.
+    const copiaH4 = { ...origenH4, proveedor: "microsoft", idExterno: "o1", creadoEn: "nekal" };
+    await invalid("items/task", { ...snap.records["items/task"], copias: [copiaH4] });
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: origenH4,
+      copias: [copiaH4, { ...copiaH4, token: "x" }],
+    });
+    await invalid("items/task", {
+      ...snap.records["items/task"],
+      origen: origenH4,
+      copias: Array.from({ length: 6 }, () => copiaH4),
+    });
+    await invalid("items/task", { ...snap.records["items/task"], origen: origenH4, copias: [] });
     const conCuentas = {
       ...dataOf(snap.records),
-      conexiones: { cuentas: [cuentaH3], ofrecido: true },
+      conexiones: { cuentas: [cuentaH3], ofrecido: true, destinos: ["google:a@b.cl"] },
+      items: dataOf(snap.records).items.map((i) =>
+        i.id === "task" ? { ...i, origen: origenH4, copias: [copiaH4] } : i,
+      ),
     };
     await a.commit(snap, operation(dataOf(snap.records), conCuentas));
     snap = await a.read();
     assert.deepEqual(dataOf(snap.records).conexiones, conCuentas.conexiones);
+    assert.deepEqual(
+      dataOf(snap.records).items.find((i) => i.id === "task").origen,
+      origenH4,
+    );
+    assert.deepEqual(
+      dataOf(snap.records).items.find((i) => i.id === "task").copias,
+      [copiaH4],
+    );
     console.log("OK Firestore: cuentas conectadas");
     // V2/F: códigos, amistades y tarjetas (spec F §5).
     const carol = env.authenticatedContext("carol").firestore();

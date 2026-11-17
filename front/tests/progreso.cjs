@@ -737,3 +737,24 @@ test("logros: el modal espera la primera sincronización y las hojas", () => {
   assert.equal(lg.listoParaLogro({ ...base, grabando: true }), false);
   assert.equal(lg.listoParaLogro({ ...base, planAbierto: true }), false);
 });
+
+test("progreso: los eventos de Google/Outlook no cuentan para tus días", () => {
+  const ahora = new Date(2026, 10, 16, 20, 0).getTime();
+  const origen = {
+    proveedor: "google",
+    cuenta: "a@b.cl",
+    calendario: "primary",
+    idExterno: "e1",
+    version: "v1",
+    firma: "[]",
+    creadoEn: "fuera",
+    diaCompleto: false,
+    soloLectura: false,
+  };
+  const tarea = item({ id: "t", startDate: "2026-11-16", scheduledAt: new Date(2026, 10, 16, 10, 0).toISOString(), status: "completado" });
+  const reunion = item({ id: "r", type: "Evento", startDate: "2026-10-01", scheduledAt: new Date(2026, 10, 16, 15, 0).toISOString(), origen });
+  const viejo = item({ id: "v", type: "Evento", startDate: "2026-10-01", scheduledAt: new Date(2026, 10, 2, 9, 0).toISOString(), origen: { ...origen, idExterno: "e2" } });
+  const d = { ...m.emptyData(), items: [tarea, reunion, viejo] };
+  assert.deepEqual(dias.cosasDelDia(d, "2026-11-16").map((i) => i.id), ["t"]);
+  assert.equal(dias.inicioHistoria(d, ahora) <= "2026-11-02", false);
+});

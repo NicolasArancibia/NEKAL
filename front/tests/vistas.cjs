@@ -414,3 +414,78 @@ test("nekaState: la pregunta va sobre «vencido» y bajo «conflicto»", () => {
 test("nekaState: sin pregunta, el estado de siempre", () => {
   assert.notEqual(neka.nekaState(con(imp("a", 5)), now).kind, "pregunta");
 });
+
+// V2/H4: lo de Google/Outlook en atrasadas, choques, huecos y Neka.
+const plannerH4 = require("../.test-build/planner.js");
+const ctxH4 = require("../.test-build/agente/contexto.js");
+const origenDe = (extra = {}) => ({
+  proveedor: "google",
+  cuenta: "a@b.cl",
+  calendario: "primary",
+  idExterno: "e1",
+  version: "v1",
+  firma: "[]",
+  creadoEn: "fuera",
+  diaCompleto: false,
+  soloLectura: false,
+  ...extra,
+});
+
+test("espejo: un evento de afuera que ya pasó no es atrasado", () => {
+  const ext = cosa("ext", {
+    type: "Evento",
+    scheduledAt: dia(-5),
+    origen: origenDe(),
+  });
+  assert.equal(esp.esExterno(ext), true);
+  assert.equal(esp.estaAtrasada(ext, now), false);
+  const copiado = cosa("cop", {
+    scheduledAt: dia(-5),
+    origen: origenDe({ creadoEn: "nekal" }),
+  });
+  assert.equal(esp.estaAtrasada(copiado, now), true);
+});
+
+test("espejo: un día completo no choca ni ocupa huecos", () => {
+  const todoElDia = cosa("feriado", {
+    type: "Evento",
+    flexible: false,
+    scheduledAt: new Date(2026, 10, 3, 0, 0).toISOString(),
+    duration: 1440,
+    origen: origenDe({ diaCompleto: true }),
+  });
+  const tarea = cosa("t", { scheduledAt: dia(1, 10), duration: 60 });
+  const d = con(todoElDia, tarea);
+  assert.equal(esp.ocupaTiempo(todoElDia), false);
+  assert.equal(esp.ocupaTiempo(tarea), true);
+  assert.equal(
+    plannerH4.findConflicts(d, now).filter((c) => c.kind === "overlap").length,
+    0,
+  );
+  const hueco = plannerH4.buscarHueco(
+    con(todoElDia),
+    { duracion: 60, desde: new Date(2026, 10, 3, 9, 0).getTime() },
+    now,
+  );
+  assert.equal(hueco, new Date(2026, 10, 3, 9, 0).toISOString());
+});
+
+test("espejo: Neka ve de dónde viene cada cosa", () => {
+  const ext = cosa("ext", {
+    type: "Evento",
+    flexible: false,
+    scheduledAt: dia(1, 10),
+    origen: origenDe({ proveedor: "microsoft" }),
+  });
+  const feriado = cosa("fer", {
+    type: "Evento",
+    flexible: false,
+    scheduledAt: new Date(2026, 10, 3, 0, 0).toISOString(),
+    duration: 1440,
+    origen: origenDe({ diaCompleto: true }),
+  });
+  const d = con(ext, feriado);
+  assert.match(ctxH4.linea(d, ext), /· de Outlook$/);
+  assert.match(ctxH4.linea(d, feriado), /· todo el día · de Google$/);
+  assert.doesNotMatch(ctxH4.linea(d, cosa("p", { scheduledAt: dia(1) })), /de Google|de Outlook/);
+});

@@ -6,7 +6,8 @@ import { useConexiones } from "../../../utils/ConexionesContext";
 import { googleDisponible } from "../../../utils/conexiones/google";
 import { microsoftDisponible } from "../../../utils/conexiones/microsoft";
 import { useApp } from "../../../utils/AppContext";
-import { Button, Txt } from "../base";
+import { claveCuenta } from "../../../utils/conexiones/estado";
+import { Button, Chip, Txt } from "../base";
 import FilaCuenta from "./FilaCuenta";
 import { NOMBRE_PROVEEDOR } from "./LogoCuenta";
 
@@ -50,6 +51,11 @@ export default function SeccionCuentas() {
               }}
               onActualizar={() => c.actualizar(cuenta)}
             />
+            {!!c.fallos[clave] && (
+              <Txt variant="caption" tone="danger">
+                {`No se pudo sincronizar con ${nombre}; se reintenta solo. Motivo: ${c.fallos[clave]}`}
+              </Txt>
+            )}
             {abierta === clave &&
               (confirmar ? (
                 <View style={{ gap: space.sm }}>
@@ -94,6 +100,41 @@ export default function SeccionCuentas() {
         <Txt tone="danger" accessibilityRole="alert">
           {error}
         </Txt>
+      )}
+      {c.cuentas.length > 0 && (
+        <View style={{ gap: space.sm }}>
+          <Txt variant="callout" weight={700} tone="secondary">
+            Lo que creas en Nekal va a
+          </Txt>
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}
+          >
+            {c.cuentas.map((cuenta) => {
+              const nombre = NOMBRE_PROVEEDOR[cuenta.proveedor];
+              const repetido =
+                c.cuentas.filter((x) => x.proveedor === cuenta.proveedor)
+                  .length > 1;
+              return (
+                <Chip
+                  key={claveCuenta(cuenta)}
+                  title={repetido ? `${nombre} · ${cuenta.correo}` : nombre}
+                  accessibilityLabel={`Copiar a ${nombre}, ${cuenta.correo}`}
+                  selected={c.destinos.includes(claveCuenta(cuenta))}
+                  onPress={() => c.alternarDestino(claveCuenta(cuenta))}
+                />
+              );
+            })}
+            <Chip
+              title="No copiar"
+              selected={c.destinos.length === 0}
+              onPress={c.noCopiar}
+            />
+          </View>
+          <Txt variant="caption" tone="secondary">
+            Puedes elegir más de una. En cada cuenta se guarda en un calendario
+            llamado «Nekal», separado de tus otros eventos.
+          </Txt>
+        </View>
       )}
       <Txt variant="callout" weight={700} tone="secondary">
         {c.cuentas.length ? "Agregar otra" : "Conectar"}

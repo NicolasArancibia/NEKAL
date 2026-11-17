@@ -10,7 +10,16 @@ import { AppState } from "react-native";
 import { useApp } from "./AppContext";
 import type { Cuenta, Proveedor } from "./conexiones/tipos";
 import {
+  aplicarEnNekal,
+  hayCambiosLocales,
+  soltarCuenta,
+} from "./conexiones/espejo";
+import type { EventoFuera } from "./conexiones/eventos";
+import { RedCalendario, sincronizarCuenta } from "./conexiones/sincronizar";
+import {
   agregarCuenta,
+  claveCuenta,
+  esperandoNube,
   estadoCuenta,
   ofrecerHoja,
   trasVuelta,
@@ -18,7 +27,12 @@ import {
   type EstadoCuenta,
 } from "./conexiones/estado";
 import {
+  borrarEventoGoogle,
+  calendariosGoogle,
+  crearCalendarioNekalGoogle,
+  eventosGoogle,
   googleDisponible,
+  guardarEventoGoogle,
   iniciarGoogle,
   olvidarGoogle,
   paseGoogle,
@@ -27,6 +41,11 @@ import {
 import { permisosGoogle } from "./conexiones/pase";
 import {
   actualizarMicrosoft,
+  borrarEventoGraph,
+  calendariosGraph,
+  crearCalendarioNekalGraph,
+  eventosGraph,
+  guardarEventoGraph,
   iniciarMicrosoft,
   microsoftDisponible,
   olvidarMicrosoft,
@@ -54,6 +73,12 @@ type Ctx = {
   desconectar: (c: Cuenta) => Promise<void>;
   marcarOfrecido: () => void;
   limpiarUltima: () => void;
+  // Dónde se copia lo creado en Nekal: claves «proveedor:correo» (vacía = no copiar).
+  destinos: string[];
+  alternarDestino: (clave: string) => void;
+  noCopiar: () => void;
+  // Por qué falló la última pasada con cada cuenta (clave → motivo); se reintenta sola.
+  fallos: Record<string, string>;
 };
 const Contexto = createContext<Ctx | null>(null);
 const CLAVE_ORIGEN = "nekal:conexion:origen";
@@ -78,6 +103,84 @@ function leerOrigen(): Origen {
   } catch {
     return "ajustes";
   }
+}
+
+// La red real de cada proveedor para el espejo del calendario.
+const RED: Record<Proveedor, RedCalendario> = {
+  google: {
+    token: async (c) => {
+      const p = paseGoogle(c.correo);
+      return p && p.vence - Date.now() > 60_000 ? p.token : null;
+    },
+    leerCalendarios: calendariosGoogle,
+    leerEventos: eventosGoogle,
+    crearCalendarioNekal: crearCalendarioNekalGoogle,
+    guardar: guardarEventoGoogle,
+    borrar: borrarEventoGoogle,
+  },
+  microsoft: {
+    token: (c) => paseMicrosoft(c.correo),
+    leerCalendarios: calendariosGraph,
+    leerEventos: eventosGraph,
+    crearCalendarioNekal: crearCalendarioNekalGraph,
+    guardar: guardarEventoGraph,
+    borrar: borrarEventoGraph,
+  },
+};
+const CINCO_MIN = 5 * 60_000;
+
+// Eventos de ejemplo para `nekalConexiones("eventos")` (solo desarrollo).
+function eventosEjemplo(ahora: number): {
+  google: EventoFuera[];
+  microsoft: EventoFuera[];
+} {
+  const hoy = new Date(ahora);
+  const a = (dias: number, h: number, m = 0) =>
+    new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate() + dias,
+      h,
+      m,
+    ).toISOString();
+  const ev = (
+    id: string,
+    titulo: string,
+    inicio: string,
+    minutos: number,
+    extra: Partial<EventoFuera> = {},
+  ): EventoFuera => ({
+    id,
+    calendario: "primary",
+    titulo,
+    inicio,
+    minutos,
+    diaCompleto: false,
+    lugar: "",
+    descripcion: "",
+    version: "1",
+    actualizado: new Date(ahora).toISOString(),
+    soloLectura: false,
+    cancelado: false,
+    ...extra,
+  });
+  return {
+    google: [
+      ev("ej-g1", "Clase de Redes", a(1, 9), 90, { lugar: "Sala 3" }),
+      ev("ej-g2", "Almuerzo con Ana", a(0, 13), 60),
+      ev("ej-g3", "Feriado", a(3, 0), 1440, {
+        diaCompleto: true,
+        soloLectura: true,
+        calendario: "feriados",
+      }),
+    ],
+    microsoft: [
+      ev("ej-m1", "Reunión de equipo", a(0, 15), 60, {
+        lugar: "Sala 3 · edificio B",
+        calendario: "cal",
+      }),
+    ],
+  };
 }
 
 const EJEMPLO: CuentaVista[] = [
@@ -109,7 +212,13 @@ export function ConexionesProvider({
   const [ultima, setUltima] = useState<UltimaConexion | null>(null);
   const [ejemplo, setEjemplo] = useState<CuentaVista[] | null>(null);
   const [forzar, setForzar] = useState(false);
+  const [fallos, setFallos] = useState<Record<string, string>>({});
   const recogida = useRef(false);
+  const corriendo = useRef(false);
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const nubeRef = useRef(cloudStatus);
+  nubeRef.current = cloudStatus;
   const cuentas = data.conexiones.cuentas;
   // Clave estable: cada sincronización recrea la lista aunque no cambie.
   const claveCuentas = cuentas
@@ -176,6 +285,61 @@ export function ConexionesProvider({
     })();
   }, [disponible, change]);
 
+  // Una pasada del espejo por cada cuenta con pase (spec H3 §7), de a una.
+  const sincronizar = useCallback(async () => {
+    if (
+      !disponible ||
+      corriendo.current ||
+      esperandoNube(nubeRef.current)
+    )
+      return;
+    corriendo.current = true;
+    try {
+      const { cuentas: todas, destinos } = dataRef.current.conexiones;
+      for (const c of todas) {
+        let fallo = "";
+        await sincronizarCuenta(c, {
+          leer: () => dataRef.current,
+          change,
+          red: RED[c.proveedor],
+          copiarAqui: destinos.includes(claveCuenta(c)),
+          ahora: Date.now(),
+          fallo: (d) => (fallo = fallo || d),
+        });
+        setFallos((f) =>
+          (f[claveCuenta(c)] ?? "") === fallo
+            ? f
+            : { ...f, [claveCuenta(c)]: fallo },
+        );
+      }
+    } finally {
+      corriendo.current = false;
+      recalcular();
+    }
+  }, [disponible, change, recalcular]);
+
+  // Al cargar, al cambiar las cuentas, cada 5 min y al volver a la app.
+  useEffect(() => {
+    if (!disponible) return;
+    sincronizar();
+    const t = setInterval(sincronizar, CINCO_MIN);
+    const s = AppState.addEventListener("change", (e) => {
+      if (e === "active") sincronizar();
+    });
+    return () => {
+      clearInterval(t);
+      s.remove();
+    };
+  }, [disponible, sincronizar]);
+
+  // 3 s después de un cambio local que el espejo tenga que enviar.
+  useEffect(() => {
+    if (!disponible || !hayCambiosLocales(data, data.conexiones, Date.now()))
+      return;
+    const t = setTimeout(sincronizar, 3000);
+    return () => clearTimeout(t);
+  }, [disponible, data, sincronizar]);
+
   useEffect(() => {
     if (!disponible) return;
     recalcular();
@@ -193,12 +357,33 @@ export function ConexionesProvider({
   useEffect(() => {
     if (!__DEV__) return;
     const g = globalThis as {
-      nekalConexiones?: (modo?: false | "hoja" | "vuelta" | "error") => string;
+      nekalConexiones?: (
+        modo?: false | "hoja" | "vuelta" | "error" | "eventos",
+      ) => string;
     };
     // nekalConexiones() cuentas · ("hoja") A1 · ("vuelta") A2 · ("error") falla · (false) quita.
     g.nekalConexiones = (modo) => {
       setEjemplo(modo === false ? null : EJEMPLO);
       setForzar(modo === "hoja");
+      if (modo === "eventos") {
+        const ej = eventosEjemplo(Date.now());
+        const plan = (lista: EventoFuera[]) => ({
+          crearEnNekal: lista,
+          actualizarEnNekal: [],
+          vincular: [],
+          aPapelera: [],
+          duplicados: [],
+          fuera: [],
+        });
+        change((d) =>
+          aplicarEnNekal(
+            aplicarEnNekal(d, EJEMPLO[0], plan(ej.google), Date.now()),
+            EJEMPLO[1],
+            plan(ej.microsoft),
+            Date.now(),
+          ),
+        );
+      }
       if (modo === "vuelta" || modo === "error")
         setUltima({
           proveedor: "google",
@@ -212,7 +397,7 @@ export function ConexionesProvider({
     return () => {
       delete g.nekalConexiones;
     };
-  }, []);
+  }, [change]);
 
   const recordarOrigen = (origen: Origen) => {
     try {
@@ -260,7 +445,7 @@ export function ConexionesProvider({
       if (c.proveedor === "google") await olvidarGoogle(c.correo);
       else await olvidarMicrosoft(c.correo);
       change((d) => ({
-        ...d,
+        ...soltarCuenta(d, c, Date.now()),
         conexiones: quitarCuenta(d.conexiones, c.proveedor, c.correo),
       }));
     },
@@ -272,6 +457,23 @@ export function ConexionesProvider({
       }));
     },
     limpiarUltima: () => setUltima(null),
+    destinos: data.conexiones.destinos,
+    alternarDestino: (clave) =>
+      change((d) => {
+        const ya = d.conexiones.destinos;
+        return {
+          ...d,
+          conexiones: {
+            ...d.conexiones,
+            destinos: ya.includes(clave)
+              ? ya.filter((x) => x !== clave)
+              : [...ya, clave],
+          },
+        };
+      }),
+    noCopiar: () =>
+      change((d) => ({ ...d, conexiones: { ...d.conexiones, destinos: [] } })),
+    fallos,
   };
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

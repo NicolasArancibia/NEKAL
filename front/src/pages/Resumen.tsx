@@ -9,7 +9,7 @@ import { miles } from "../utils/progreso/logros";
 import { useProgreso } from "../utils/useProgreso";
 import { findConflicts } from "../utils/planner";
 import { aPapelera, siguientePregunta } from "../utils/atrasadas";
-import { esImportante, estaAtrasada } from "../utils/espacio";
+import { esExterno, esImportante, estaAtrasada } from "../utils/espacio";
 import { usePreguntadas } from "../utils/usePreguntadas";
 import {
   NekaAction,
@@ -183,7 +183,9 @@ export default function Resumen() {
               <ListRow
                 key={item.id}
                 title={item.title}
-                time={hhmm(todayTime(item, now))}
+                time={
+                  item.origen?.diaCompleto ? "" : hhmm(todayTime(item, now))
+                }
                 dotColor={space_(item.workspaceId)?.color ?? color.primary}
                 done={item.status === "completado"}
                 tag={
@@ -192,7 +194,8 @@ export default function Resumen() {
                     : undefined
                 }
                 onPress={() => setEditor(item)}
-                onToggle={() => toggle(item)}
+                icono={esExterno(item) ? "calendar-clear-outline" : undefined}
+                onToggle={esExterno(item) ? undefined : () => toggle(item)}
               />
             ))}
           </View>

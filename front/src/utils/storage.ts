@@ -10,7 +10,7 @@ import {
   validateItem,
   passive,
 } from "./model";
-import { normalizarConexiones } from "./conexiones/estado";
+import { normalizarConexiones, normalizarOrigen } from "./conexiones/estado";
 
 // Grupos guardados antes de la V2/B (3 campos) reciben los campos nuevos vacíos.
 export function normalizeGroup(g: any): Group {
@@ -250,6 +250,20 @@ export function readBackup(text: string): AppData {
     throw new Error("Logros inválidos.");
   // Cuentas conectadas (spec H3 §5.2): respaldos viejos no las traen.
   d.conexiones = normalizarConexiones(d.conexiones);
+  // Espejo (V2/H4): un origen mal formado se quita; el ítem queda como propio.
+  // Las copias en más cuentas solo existen junto a un origen (máximo 5).
+  d.items = d.items.map((i: any) => {
+    if (i.origen === undefined && i.copias === undefined) return i;
+    const { origen, copias, ...resto } = i;
+    const o = normalizarOrigen(origen);
+    const c = (Array.isArray(copias) ? copias : [])
+      .map(normalizarOrigen)
+      .filter((x: unknown) => !!x)
+      .slice(0, 5);
+    return o
+      ? { ...resto, origen: o, ...(c.length > 0 && { copias: c }) }
+      : resto;
+  });
   for (const k of ["dayStart", "dayEnd", "quietStart", "quietEnd"])
     if (
       !Number.isInteger(d.preferences[k]) ||

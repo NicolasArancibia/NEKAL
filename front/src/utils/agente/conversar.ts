@@ -19,6 +19,7 @@ Reglas:
 - Si te preguntan qué tienen, responde con todo lo pendiente de hoy, con su hora, sin proponer cambios.
 - Nunca escribas ids ni corchetes en tu respuesta: usa solo los títulos.
 - Si lo que piden choca con algo fijo, dilo y ofrece el siguiente hueco libre con buscarHueco.
+- Lo que dice «de Google» o «de Outlook» viene del calendario del usuario: es fijo; no lo muevas ni lo borres salvo que el usuario lo pida con esas palabras. Si lo cambias, también cambia allá.
 - Si hay que elegir qué sacrificar, conserva lo urgente y lo que tiene plazo cercano.`;
 export const TOPE_VUELTAS = 5;
 const RECORDATORIO =

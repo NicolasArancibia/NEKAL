@@ -1,5 +1,5 @@
 import { AppData, Item, RAZON_COMPLETADO, localDay, passive } from "../model";
-import { timedItems } from "../espacio";
+import { esExterno, timedItems } from "../espacio";
 import { timeOn } from "../neka";
 import { dia1De, sumarDias } from "./desde";
 
@@ -47,11 +47,15 @@ const fecha = (dia: string) => {
 const lunesDe = (dia: string) =>
   sumarDias(dia, -((fecha(dia).getDay() + 6) % 7));
 
-// La misma regla que «Hoy»: sin notas, ideas, borradas ni modelos de rutina.
+// La misma regla que «Hoy»: sin notas, ideas, borradas ni modelos de rutina,
+// ni eventos de Google/Outlook (no son tareas tuyas; V2/H4).
 export const cosasDelDia = (d: AppData, dia: string, mesaId?: string): Item[] =>
   timedItems(d).filter(
     (i) =>
-      !passive(i) && !!timeOn(i, dia) && (!mesaId || i.workspaceId === mesaId),
+      !passive(i) &&
+      !esExterno(i) &&
+      !!timeOn(i, dia) &&
+      (!mesaId || i.workspaceId === mesaId),
   );
 
 function armarDia(dia: string, cosas: Item[], sinAgenda: number): Dia {
@@ -96,7 +100,8 @@ export function historial(
   const cosas = new Map<string, Item[]>();
   const enMesa = new Set<string>();
   for (const i of timedItems(d)) {
-    if (passive(i) || (mesaId && i.workspaceId !== mesaId)) continue;
+    if (passive(i) || esExterno(i) || (mesaId && i.workspaceId !== mesaId))
+      continue;
     const dias = new Set(
       [i.scheduledAt, i.dueAt]
         .filter(Boolean)
@@ -134,7 +139,8 @@ export function inicioHistoria(d: AppData, now: number): string {
   const hoy = localDay(new Date(now));
   let inicio = dia1De(d, now);
   for (const i of timedItems(d)) {
-    if (passive(i)) continue;
+    // Los eventos de Google/Outlook no son tu historia en Nekal (V2/H4).
+    if (passive(i) || esExterno(i)) continue;
     for (const f of [i.scheduledAt, i.dueAt]) {
       if (!f) continue;
       const dia = localDay(new Date(f));

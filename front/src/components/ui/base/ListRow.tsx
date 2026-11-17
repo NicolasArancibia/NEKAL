@@ -83,6 +83,7 @@ export default function ListRow({
   detail,
   onPress,
   onToggle,
+  icono,
 }: {
   title: string;
   time?: string;
@@ -92,6 +93,8 @@ export default function ListRow({
   detail?: string; // segunda línea bajo el título (la Agenda)
   onPress: () => void;
   onToggle?: () => void;
+  // Sin círculo de hecho: un ícono (eventos de Google/Outlook, V2/H4).
+  icono?: keyof typeof Ionicons.glyphMap;
 }) {
   // La zona que abre el ítem y el círculo son hermanos (no anidados) para que
   // VoiceOver y la web los expongan como dos controles distintos.
@@ -125,6 +128,13 @@ export default function ListRow({
           dotColor={dotColor}
           title={title}
           onToggle={onToggle}
+        />
+      ) : icono ? (
+        <Ionicons
+          aria-hidden
+          name={icono}
+          size={20}
+          color={color.inkSecondary}
         />
       ) : (
         <View

@@ -4,6 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { useApp } from "../../utils/AppContext";
+import AvisoOrigen from "./conexiones/AvisoOrigen";
+import { enlaces } from "../../utils/conexiones/espejo";
 import { mergeValue } from "../../utils/syncModel";
 import {
   Item,
@@ -221,6 +223,7 @@ export default function ItemEditor({
         <Tag text={draft.type} tone="primary" />
       )}
       {acciones}
+      {!!draft.origen && <AvisoOrigen enlaces={enlaces(draft)} />}
 
       <Section title="Qué">
         <Field

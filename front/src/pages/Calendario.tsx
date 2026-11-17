@@ -13,7 +13,9 @@ import {
   newItem,
   passive,
 } from "../utils/model";
-import { atrasadas, timedItems } from "../utils/espacio";
+import { atrasadas, esExterno, timedItems } from "../utils/espacio";
+import { textoOrigen } from "../components/ui/conexiones/AvisoOrigen";
+import { enlaces } from "../utils/conexiones/espejo";
 import { agenda } from "../utils/agenda";
 import { hhmm, timeOn } from "../utils/neka";
 import { useNeka } from "../utils/NekaContext";
@@ -303,8 +305,21 @@ export default function Calendario({
                     <ListRow
                       key={f.item.id}
                       title={f.item.title}
-                      time={hhmm(f.inicio)}
-                      detail={`hasta ${hhmm(f.fin)} · ${f.minutos} min · ${mesaDe(f.item.workspaceId)?.name ?? ""}`}
+                      time={f.item.origen?.diaCompleto ? "" : hhmm(f.inicio)}
+                      detail={[
+                        f.item.origen?.diaCompleto
+                          ? "Todo el día"
+                          : `hasta ${hhmm(f.fin)} · ${f.minutos} min`,
+                        esExterno(f.item)
+                          ? ""
+                          : (mesaDe(f.item.workspaceId)?.name ?? ""),
+                        textoOrigen(enlaces(f.item)),
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      icono={
+                        esExterno(f.item) ? "calendar-clear-outline" : undefined
+                      }
                       dotColor={
                         mesaDe(f.item.workspaceId)?.color ?? color.primary
                       }
@@ -314,7 +329,9 @@ export default function Calendario({
                       }
                       onPress={() => setEditor(f.item)}
                       onToggle={
-                        passive(f.item) ? undefined : () => toggle(f.item)
+                        passive(f.item) || esExterno(f.item)
+                          ? undefined
+                          : () => toggle(f.item)
                       }
                     />
                   ))}
@@ -549,12 +566,16 @@ export default function Calendario({
                   <ListRow
                     key={i.id}
                     title={i.title}
-                    time={time ? hhmm(time) : undefined}
+                    time={
+                      time && !i.origen?.diaCompleto ? hhmm(time) : undefined
+                    }
+                    icono={esExterno(i) ? "calendar-clear-outline" : undefined}
                     dotColor={mesaDe(i.workspaceId)?.color ?? color.primary}
                     done={i.status === "completado"}
                     onPress={() => setEditor(i)}
                     onToggle={
-                      passive(i)
+                      // Lo de Google/Outlook no es una tarea tuya: no se marca (igual que en Agenda).
+                      passive(i) || esExterno(i)
                         ? undefined
                         : () => {
                             if (i.status !== "completado")
