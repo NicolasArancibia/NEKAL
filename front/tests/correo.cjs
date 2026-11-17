@@ -377,6 +377,11 @@ test("correo Neka: textos de la fila y del encabezado", () => {
     cn.textoRazon({ razon: "relacionado", sobre: "tu reunión de hoy" }, AHORA),
     "Sobre tu reunión de hoy",
   );
+  // Neka suele devolver el título de Nekal con mayúscula.
+  assert.equal(
+    cn.textoRazon({ razon: "relacionado", sobre: "Reunión de equipo" }, AHORA),
+    "Sobre reunión de equipo",
+  );
   assert.equal(cn.textoRazon({ razon: "fecha", fecha: "2026-12-01" }, AHORA), "Fecha · 1 dic");
   assert.equal(cn.resumenBandeja(27, 4), "De 27 correos de esta semana, 4 son para ti.");
   assert.equal(cn.resumenBandeja(1, 1), "De 1 correo de esta semana, 1 es para ti.");

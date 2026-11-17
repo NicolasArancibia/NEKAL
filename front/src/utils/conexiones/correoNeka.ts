@@ -230,7 +230,7 @@ export function textoRazon(c: Clase, ahora: number): string {
     case "fecha":
       return f ? `Fecha · ${f}` : "Trae una fecha";
     case "relacionado":
-      return c.sobre ? `Sobre ${c.sobre}` : "Tiene que ver con tus cosas";
+      return c.sobre ? `Sobre ${c.sobre.charAt(0).toLowerCase()}${c.sobre.slice(1)}` : "Tiene que ver con tus cosas";
     default:
       return "";
   }
