@@ -16,6 +16,8 @@ import {
 } from "./conexiones/espejo";
 import type { EventoFuera } from "./conexiones/eventos";
 import { RedCalendario, sincronizarCuenta } from "./conexiones/sincronizar";
+import type { RedCorreo } from "./conexiones/bandeja";
+import { redCorreoEjemplo } from "./conexiones/ejemploCorreo";
 import {
   agregarCuenta,
   claveCuenta,
@@ -29,28 +31,36 @@ import {
 import {
   borrarEventoGoogle,
   calendariosGoogle,
+  correoGoogle,
+  correosGoogle,
   crearCalendarioNekalGoogle,
   eventosGoogle,
   googleDisponible,
   guardarEventoGoogle,
   iniciarGoogle,
+  marcarLeidoGoogle,
   olvidarGoogle,
   paseGoogle,
   recogerVueltaGoogle,
+  responderGoogle,
 } from "./conexiones/google";
 import { permisosGoogle } from "./conexiones/pase";
 import {
   actualizarMicrosoft,
   borrarEventoGraph,
   calendariosGraph,
+  correoGraph,
+  correosGraph,
   crearCalendarioNekalGraph,
   eventosGraph,
   guardarEventoGraph,
   iniciarMicrosoft,
+  marcarLeidoGraph,
   microsoftDisponible,
   olvidarMicrosoft,
   paseMicrosoft,
   recogerVueltaMicrosoft,
+  responderGraph,
 } from "./conexiones/microsoft";
 
 // Une las cuentas guardadas (sin pases) con los pases de este dispositivo (spec H3_CONEXIONES §5).
@@ -79,6 +89,8 @@ type Ctx = {
   noCopiar: () => void;
   // Por qué falló la última pasada con cada cuenta (clave → motivo); se reintenta sola.
   fallos: Record<string, string>;
+  // La red del correo de cada cuenta (V2/H5); en el ejemplo, una falsa.
+  redCorreo: (c: Cuenta) => RedCorreo;
 };
 const Contexto = createContext<Ctx | null>(null);
 const CLAVE_ORIGEN = "nekal:conexion:origen";
@@ -128,6 +140,29 @@ const RED: Record<Proveedor, RedCalendario> = {
   },
 };
 const CINCO_MIN = 5 * 60_000;
+
+// La red real del correo (V2/H5). Google necesita el permiso de Gmail en el pase.
+const RED_CORREO: Record<Proveedor, RedCorreo> = {
+  google: {
+    token: RED.google.token,
+    permiso: (c) => {
+      const p = paseGoogle(c.correo);
+      return !p || permisosGoogle(p.scopes).correo;
+    },
+    listar: correosGoogle,
+    abrir: correoGoogle,
+    marcarLeido: marcarLeidoGoogle,
+    responder: responderGoogle,
+  },
+  microsoft: {
+    token: RED.microsoft.token,
+    permiso: () => true,
+    listar: correosGraph,
+    abrir: correoGraph,
+    marcarLeido: marcarLeidoGraph,
+    responder: responderGraph,
+  },
+};
 
 // Eventos de ejemplo para `nekalConexiones("eventos")` (solo desarrollo).
 function eventosEjemplo(ahora: number): {
@@ -213,6 +248,18 @@ export function ConexionesProvider({
   const [ejemplo, setEjemplo] = useState<CuentaVista[] | null>(null);
   const [forzar, setForzar] = useState(false);
   const [fallos, setFallos] = useState<Record<string, string>>({});
+  // Una red de ejemplo por cuenta, que recuerda lo leído mientras la app está abierta.
+  const ejemplosCorreo = useRef(new Map<string, RedCorreo>());
+  const redCorreo = useCallback(
+    (c: Cuenta): RedCorreo => {
+      if (!ejemplo) return RED_CORREO[c.proveedor];
+      const k = claveCuenta(c);
+      if (!ejemplosCorreo.current.has(k))
+        ejemplosCorreo.current.set(k, redCorreoEjemplo(c));
+      return ejemplosCorreo.current.get(k)!;
+    },
+    [ejemplo],
+  );
   const recogida = useRef(false);
   const corriendo = useRef(false);
   const dataRef = useRef(data);
@@ -358,10 +405,12 @@ export function ConexionesProvider({
     if (!__DEV__) return;
     const g = globalThis as {
       nekalConexiones?: (
-        modo?: false | "hoja" | "vuelta" | "error" | "eventos",
+        modo?: false | "hoja" | "vuelta" | "error" | "eventos" | "correo",
       ) => string;
     };
-    // nekalConexiones() cuentas · ("hoja") A1 · ("vuelta") A2 · ("error") falla · (false) quita.
+    // nekalConexiones() cuentas · ("hoja") A1 · ("vuelta") A2 · ("error") falla ·
+    // ("eventos") eventos de ejemplo · ("correo") correos de ejemplo · (false) quita.
+    // Con cualquier ejemplo activo, el correo usa la red de ejemplo.
     g.nekalConexiones = (modo) => {
       setEjemplo(modo === false ? null : EJEMPLO);
       setForzar(modo === "hoja");
@@ -474,6 +523,7 @@ export function ConexionesProvider({
     noCopiar: () =>
       change((d) => ({ ...d, conexiones: { ...d.conexiones, destinos: [] } })),
     fallos,
+    redCorreo,
   };
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }
