@@ -566,12 +566,16 @@ export default function Calendario({
                   <ListRow
                     key={i.id}
                     title={i.title}
-                    time={time ? hhmm(time) : undefined}
+                    time={
+                      time && !i.origen?.diaCompleto ? hhmm(time) : undefined
+                    }
+                    icono={esExterno(i) ? "calendar-clear-outline" : undefined}
                     dotColor={mesaDe(i.workspaceId)?.color ?? color.primary}
                     done={i.status === "completado"}
                     onPress={() => setEditor(i)}
                     onToggle={
-                      passive(i)
+                      // Lo de Google/Outlook no es una tarea tuya: no se marca (igual que en Agenda).
+                      passive(i) || esExterno(i)
                         ? undefined
                         : () => {
                             if (i.status !== "completado")
