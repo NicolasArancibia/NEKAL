@@ -50,6 +50,7 @@ const build = spawnSync(
     "src/utils/conexiones/sincronizar.ts",
     "src/utils/conexiones/correo.ts",
     "src/utils/conexiones/correoNeka.ts",
+    "src/utils/conexiones/bandeja.ts",
     "--outDir",
     ".test-build",
     "--module",

@@ -444,3 +444,71 @@ test("correo Neka: borrador", () => {
   assert.match(p, /¿Te tinca el sábado en la biblioteca\?/);
   assert.match(p, /Sofía/);
 });
+
+// ── Task 3: la bandeja de varias cuentas ───────────────────────────────────
+const ba = require("../.test-build/conexiones/bandeja.js");
+const G = { proveedor: "google", correo: "sofia@gmail.com", nombre: "Sofía", desde: "" };
+const O = { proveedor: "microsoft", correo: "sofia@outlook.com", nombre: "Sofía", desde: "" };
+function redCorreoFalsa(o = {}) {
+  const r = {
+    llamadas: [],
+    token: async () => (o.sinPase ? null : "T"),
+    permiso: () => o.permiso !== false,
+    listar: async (_t, cuenta) => {
+      r.llamadas.push("listar");
+      if (o.falla) throw new Error(o.falla);
+      return o.correos?.(cuenta) ?? { principales: [], mas: [] };
+    },
+    abrir: async () => {
+      throw new Error("no usado");
+    },
+    marcarLeido: async () => {},
+    responder: async () => {},
+  };
+  return r;
+}
+const deCuenta = (cuenta, proveedor, ids, fecha) =>
+  ids.map((id, n) => resumen(id, { cuenta, proveedor, fecha: fecha(n) }));
+
+test("bandeja: junta las dos cuentas por fecha", async () => {
+  const redG = redCorreoFalsa({
+    correos: (c) => ({
+      principales: deCuenta(c, "google", ["g1", "g2"], (n) => `2026-11-17T1${n * 2}:00:00.000Z`),
+      mas: deCuenta(c, "google", ["g9"], () => "2026-11-16T00:00:00.000Z"),
+    }),
+  });
+  const redO = redCorreoFalsa({
+    correos: (c) => ({
+      principales: deCuenta(c, "microsoft", ["o1"], () => "2026-11-17T11:00:00.000Z"),
+      mas: [],
+    }),
+  });
+  const b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? redG : redO), AHORA);
+  assert.deepEqual(b.principales.map((c) => c.id), ["g2", "o1", "g1"]);
+  assert.deepEqual(b.mas.map((c) => c.id), ["g9"]);
+  assert.deepEqual(b.avisos, []);
+});
+
+test("bandeja: una cuenta falla y la otra se ve", async () => {
+  const bien = redCorreoFalsa({
+    correos: (c) => ({ principales: deCuenta(c, "microsoft", ["o1"], () => "2026-11-17T11:00:00.000Z"), mas: [] }),
+  });
+  const sinPase = redCorreoFalsa({ sinPase: true });
+  let b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? sinPase : bien), AHORA);
+  assert.deepEqual(b.principales.map((c) => c.id), ["o1"]);
+  assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "pase", detalle: "" }]);
+
+  const caida = redCorreoFalsa({ falla: "red 500 · x" });
+  b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? caida : bien), AHORA);
+  assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "red", detalle: "red 500 · x" }]);
+
+  const vencido = redCorreoFalsa({ falla: "pase" });
+  b = await ba.traerBandeja([G], () => vencido, AHORA);
+  assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "pase", detalle: "" }]);
+
+  const sinPermiso = redCorreoFalsa({ permiso: false });
+  b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? sinPermiso : bien), AHORA);
+  assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "permiso", detalle: "" }]);
+  assert.deepEqual(sinPermiso.llamadas, []);
+  assert.equal(b.principales.length, 1);
+});

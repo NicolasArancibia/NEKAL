@@ -1,6 +1,13 @@
 import { Platform } from "react-native";
 import { leerVuelta, permisosGoogle, urlGoogle } from "./pase";
-import type { CalendarioFuera, PaseGoogle, Permisos } from "./tipos";
+import type {
+  CalendarioFuera,
+  CorreoCompleto,
+  CorreoResumen,
+  PaseGoogle,
+  Permisos,
+} from "./tipos";
+import { desdeGmail, desdeGmailCompleto, respuestaGmail } from "./correo";
 import type { Item } from "../model";
 import {
   cambiosGoogle,
@@ -230,4 +237,94 @@ export async function borrarEventoGoogle(
   );
   if (!r.ok && r.status !== 404 && r.status !== 410)
     throw new Error(detalleDeError(r.status, await r.text()));
+}
+
+// ── Correo (V2/H5) ─────────────────────────────────────────────────────────
+const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
+const PRINCIPALES = "in:inbox category:primary newer_than:7d";
+const MAS = "in:inbox newer_than:7d -category:primary";
+
+async function idsGmail(token: string, q: string): Promise<string[]> {
+  const r = await json(
+    token,
+    `${GMAIL}/messages?${new URLSearchParams({ q, maxResults: "50" })}`,
+  );
+  return (r.messages ?? []).map((m: { id: string }) => m.id);
+}
+
+// Solo remitente, asunto y fecha (más el extracto que da Gmail), de a 10 a la vez.
+async function resumenesGmail(
+  token: string,
+  cuenta: string,
+  ids: string[],
+): Promise<CorreoResumen[]> {
+  const q =
+    "format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date";
+  const out: CorreoResumen[] = [];
+  for (let i = 0; i < ids.length; i += 10) {
+    const lote = await Promise.all(
+      ids
+        .slice(i, i + 10)
+        .map((id) =>
+          json(token, `${GMAIL}/messages/${encodeURIComponent(id)}?${q}`),
+        ),
+    );
+    for (const m of lote) {
+      const c = desdeGmail(m, cuenta);
+      if (c) out.push(c);
+    }
+  }
+  return out;
+}
+
+export async function correosGoogle(
+  token: string,
+  cuenta: string,
+  _ahora: number,
+): Promise<{ principales: CorreoResumen[]; mas: CorreoResumen[] }> {
+  const [p, m] = await Promise.all([
+    idsGmail(token, PRINCIPALES),
+    idsGmail(token, MAS),
+  ]);
+  const [principales, mas] = await Promise.all([
+    resumenesGmail(token, cuenta, p),
+    resumenesGmail(token, cuenta, m),
+  ]);
+  return { principales, mas };
+}
+
+export async function correoGoogle(
+  token: string,
+  cuenta: string,
+  id: string,
+): Promise<CorreoCompleto> {
+  const m = await json(
+    token,
+    `${GMAIL}/messages/${encodeURIComponent(id)}?format=full`,
+  );
+  const c = desdeGmailCompleto(m, cuenta);
+  if (!c) throw new Error("red: Gmail respondió un correo ilegible");
+  return c;
+}
+
+export async function marcarLeidoGoogle(token: string, id: string) {
+  await json(token, `${GMAIL}/messages/${encodeURIComponent(id)}/modify`, {
+    method: "POST",
+    body: JSON.stringify({ removeLabelIds: ["UNREAD"] }),
+  });
+}
+
+// En el mismo hilo: threadId + In-Reply-To/References (correo.ts).
+export async function responderGoogle(
+  token: string,
+  original: CorreoCompleto,
+  texto: string,
+) {
+  await json(token, `${GMAIL}/messages/send`, {
+    method: "POST",
+    body: JSON.stringify({
+      raw: respuestaGmail(original, texto),
+      threadId: original.hilo,
+    }),
+  });
 }
