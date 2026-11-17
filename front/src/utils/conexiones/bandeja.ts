@@ -55,6 +55,16 @@ async function deUnaCuenta(
   }
 }
 
+// Mientras una llamada está en curso, las siguientes reciben la misma promesa
+// (así dos recargas seguidas no le piden a Neka clasificar dos veces).
+export function unaALaVez<T>(f: () => Promise<T>): () => Promise<T> {
+  let enCurso: Promise<T> | null = null;
+  return () =>
+    (enCurso ??= f().finally(() => {
+      enCurso = null;
+    }));
+}
+
 // Una cuenta que falla no esconde el correo de las demás: queda un aviso.
 export async function traerBandeja(
   cuentas: Cuenta[],

@@ -42,7 +42,7 @@ export default function FilaCorreo({
         style={{ flex: 1, flexDirection: "row", gap: space.md }}
       >
         <LogoCuenta proveedor={correo.proveedor} chico />
-        <View style={{ flex: 1, gap: 2 }}>
+        <View style={{ flex: 1, gap: space.xs }}>
           <View style={{ flexDirection: "row", gap: space.sm }}>
             <Txt
               variant="headline"
@@ -70,8 +70,8 @@ export default function FilaCorreo({
               <View
                 aria-hidden
                 style={{
-                  width: 7,
-                  height: 7,
+                  width: space.sm,
+                  height: space.sm,
                   borderRadius: radius.pill,
                   backgroundColor: color.primary,
                 }}

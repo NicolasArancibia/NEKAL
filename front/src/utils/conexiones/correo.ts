@@ -92,12 +92,22 @@ export function htmlATexto(html: string): string {
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(p|h[1-6]|table|ul|ol|blockquote)\s*>/gi, "\n\n")
     .replace(/<\/(div|li|tr)\s*>/gi, "\n")
+    .replace(/<\/t[dh]\s*>/gi, " ")
     .replace(/<[^>]*>/g, "");
   return ordenarLineas(entidades(sinTags));
 }
 
+// Texto plano → HTML mínimo (para el `comment` de Graph, que se lee como HTML).
+export const htmlDeTexto = (texto: string) =>
+  texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\r?\n/g, "<br>");
+
 export function persona(cabecera: string): Persona {
-  const s = decodificarCabecera(cabecera ?? "").trim();
+  // Varias direcciones: queda la primera.
+  const s = decodificarCabecera(cabecera ?? "").trim().split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)(?=[^<>]*(?:<|$))/)[0].trim();
   const m = s.match(/^(.*?)\s*<([^<>]+)>\s*$/);
   const correo = (m ? m[2] : s).trim();
   const nombre = (m ? m[1] : "")

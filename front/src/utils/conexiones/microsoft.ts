@@ -5,7 +5,11 @@ import type {
 } from "@azure/msal-browser";
 import type { Item } from "../model";
 import type { CalendarioFuera, CorreoCompleto, CorreoResumen } from "./tipos";
-import { desdeGraph as correoDeGraph, desdeGraphCompleto } from "./correo";
+import {
+  desdeGraph as correoDeGraph,
+  desdeGraphCompleto,
+  htmlDeTexto,
+} from "./correo";
 import {
   cambiosGraph,
   cuerpoGraph,
@@ -304,7 +308,8 @@ export async function responderGraph(
   const r = await pedirGraph(
     token,
     `${GRAPH}/me/messages/${encodeURIComponent(original.id)}/reply`,
-    { method: "POST", body: JSON.stringify({ comment: texto }) },
+    // `comment` se lee como HTML: sin esto los saltos de línea se pierden.
+    { method: "POST", body: JSON.stringify({ comment: htmlDeTexto(texto) }) },
   );
   if (!r.ok) throw new Error(detalleDeError(r.status, await r.text()));
 }

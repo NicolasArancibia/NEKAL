@@ -522,3 +522,37 @@ test("correo Neka: hora corta de la fila y fecha de la cita", () => {
   assert.equal(cn.textoInicio("2026-12-01"), "martes 1");
   assert.equal(cn.textoInicio("nada"), "");
 });
+
+// ── Revisión H5 ──────────────────────────────────────────────────────────
+test("revisión H5: las celdas de una tabla no se pegan", () => {
+  assert.equal(
+    co.htmlATexto("<table><tr><td>Fecha</td><td>1 dic</td></tr><tr><th>Sala</th><td>3</td></tr></table>"),
+    "Fecha 1 dic\nSala 3",
+  );
+});
+
+test("revisión H5: la respuesta de Outlook conserva los saltos de línea", () => {
+  assert.equal(
+    co.htmlDeTexto("¡Hola Ana!\n\nSí <b> & no\nSofía"),
+    "¡Hola Ana!<br><br>Sí &lt;b&gt; &amp; no<br>Sofía",
+  );
+});
+
+test("revisión H5: una recarga a la vez (Neka no clasifica dos veces)", async () => {
+  let llamadas = 0;
+  let soltar;
+  const f = ba.unaALaVez(() => {
+    llamadas++;
+    return new Promise((r) => (soltar = r));
+  });
+  const a = f();
+  const b = f();
+  assert.equal(a, b);
+  assert.equal(llamadas, 1);
+  soltar("ok");
+  assert.equal(await a, "ok");
+  const c = f();
+  assert.equal(llamadas, 2);
+  soltar("otra");
+  assert.equal(await c, "otra");
+});

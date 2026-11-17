@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "./AppContext";
 import { useConexiones } from "./ConexionesContext";
 import { crearCerebro } from "./agente/cerebro";
@@ -6,6 +6,7 @@ import {
   type AvisoCuenta,
   type Bandeja,
   traerBandeja,
+  unaALaVez,
 } from "./conexiones/bandeja";
 import {
   type Borrador,
@@ -39,7 +40,7 @@ export function useCorreo() {
   cuentasRef.current = cuentas;
   const firma = cuentas.map(claveCuenta).join("|");
 
-  const recargar = useCallback(async () => {
+  const cargar = useCallback(async () => {
     const lista = cuentasRef.current;
     if (!lista.length) return;
     setActualizando(true);
@@ -67,6 +68,8 @@ export function useCorreo() {
       setActualizando(false);
     }
   }, [redCorreo]);
+  // Una recarga a la vez: al montar (dos veces en desarrollo) y al tirar.
+  const recargar = useMemo(() => unaALaVez(cargar), [cargar]);
 
   useEffect(() => {
     setBandeja(null);

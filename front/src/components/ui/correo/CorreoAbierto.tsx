@@ -209,7 +209,7 @@ export default function CorreoAbierto({
                         {
                           indicacion,
                           texto,
-                          deNeka: { texto: deNeka?.texto ?? texto },
+                          deNeka: deNeka ? { texto: deNeka.texto } : null,
                         },
                       )
                     }
