@@ -141,6 +141,25 @@ test("correo: Gmail resumen y completo", () => {
   };
   const l = co.desdeGmailCompleto(latin, "sofia@gmail.com");
   assert.equal(l.texto, "Inscripción");
+
+  // Prueba real (Outlook → Gmail): dice ISO-8859-1, pero Gmail ya lo entrega
+  // en UTF-8. No debe quedar «Â¿» ni «Ã­».
+  const outlook = {
+    ...GMAIL_FULL,
+    payload: {
+      mimeType: "text/plain",
+      headers: cab({
+        From: "N <n@outlook.com>",
+        Subject: "Prueba",
+        "Content-Type": 'text/plain; charset="iso-8859-1"',
+      }),
+      body: { data: b64u("¿Puedes el viernes?\nConfírmame") },
+    },
+  };
+  assert.equal(
+    co.desdeGmailCompleto(outlook, "sofia@gmail.com").texto,
+    "¿Puedes el viernes?\nConfírmame",
+  );
   assert.deepEqual(l.responderA, { nombre: "U", correo: "u@x.cl" });
   assert.equal(l.idMensaje, "");
 });
@@ -283,14 +302,21 @@ const datosNekal = () => {
   };
   return {
     ...d,
-    workspaces: [...d.workspaces, { id: "u", name: "Universidad", color: "#948BA6" }],
+    workspaces: [
+      ...d.workspaces,
+      { id: "u", name: "Universidad", color: "#948BA6" },
+    ],
     items: [pronto, lejos],
   };
 };
 
 test("correo Neka: el pedido lleva solo remitente, asunto y extracto", () => {
   const largo = "x".repeat(400);
-  const pedido = cn.pedidoClasificar([resumen("1", { extracto: largo })], datosNekal(), AHORA);
+  const pedido = cn.pedidoClasificar(
+    [resumen("1", { extracto: largo })],
+    datosNekal(),
+    AHORA,
+  );
   assert.match(pedido, /\[c1\]/);
   assert.match(pedido, /Ana Pérez <ana@x\.cl>/);
   assert.match(pedido, /Asunto 1/);
@@ -309,12 +335,19 @@ test("correo Neka: leer la clasificación", () => {
       { id: "c1", razon: "pide", fecha: "2026-11-20" },
       { id: "c2", razon: "urgente" },
       { id: "c3", razon: "fecha", fecha: "mañana" },
-      { id: "c4", razon: "relacionado", sobre: "tu reunión de hoy " + "z".repeat(80) },
+      {
+        id: "c4",
+        razon: "relacionado",
+        sobre: "tu reunión de hoy " + "z".repeat(80),
+      },
       { id: "c5", razon: "pide", fecha: "2026-02-31" },
       { id: "c9", razon: "pide" },
     ],
   });
-  const m = cn.leerClasificacion("Aquí va:\n```json\n" + json + "\n```", claves);
+  const m = cn.leerClasificacion(
+    "Aquí va:\n```json\n" + json + "\n```",
+    claves,
+  );
   assert.deepEqual(m.get("a"), { razon: "pide", fecha: "2026-11-20" });
   assert.deepEqual(m.get("b"), { razon: "nada" });
   assert.deepEqual(m.get("c"), { razon: "nada" });
@@ -325,7 +358,12 @@ test("correo Neka: leer la clasificación", () => {
   assert.equal(cn.leerClasificacion("no sé", claves), null);
   assert.equal(cn.leerClasificacion('{"otra":1}', claves), null);
   assert.deepEqual(
-    cn.leerClasificacion('{"correos":[{"id":"c1","razon":"fecha","fecha":"2026-12-01T17:30"}]}', ["a"]).get("a"),
+    cn
+      .leerClasificacion(
+        '{"correos":[{"id":"c1","razon":"fecha","fecha":"2026-12-01T17:30"}]}',
+        ["a"],
+      )
+      .get("a"),
     { razon: "fecha", fecha: "2026-12-01T17:30" },
   );
 });
@@ -333,8 +371,16 @@ test("correo Neka: leer la clasificación", () => {
 test("correo Neka: clasificar solo lo nuevo y no esconder nada si falla", async () => {
   const correos = [resumen("1"), resumen("2"), resumen("3")];
   const memoria = new Map([[cn.clave(correos[0]), { razon: "pregunta" }]]);
-  const cerebro = cerebroFalso([JSON.stringify({ correos: [{ id: "c1", razon: "pide" }] })]);
-  const r = await cn.clasificar({ cerebro, correos, data: datosNekal(), ahora: AHORA, memoria });
+  const cerebro = cerebroFalso([
+    JSON.stringify({ correos: [{ id: "c1", razon: "pide" }] }),
+  ]);
+  const r = await cn.clasificar({
+    cerebro,
+    correos,
+    data: datosNekal(),
+    ahora: AHORA,
+    memoria,
+  });
   assert.deepEqual(r, { fallo: false });
   assert.equal(cerebro.registro.enviados.length, 1);
   assert.doesNotMatch(cerebro.registro.enviados[0], /Asunto 1/);
@@ -344,7 +390,13 @@ test("correo Neka: clasificar solo lo nuevo y no esconder nada si falla", async 
   // Nada nuevo: no se llama a Neka.
   const quieto = cerebroFalso(["{}"]);
   assert.deepEqual(
-    await cn.clasificar({ cerebro: quieto, correos, data: datosNekal(), ahora: AHORA, memoria }),
+    await cn.clasificar({
+      cerebro: quieto,
+      correos,
+      data: datosNekal(),
+      ahora: AHORA,
+      memoria,
+    }),
     { fallo: false },
   );
   assert.equal(quieto.registro.enviados.length, 0);
@@ -352,26 +404,50 @@ test("correo Neka: clasificar solo lo nuevo y no esconder nada si falla", async 
   const otros = [resumen("4"), resumen("5")];
   const roto = cerebroFalso([() => Promise.reject(new Error("sin cupo"))]);
   assert.deepEqual(
-    await cn.clasificar({ cerebro: roto, correos: otros, data: datosNekal(), ahora: AHORA, memoria }),
+    await cn.clasificar({
+      cerebro: roto,
+      correos: otros,
+      data: datosNekal(),
+      ahora: AHORA,
+      memoria,
+    }),
     { fallo: true },
   );
   const ilegible = cerebroFalso(["no entendí"]);
   assert.deepEqual(
-    await cn.clasificar({ cerebro: ilegible, correos: otros, data: datosNekal(), ahora: AHORA, memoria }),
+    await cn.clasificar({
+      cerebro: ilegible,
+      correos: otros,
+      data: datosNekal(),
+      ahora: AHORA,
+      memoria,
+    }),
     { fallo: true },
   );
   assert.equal(memoria.size, 3);
   // De a 25 por pedido.
   const muchos = Array.from({ length: 30 }, (_, i) => resumen("m" + i));
   const lotes = cerebroFalso(['{"correos":[]}']);
-  await cn.clasificar({ cerebro: lotes, correos: muchos, data: datosNekal(), ahora: AHORA, memoria: new Map() });
+  await cn.clasificar({
+    cerebro: lotes,
+    correos: muchos,
+    data: datosNekal(),
+    ahora: AHORA,
+    memoria: new Map(),
+  });
   assert.equal(lotes.registro.enviados.length, 2);
 });
 
 test("correo Neka: textos de la fila y del encabezado", () => {
-  assert.equal(cn.textoRazon({ razon: "pide", fecha: "2026-11-20" }, AHORA), "Pide algo · viernes");
+  assert.equal(
+    cn.textoRazon({ razon: "pide", fecha: "2026-11-20" }, AHORA),
+    "Pide algo · viernes",
+  );
   assert.equal(cn.textoRazon({ razon: "pide" }, AHORA), "Pide algo");
-  assert.equal(cn.textoRazon({ razon: "pide", fecha: "2026-11-18T10:00" }, AHORA), "Pide algo · mañana");
+  assert.equal(
+    cn.textoRazon({ razon: "pide", fecha: "2026-11-18T10:00" }, AHORA),
+    "Pide algo · mañana",
+  );
   assert.equal(cn.textoRazon({ razon: "pregunta" }, AHORA), "Te pregunta algo");
   assert.equal(
     cn.textoRazon({ razon: "relacionado", sobre: "tu reunión de hoy" }, AHORA),
@@ -382,9 +458,23 @@ test("correo Neka: textos de la fila y del encabezado", () => {
     cn.textoRazon({ razon: "relacionado", sobre: "Reunión de equipo" }, AHORA),
     "Sobre reunión de equipo",
   );
-  assert.equal(cn.textoRazon({ razon: "fecha", fecha: "2026-12-01" }, AHORA), "Fecha · 1 dic");
-  assert.equal(cn.resumenBandeja(27, 4), "De 27 correos de esta semana, 4 son para ti.");
-  assert.equal(cn.resumenBandeja(1, 1), "De 1 correo de esta semana, 1 es para ti.");
+  assert.equal(
+    cn.textoRazon({ razon: "fecha", fecha: "2026-12-01" }, AHORA),
+    "Fecha · 1 dic",
+  );
+  assert.equal(
+    cn.resumenBandeja(27, 4),
+    "De 27 correos de esta semana, 4 son para ti.",
+  );
+  assert.equal(
+    cn.resumenBandeja(1, 1),
+    "De 1 correo de esta semana, 1 es para ti.",
+  );
+  // Si Neka no ordenó, no se dice que eligió (prueba real: «35 son para ti»).
+  assert.equal(
+    cn.resumenBandeja(85, 35, false),
+    "Tienes 85 correos de esta semana.",
+  );
   assert.equal(cn.accion("pide"), "Crear tarea");
   assert.equal(cn.accion("pregunta"), "Responder");
   assert.equal(cn.accion("fecha"), "Al calendario");
@@ -403,22 +493,45 @@ test("correo Neka: tarea y evento desde un correo", () => {
   assert.match(t.description, /Recuerden entregar el viernes/);
   assert.equal(t.dueAt, new Date(2026, 10, 20, 18, 0).toISOString());
   assert.equal(cn.tareaDesdeCorreo(c, undefined).dueAt, "");
-  assert.equal(cn.tareaDesdeCorreo({ ...c, asunto: "" }, undefined).title, "Correo de Ana Pérez");
-  assert.equal(cn.tareaDesdeCorreo({ ...c, asunto: "a".repeat(200) }, undefined).title.length, 160);
-  const e = cn.eventoDesdeCorreo(c, { razon: "fecha", fecha: "2026-12-01" }, AHORA);
+  assert.equal(
+    cn.tareaDesdeCorreo({ ...c, asunto: "" }, undefined).title,
+    "Correo de Ana Pérez",
+  );
+  assert.equal(
+    cn.tareaDesdeCorreo({ ...c, asunto: "a".repeat(200) }, undefined).title
+      .length,
+    160,
+  );
+  const e = cn.eventoDesdeCorreo(
+    c,
+    { razon: "fecha", fecha: "2026-12-01" },
+    AHORA,
+  );
   assert.equal(e.type, "Evento");
   assert.equal(e.scheduledAt, new Date(2026, 11, 1, 9, 0).toISOString());
   assert.equal(e.startDate, "2026-12-01");
   assert.equal(e.duration, 60);
   assert.equal(
-    cn.eventoDesdeCorreo(c, { razon: "fecha", fecha: "2026-12-01T17:30" }, AHORA).scheduledAt,
+    cn.eventoDesdeCorreo(
+      c,
+      { razon: "fecha", fecha: "2026-12-01T17:30" },
+      AHORA,
+    ).scheduledAt,
     new Date(2026, 11, 1, 17, 30).toISOString(),
   );
-  assert.equal(cn.eventoDesdeCorreo(c, undefined, AHORA).scheduledAt, new Date(2026, 10, 18, 9, 0).toISOString());
-  const conExtra = cn.eventoDesdeCorreo(c, { razon: "fecha", fecha: "2026-11-21T17:00" }, AHORA, {
-    titulo: "Juntarse con Ana",
-    minutos: 90,
-  });
+  assert.equal(
+    cn.eventoDesdeCorreo(c, undefined, AHORA).scheduledAt,
+    new Date(2026, 10, 18, 9, 0).toISOString(),
+  );
+  const conExtra = cn.eventoDesdeCorreo(
+    c,
+    { razon: "fecha", fecha: "2026-11-21T17:00" },
+    AHORA,
+    {
+      titulo: "Juntarse con Ana",
+      minutos: 90,
+    },
+  );
   assert.equal(conExtra.title, "Juntarse con Ana");
   assert.equal(conExtra.duration, 90);
 });
@@ -426,14 +539,27 @@ test("correo Neka: tarea y evento desde un correo", () => {
 test("correo Neka: borrador", () => {
   const json = JSON.stringify({
     texto: "¡Hola Ana!\nSí, me sirve.",
-    evento: { titulo: "Juntarse con Ana", inicio: "2026-11-21T17:00", minutos: 60 },
+    evento: {
+      titulo: "Juntarse con Ana",
+      inicio: "2026-11-21T17:00",
+      minutos: 60,
+    },
   });
   assert.deepEqual(cn.leerBorrador("```json\n" + json + "\n```"), {
     texto: "¡Hola Ana!\nSí, me sirve.",
-    evento: { titulo: "Juntarse con Ana", inicio: "2026-11-21T17:00", minutos: 60 },
+    evento: {
+      titulo: "Juntarse con Ana",
+      inicio: "2026-11-21T17:00",
+      minutos: 60,
+    },
   });
-  assert.deepEqual(cn.leerBorrador('{"texto":"Ok","evento":{"titulo":"X","inicio":"pronto"}}'), { texto: "Ok" });
-  assert.deepEqual(cn.leerBorrador('{"texto":"Ok","evento":null}'), { texto: "Ok" });
+  assert.deepEqual(
+    cn.leerBorrador('{"texto":"Ok","evento":{"titulo":"X","inicio":"pronto"}}'),
+    { texto: "Ok" },
+  );
+  assert.deepEqual(cn.leerBorrador('{"texto":"Ok","evento":null}'), {
+    texto: "Ok",
+  });
   assert.equal(cn.leerBorrador('{"texto":"  "}'), null);
   assert.equal(cn.leerBorrador("hola"), null);
   const completo = {
@@ -452,8 +578,18 @@ test("correo Neka: borrador", () => {
 
 // ── Task 3: la bandeja de varias cuentas ───────────────────────────────────
 const ba = require("../.test-build/conexiones/bandeja.js");
-const G = { proveedor: "google", correo: "sofia@gmail.com", nombre: "Sofía", desde: "" };
-const O = { proveedor: "microsoft", correo: "sofia@outlook.com", nombre: "Sofía", desde: "" };
+const G = {
+  proveedor: "google",
+  correo: "sofia@gmail.com",
+  nombre: "Sofía",
+  desde: "",
+};
+const O = {
+  proveedor: "microsoft",
+  correo: "sofia@outlook.com",
+  nombre: "Sofía",
+  desde: "",
+};
 function redCorreoFalsa(o = {}) {
   const r = {
     llamadas: [],
@@ -478,51 +614,108 @@ const deCuenta = (cuenta, proveedor, ids, fecha) =>
 test("bandeja: junta las dos cuentas por fecha", async () => {
   const redG = redCorreoFalsa({
     correos: (c) => ({
-      principales: deCuenta(c, "google", ["g1", "g2"], (n) => `2026-11-17T1${n * 2}:00:00.000Z`),
+      principales: deCuenta(
+        c,
+        "google",
+        ["g1", "g2"],
+        (n) => `2026-11-17T1${n * 2}:00:00.000Z`,
+      ),
       mas: deCuenta(c, "google", ["g9"], () => "2026-11-16T00:00:00.000Z"),
     }),
   });
   const redO = redCorreoFalsa({
     correos: (c) => ({
-      principales: deCuenta(c, "microsoft", ["o1"], () => "2026-11-17T11:00:00.000Z"),
+      principales: deCuenta(
+        c,
+        "microsoft",
+        ["o1"],
+        () => "2026-11-17T11:00:00.000Z",
+      ),
       mas: [],
     }),
   });
-  const b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? redG : redO), AHORA);
-  assert.deepEqual(b.principales.map((c) => c.id), ["g2", "o1", "g1"]);
-  assert.deepEqual(b.mas.map((c) => c.id), ["g9"]);
+  const b = await ba.traerBandeja(
+    [G, O],
+    (c) => (c.proveedor === "google" ? redG : redO),
+    AHORA,
+  );
+  assert.deepEqual(
+    b.principales.map((c) => c.id),
+    ["g2", "o1", "g1"],
+  );
+  assert.deepEqual(
+    b.mas.map((c) => c.id),
+    ["g9"],
+  );
   assert.deepEqual(b.avisos, []);
 });
 
 test("bandeja: una cuenta falla y la otra se ve", async () => {
   const bien = redCorreoFalsa({
-    correos: (c) => ({ principales: deCuenta(c, "microsoft", ["o1"], () => "2026-11-17T11:00:00.000Z"), mas: [] }),
+    correos: (c) => ({
+      principales: deCuenta(
+        c,
+        "microsoft",
+        ["o1"],
+        () => "2026-11-17T11:00:00.000Z",
+      ),
+      mas: [],
+    }),
   });
   const sinPase = redCorreoFalsa({ sinPase: true });
-  let b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? sinPase : bien), AHORA);
-  assert.deepEqual(b.principales.map((c) => c.id), ["o1"]);
+  let b = await ba.traerBandeja(
+    [G, O],
+    (c) => (c.proveedor === "google" ? sinPase : bien),
+    AHORA,
+  );
+  assert.deepEqual(
+    b.principales.map((c) => c.id),
+    ["o1"],
+  );
   assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "pase", detalle: "" }]);
 
   const caida = redCorreoFalsa({ falla: "red 500 · x" });
-  b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? caida : bien), AHORA);
-  assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "red", detalle: "red 500 · x" }]);
+  b = await ba.traerBandeja(
+    [G, O],
+    (c) => (c.proveedor === "google" ? caida : bien),
+    AHORA,
+  );
+  assert.deepEqual(b.avisos, [
+    { cuenta: G, tipo: "red", detalle: "red 500 · x" },
+  ]);
 
   const vencido = redCorreoFalsa({ falla: "pase" });
   b = await ba.traerBandeja([G], () => vencido, AHORA);
   assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "pase", detalle: "" }]);
 
   const sinPermiso = redCorreoFalsa({ permiso: false });
-  b = await ba.traerBandeja([G, O], (c) => (c.proveedor === "google" ? sinPermiso : bien), AHORA);
+  b = await ba.traerBandeja(
+    [G, O],
+    (c) => (c.proveedor === "google" ? sinPermiso : bien),
+    AHORA,
+  );
   assert.deepEqual(b.avisos, [{ cuenta: G, tipo: "permiso", detalle: "" }]);
   assert.deepEqual(sinPermiso.llamadas, []);
   assert.equal(b.principales.length, 1);
 });
 
 test("correo Neka: hora corta de la fila y fecha de la cita", () => {
-  assert.equal(cn.horaCorreo(new Date(2026, 10, 17, 9, 12).toISOString(), AHORA), "09:12");
-  assert.equal(cn.horaCorreo(new Date(2026, 10, 16, 20, 0).toISOString(), AHORA), "ayer");
-  assert.equal(cn.horaCorreo(new Date(2026, 10, 13, 8, 0).toISOString(), AHORA), "vie");
-  assert.equal(cn.horaCorreo(new Date(2026, 10, 2, 8, 0).toISOString(), AHORA), "2 nov");
+  assert.equal(
+    cn.horaCorreo(new Date(2026, 10, 17, 9, 12).toISOString(), AHORA),
+    "09:12",
+  );
+  assert.equal(
+    cn.horaCorreo(new Date(2026, 10, 16, 20, 0).toISOString(), AHORA),
+    "ayer",
+  );
+  assert.equal(
+    cn.horaCorreo(new Date(2026, 10, 13, 8, 0).toISOString(), AHORA),
+    "vie",
+  );
+  assert.equal(
+    cn.horaCorreo(new Date(2026, 10, 2, 8, 0).toISOString(), AHORA),
+    "2 nov",
+  );
   assert.equal(cn.textoInicio("2026-11-21T17:00"), "sábado 21 a las 17:00");
   assert.equal(cn.textoInicio("2026-12-01"), "martes 1");
   assert.equal(cn.textoInicio("nada"), "");
@@ -531,7 +724,9 @@ test("correo Neka: hora corta de la fila y fecha de la cita", () => {
 // ── Revisión H5 ──────────────────────────────────────────────────────────
 test("revisión H5: las celdas de una tabla no se pegan", () => {
   assert.equal(
-    co.htmlATexto("<table><tr><td>Fecha</td><td>1 dic</td></tr><tr><th>Sala</th><td>3</td></tr></table>"),
+    co.htmlATexto(
+      "<table><tr><td>Fecha</td><td>1 dic</td></tr><tr><th>Sala</th><td>3</td></tr></table>",
+    ),
     "Fecha 1 dic\nSala 3",
   );
 });

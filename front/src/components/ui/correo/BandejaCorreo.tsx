@@ -113,7 +113,11 @@ export default function BandejaCorreo() {
               <Txt variant="headline">
                 {correo.estado === "cargando"
                   ? "Neka está leyendo tu correo…"
-                  : resumenBandeja(correo.total, correo.importantes.length)}
+                  : resumenBandeja(
+                      correo.total,
+                      correo.importantes.length,
+                      !correo.nekaFallo,
+                    )}
               </Txt>
               {correo.estado === "listo" && (
                 <Txt variant="callout" tone="secondary">
@@ -250,7 +254,11 @@ export default function BandejaCorreo() {
           onEditar={(i, respuesta) => {
             setVolver(
               respuesta
-                ? { correo: abierto.correo, responder: true, inicial: respuesta }
+                ? {
+                    correo: abierto.correo,
+                    responder: true,
+                    inicial: respuesta,
+                  }
                 : null,
             );
             setAbierto(null);

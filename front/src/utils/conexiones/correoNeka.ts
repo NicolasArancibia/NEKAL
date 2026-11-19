@@ -230,7 +230,9 @@ export function textoRazon(c: Clase, ahora: number): string {
     case "fecha":
       return f ? `Fecha · ${f}` : "Trae una fecha";
     case "relacionado":
-      return c.sobre ? `Sobre ${c.sobre.charAt(0).toLowerCase()}${c.sobre.slice(1)}` : "Tiene que ver con tus cosas";
+      return c.sobre
+        ? `Sobre ${c.sobre.charAt(0).toLowerCase()}${c.sobre.slice(1)}`
+        : "Tiene que ver con tus cosas";
     default:
       return "";
   }
@@ -245,7 +247,13 @@ export function accion(
   return "Ver";
 }
 
-export function resumenBandeja(total: number, importantes: number): string {
+export function resumenBandeja(
+  total: number,
+  importantes: number,
+  ordenado = true,
+): string {
+  if (!ordenado)
+    return `Tienes ${total} ${total === 1 ? "correo" : "correos"} de esta semana.`;
   return `De ${total} ${total === 1 ? "correo" : "correos"} de esta semana, ${importantes} ${importantes === 1 ? "es" : "son"} para ti.`;
 }
 

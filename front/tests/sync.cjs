@@ -91,8 +91,21 @@ assert.deepEqual(
   mergeOperation(recordsOf(deleted), operation(a, local)).conflicts,
   ["items/a"],
 );
+// H5 (prueba real): una cuenta de antes de H3 no tiene settings/conexiones en
+// la nube; el primer cambio (ofrecido, conectar) no es un conflicto.
+{
+  const nube = recordsOf(a);
+  delete nube["settings/conexiones"];
+  const conectado = {
+    ...a,
+    conexiones: { cuentas: [], ofrecido: true, destinos: [] },
+  };
+  const m = mergeOperation(nube, operation(dataOf(nube), conectado));
+  assert.deepEqual(m.conflicts, []);
+  assert.equal(dataOf(m.records).conexiones.ofrecido, true);
+}
 console.log(
-  "OK sync: normalization, field merge, same-field conflict, duplicate rewards, deletion conflict",
+  "OK sync: normalization, field merge, same-field conflict, duplicate rewards, deletion conflict, missing settings record",
 );
 (async () => {
   let snapshot = { revision: 1, records: recordsOf(a) },
@@ -259,7 +272,13 @@ console.log(
   assert.deepEqual(recs["items/ext"].origen, origen);
   assert.deepEqual(dataOf(recs).items[0].origen, origen);
   assert.deepEqual(validateRecords(recs).items[0].origen, origen);
-  const malo = { ...recs, "items/ext": { ...recs["items/ext"], origen: { ...origen, proveedor: "yahoo" } } };
+  const malo = {
+    ...recs,
+    "items/ext": {
+      ...recs["items/ext"],
+      origen: { ...origen, proveedor: "yahoo" },
+    },
+  };
   assert.equal(validateRecords(malo).items[0].origen, undefined);
   console.log("OK sync: ítem con origen va y vuelve");
 }

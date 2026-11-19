@@ -107,7 +107,10 @@ export const htmlDeTexto = (texto: string) =>
 
 export function persona(cabecera: string): Persona {
   // Varias direcciones: queda la primera.
-  const s = decodificarCabecera(cabecera ?? "").trim().split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)(?=[^<>]*(?:<|$))/)[0].trim();
+  const s = decodificarCabecera(cabecera ?? "")
+    .trim()
+    .split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)(?=[^<>]*(?:<|$))/)[0]
+    .trim();
   const m = s.match(/^(.*?)\s*<([^<>]+)>\s*$/);
   const correo = (m ? m[2] : s).trim();
   const nombre = (m ? m[1] : "")
@@ -136,11 +139,18 @@ function hojas(p: Parte): Parte[] {
   return p.parts?.length ? p.parts.flatMap(hojas) : [p];
 }
 
+// Gmail suele entregar el cuerpo ya en UTF-8 aunque la cabecera diga otro
+// charset (pasa con lo que manda Outlook): si es UTF-8 válido, se lee así.
 function cuerpo(p: Parte): string {
-  const charset = cabecera(p, "Content-Type").match(
-    /charset="?([^";\s]+)"?/i,
-  )?.[1];
-  return decodificar(bytesDeBase64(p.body?.data ?? ""), charset);
+  const bytes = bytesDeBase64(p.body?.data ?? "");
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    const charset = cabecera(p, "Content-Type").match(
+      /charset="?([^";\s]+)"?/i,
+    )?.[1];
+    return decodificar(bytes, charset);
+  }
 }
 
 export function desdeGmail(m: any, cuenta: string): CorreoResumen | null {
