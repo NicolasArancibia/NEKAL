@@ -37,3 +37,24 @@ export type Permisos = { calendario: boolean; correo: boolean };
 export type Vuelta =
   | { ok: true; pase: PaseGoogle }
   | { ok: false; error: "state" | "cancelado" | "necesita_toque" | "sin_pase" };
+
+// Correo (V2/H5): se lee en vivo y nunca se guarda.
+export type Persona = { nombre: string; correo: string };
+export type CorreoResumen = {
+  id: string;
+  proveedor: Proveedor;
+  cuenta: string;
+  hilo: string;
+  de: Persona;
+  asunto: string;
+  fecha: string;
+  extracto: string;
+  leido: boolean;
+};
+export type CorreoCompleto = CorreoResumen & {
+  texto: string;
+  para: string;
+  responderA: Persona;
+  idMensaje: string;
+  referencias: string;
+};

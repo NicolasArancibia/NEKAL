@@ -48,6 +48,9 @@ const build = spawnSync(
     "src/utils/conexiones/eventos.ts",
     "src/utils/conexiones/espejo.ts",
     "src/utils/conexiones/sincronizar.ts",
+    "src/utils/conexiones/correo.ts",
+    "src/utils/conexiones/correoNeka.ts",
+    "src/utils/conexiones/bandeja.ts",
     "--outDir",
     ".test-build",
     "--module",
@@ -98,4 +101,5 @@ require("./vistas.cjs");
 require("./progreso.cjs");
 require("./amigos.cjs");
 require("./conexiones.cjs");
+require("./correo.cjs");
 require("./styles.cjs");

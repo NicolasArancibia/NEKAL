@@ -4,7 +4,12 @@ import type {
   IPublicClientApplication,
 } from "@azure/msal-browser";
 import type { Item } from "../model";
-import type { CalendarioFuera } from "./tipos";
+import type { CalendarioFuera, CorreoCompleto, CorreoResumen } from "./tipos";
+import {
+  desdeGraph as correoDeGraph,
+  desdeGraphCompleto,
+  htmlDeTexto,
+} from "./correo";
 import {
   cambiosGraph,
   cuerpoGraph,
@@ -245,4 +250,66 @@ export async function borrarEventoGraph(
   );
   if (!r.ok && r.status !== 404 && r.status !== 410)
     throw new Error(detalleDeError(r.status, await r.text()));
+}
+
+// ── Correo (V2/H5) ─────────────────────────────────────────────────────────
+const CAMPOS_CORREO =
+  "id,subject,from,receivedDateTime,bodyPreview,isRead,conversationId";
+
+// Prioritarios («focused») son lo principal; «other», los correos más.
+export async function correosGraph(
+  token: string,
+  cuenta: string,
+  ahora: number,
+): Promise<{ principales: CorreoResumen[]; mas: CorreoResumen[] }> {
+  const desde = new Date(ahora - 7 * 86_400_000).toISOString();
+  const url = (clase: string) =>
+    `${GRAPH}/me/mailFolders/inbox/messages?$filter=${encodeURIComponent(
+      `receivedDateTime ge ${desde} and inferenceClassification eq '${clase}'`,
+    )}&$orderby=${encodeURIComponent("receivedDateTime desc")}&$top=50&$select=${CAMPOS_CORREO}`;
+  const [p, m] = await Promise.all([
+    jsonGraph(token, url("focused")),
+    jsonGraph(token, url("other")),
+  ]);
+  const lista = (r: any): CorreoResumen[] =>
+    (r.value ?? [])
+      .map((x: unknown) => correoDeGraph(x, cuenta))
+      .filter((x: CorreoResumen | null): x is CorreoResumen => !!x);
+  return { principales: lista(p), mas: lista(m) };
+}
+
+export async function correoGraph(
+  token: string,
+  cuenta: string,
+  id: string,
+): Promise<CorreoCompleto> {
+  const m = await jsonGraph(
+    token,
+    `${GRAPH}/me/messages/${encodeURIComponent(id)}?$select=${CAMPOS_CORREO},body,replyTo,toRecipients,internetMessageId`,
+  );
+  const c = desdeGraphCompleto(m, cuenta);
+  if (!c) throw new Error("red: Outlook respondió un correo ilegible");
+  return c;
+}
+
+export async function marcarLeidoGraph(token: string, id: string) {
+  await jsonGraph(token, `${GRAPH}/me/messages/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ isRead: true }),
+  });
+}
+
+// `reply` de Graph responde en la misma conversación (202, sin cuerpo).
+export async function responderGraph(
+  token: string,
+  original: CorreoCompleto,
+  texto: string,
+) {
+  const r = await pedirGraph(
+    token,
+    `${GRAPH}/me/messages/${encodeURIComponent(original.id)}/reply`,
+    // `comment` se lee como HTML: sin esto los saltos de línea se pierden.
+    { method: "POST", body: JSON.stringify({ comment: htmlDeTexto(texto) }) },
+  );
+  if (!r.ok) throw new Error(detalleDeError(r.status, await r.text()));
 }

@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import { Chip, ScreenHeader, Txt } from "../components/ui/base";
+import { Chip, ScreenHeader, Segmentos, Txt } from "../components/ui/base";
+import { BandejaCorreo } from "../components/ui/correo";
 import { color, space } from "../styles/theme";
 import ChatMessage from "../components/ui/ChatUi/ChatMessage";
 import ChatInput from "../components/ui/ChatUi/ChatInput";
@@ -14,23 +15,49 @@ import { estadoVisible } from "../utils/agente/mensajes";
 
 const ATAJOS = ["Voy atrasado", "¿Qué tengo hoy?", "Arregla los choques"];
 
+// Pestaña IA (spec H3 §6.4): arriba Chat | Correo.
 // Chat con Neka (spec D §5.1). La hoja del plan es global (TabNavigator). Si la
 // IA falla (sin internet o sin cupo), vuelven las secciones de la V1 y cada
 // mensaje escrito la reintenta; sin Firebase, todo es el chat de la V1.
 export default function Chat() {
+  const [modo, setModo] = useState<"chat" | "correo">("chat");
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: color.background }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View style={{ paddingHorizontal: space.screen, gap: space.md }}>
+        <ScreenHeader
+          title="IA"
+          right={modo === "chat" ? <InterruptorVoz /> : undefined}
+        />
+        <Segmentos
+          opciones={[
+            ["chat", "Chat"],
+            ["correo", "Correo"],
+          ]}
+          valor={modo}
+          onCambio={setModo}
+        />
+      </View>
+      {modo === "correo" ? (
+        <BandejaCorreo />
+      ) : (
+        <ChatConNeka />
+      )}
+    </KeyboardAvoidingView>
+  );
+}
+
+// El chat de Neka de siempre, sin cambios.
+function ChatConNeka() {
   const { data } = useApp();
   const neka = useNeka();
   const sinIA = useChatSinIA();
   const conIA = firebaseConfigured && !neka.sinIA;
   const scroll = useRef<ScrollView>(null);
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: color.background }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View style={{ paddingHorizontal: space.screen }}>
-        <ScreenHeader title="Neka" right={<InterruptorVoz />} />
-      </View>
+    <>
       <ScrollView
         ref={scroll}
         onContentSizeChange={() =>
@@ -111,6 +138,6 @@ export default function Chat() {
         grabando={neka.grabando}
       />
       {sinIA.hojas}
-    </KeyboardAvoidingView>
+    </>
   );
 }

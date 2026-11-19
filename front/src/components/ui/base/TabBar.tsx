@@ -21,7 +21,7 @@ const tabs: Record<
   Resumen: { icon: "grid-outline", label: "Resumen" },
   Calendario: { icon: "calendar-outline", label: "Calendario" },
   EspacioTrabajo: { icon: "git-network-outline", label: "Espacio" },
-  Chat: { icon: "chatbubble-outline", label: "Chat con Neka" },
+  Chat: { icon: "sparkles-outline", label: "IA: chat y correo" },
   Perfil: { icon: "person-outline", label: "Perfil" },
 };
 

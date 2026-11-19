@@ -191,16 +191,28 @@ export function mergeOperation(
 ): { records: Records; conflicts: string[] } {
   const records = { ...remote },
     conflicts: string[] = [];
+  // Un ajuste que falta en la nube vale lo mismo que su valor por defecto
+  // (dataOf lo lee así): si no, el primer cambio de una cuenta vieja choca.
+  const porDefecto = recordsOf(emptyData());
   for (const edit of op.edits) {
-    const current = remote[edit.path] ?? null;
+    const current =
+      remote[edit.path] ??
+      (edit.path.startsWith("settings/") ? porDefecto[edit.path] : null) ??
+      null;
     let result = mergeValue(edit.before, edit.after, current);
+    // El orden (x, y) no es contenido: dataOf reordena posiciones viejas sin
+    // escribirlas, y eso no cuenta como un cambio de otro dispositivo.
+    const sinOrden = (v: Value) => {
+      const { x, y, ...resto } = v;
+      return resto;
+    };
     if (
       edit.path.startsWith("items/") &&
       edit.before &&
       edit.after &&
       current &&
-      !equal(edit.after, current) &&
-      !equal(edit.before, current) &&
+      !equal(sinOrden(edit.after), sinOrden(current)) &&
+      !equal(sinOrden(edit.before), sinOrden(current)) &&
       ["type", "deletedAt"].some(
         (k) =>
           !equal(edit.before![k], current[k]) ||
@@ -302,7 +314,10 @@ export function validateRecords(records: Records): AppData {
         bound(s.title, 1000);
       }
       value.dependencies.forEach((v: string) => bound(v, 200));
-      if (value.copias !== undefined && (!Array.isArray(value.copias) || value.copias.length > 5))
+      if (
+        value.copias !== undefined &&
+        (!Array.isArray(value.copias) || value.copias.length > 5)
+      )
         throw new Error("Un ítem tiene demasiadas copias en otras cuentas.");
       for (const o of [value.origen, ...(value.copias ?? [])])
         if (o && typeof o === "object")
