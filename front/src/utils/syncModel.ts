@@ -200,13 +200,19 @@ export function mergeOperation(
       (edit.path.startsWith("settings/") ? porDefecto[edit.path] : null) ??
       null;
     let result = mergeValue(edit.before, edit.after, current);
+    // El orden (x, y) no es contenido: dataOf reordena posiciones viejas sin
+    // escribirlas, y eso no cuenta como un cambio de otro dispositivo.
+    const sinOrden = (v: Value) => {
+      const { x, y, ...resto } = v;
+      return resto;
+    };
     if (
       edit.path.startsWith("items/") &&
       edit.before &&
       edit.after &&
       current &&
-      !equal(edit.after, current) &&
-      !equal(edit.before, current) &&
+      !equal(sinOrden(edit.after), sinOrden(current)) &&
+      !equal(sinOrden(edit.before), sinOrden(current)) &&
       ["type", "deletedAt"].some(
         (k) =>
           !equal(edit.before![k], current[k]) ||

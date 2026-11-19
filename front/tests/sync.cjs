@@ -104,8 +104,22 @@ assert.deepEqual(
   assert.deepEqual(m.conflicts, []);
   assert.equal(dataOf(m.records).conexiones.ofrecido, true);
 }
+// Prueba real: dataOf reordena posiciones viejas (x) sin escribirlas en la
+// nube; borrar ese ítem no es un conflicto (el orden no es contenido).
+{
+  const nube = recordsOf(a);
+  nube["items/a"] = { ...nube["items/a"], x: 0 };
+  const visto = { ...a, items: [{ ...a.items[0], x: 45 }] };
+  const borrado = {
+    ...visto,
+    items: [{ ...visto.items[0], deletedAt: "2026-11-19T04:10:15.698Z" }],
+  };
+  const m = mergeOperation(nube, operation(visto, borrado));
+  assert.deepEqual(m.conflicts, []);
+  assert.equal(m.records["items/a"].deletedAt, "2026-11-19T04:10:15.698Z");
+}
 console.log(
-  "OK sync: normalization, field merge, same-field conflict, duplicate rewards, deletion conflict, missing settings record",
+  "OK sync: normalization, field merge, same-field conflict, duplicate rewards, deletion conflict, missing settings record, layout-only difference",
 );
 (async () => {
   let snapshot = { revision: 1, records: recordsOf(a) },
