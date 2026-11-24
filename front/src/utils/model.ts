@@ -57,12 +57,7 @@ export type Item = {
 };
 // Área de vida de una mesa (spec E §5). Sin el campo, se usa la sugerida por el nombre.
 export type Area =
-  | "estudio"
-  | "trabajo"
-  | "salud"
-  | "hogar"
-  | "social"
-  | "personal";
+  "estudio" | "trabajo" | "salud" | "hogar" | "social" | "personal";
 export const AREA_IDS: Area[] = [
   "estudio",
   "trabajo",
@@ -71,7 +66,12 @@ export const AREA_IDS: Area[] = [
   "social",
   "personal",
 ];
-export type Workspace = { id: string; name: string; color: string; area?: Area };
+export type Workspace = {
+  id: string;
+  name: string;
+  color: string;
+  area?: Area;
+};
 // Mesa ⊃ grupos (anidables) ⊃ cosas. Un grupo con `repeat` es una rutina (spec B §2).
 export type Repeat = "" | "diario" | "semanal" | "dias";
 export const REPEATS: Repeat[] = ["", "diario", "semanal", "dias"];
@@ -107,7 +107,12 @@ export const newGroup = (
 });
 // Un mensaje tiene sus 3 claves o, si es audio o plan de Neka (spec D §8), las 6.
 export type EstadoPlan = "" | "pendiente" | "aceptado" | "descartado";
-export const ESTADOS_PLAN: EstadoPlan[] = ["", "pendiente", "aceptado", "descartado"];
+export const ESTADOS_PLAN: EstadoPlan[] = [
+  "",
+  "pendiente",
+  "aceptado",
+  "descartado",
+];
 export type Message = {
   id: string;
   text: string;
@@ -181,7 +186,7 @@ export const emptyData = (): AppData => ({
   messages: [],
   logros: [],
   conexiones: { cuentas: [], ofrecido: false, destinos: [] },
-  workspaces: [{ id: "general", name: "General", color: "#7847EB" }],
+  workspaces: [{ id: "general", name: "General", color: "#7546EC" }],
   profile: { name: "", roles: "" },
   preferences: {
     softAlerts: true,
@@ -337,7 +342,10 @@ export function validateGroup(group: Group, data: AppData): string | null {
   if (!data.workspaces.some((w) => w.id === group.workspaceId))
     return "La mesa ya no existe.";
   const byId = new Map(
-    data.groups.filter((g) => g.id !== group.id).concat(group).map((g) => [g.id, g]),
+    data.groups
+      .filter((g) => g.id !== group.id)
+      .concat(group)
+      .map((g) => [g.id, g]),
   );
   if (group.parentId) {
     const parent = byId.get(group.parentId);

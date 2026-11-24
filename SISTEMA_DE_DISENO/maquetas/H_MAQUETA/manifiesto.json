@@ -1,0 +1,245 @@
+{
+  "_nota": "Índice de maquetas de la fase H para armar la mega maqueta al final: una entrada por cuadro, en orden de flujo. Cada maqueta se conserva (nunca se borra); una versión nueva es un archivo nuevo.",
+  "cuadros": [
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 1,
+      "cuadro": "A",
+      "titulo": "El plan dice por qué",
+      "explicacion": "Atraso de 20 minutos con un compromiso fijo en medio: el paso explica que se salta el Gimnasio, que es fijo.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 2,
+      "cuadro": "B",
+      "titulo": "Aviso, no bloqueo",
+      "explicacion": "Dos cosas fijas que pediste chocan entre sí: se avisa y se puede aceptar.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 3,
+      "cuadro": "C",
+      "titulo": "La agenda cambió",
+      "explicacion": "Mientras miras el plan entra una reunión: «Aceptar» se reemplaza por «Pedir de nuevo».",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Imprevisto con Neka",
+      "orden": 4,
+      "cuadro": "D",
+      "titulo": "No cabe todo hoy",
+      "explicacion": "Lo que no cabe hoy se propone para el primer hueco de mañana, calculado por la app.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "01-plan-de-neka-estados.html",
+      "version": 1,
+      "flujo": "Estados de error",
+      "orden": 1,
+      "cuadro": "E",
+      "titulo": "Cuando la IA no responde",
+      "explicacion": "El aviso aparece en el chat pero ya no se guarda en el historial.",
+      "estado": "aprobada y construida (H1, tarea 6)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 1,
+      "cuadro": "A",
+      "titulo": "Hoy, así se ve",
+      "explicacion": "El círculo con todo lo atrasado amontonado en «Hoy» y tres vistas (con Mesas 3D).",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 2,
+      "cuadro": "B",
+      "titulo": "Después",
+      "explicacion": "Círculo sin lo atrasado hace más de 2 días, selector de dos vistas, burbujas «+N» y nombre al tocar un punto.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 3,
+      "cuadro": "C",
+      "titulo": "Atrasadas",
+      "explicacion": "Hoja con la lista de lo atrasado: «A hoy», completar o mandar a la papelera.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "02-vistas-circulo-agenda.html",
+      "version": 1,
+      "flujo": "Vistas: Calendario",
+      "orden": 4,
+      "cuadro": "D",
+      "titulo": "Agenda",
+      "explicacion": "El Calendario con modo Mes | Agenda, choques marcados y «Arreglar con Neka».",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Espacio",
+      "orden": 10,
+      "cuadro": "E",
+      "titulo": "Espacio solo con el círculo",
+      "explicacion": "Sin selector ni 3D; mismo selector de tiempo, burbujas +N y píldora de atrasadas.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Calendario",
+      "orden": 11,
+      "cuadro": "F",
+      "titulo": "Calendario con Plano",
+      "explicacion": "El Calendario pasa a Mes | Agenda | Plano; el Plano se muda aquí.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 12,
+      "cuadro": "G",
+      "titulo": "Neka pregunta por lo importante",
+      "explicacion": "Tarjeta del Resumen: reprogramar, ya la hice o soltarla, una a la vez.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "03-espacio-calendario-neka.html",
+      "version": 1,
+      "flujo": "Vistas: Atrasadas",
+      "orden": 13,
+      "cuadro": "H",
+      "titulo": "Atrasadas, lo importante primero",
+      "explicacion": "Hoja con Importantes arriba (con entrega, urgente) y las demás debajo.",
+      "estado": "aprobada (2/11/2026)"
+    },
+    {
+      "archivo": "04-primer-uso-conectar-y-tutorial.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 14,
+      "cuadro": "A",
+      "titulo": "Conectar Google Calendar",
+      "explicacion": "Pop-up al crear la cuenta; solo visual por ahora. «Ahora no» siempre visible.",
+      "estado": "propuesta (2/11/2026, sin aprobar)"
+    },
+    {
+      "archivo": "04-primer-uso-conectar-y-tutorial.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 15,
+      "cuadro": "B",
+      "titulo": "Tutorial guiado",
+      "explicacion": "La app se oscurece y se ilumina una cosa por paso (6 pasos); Saltar siempre visible; termina empujando a crear la primera cosa.",
+      "estado": "propuesta (2/11/2026, sin aprobar)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 16,
+      "cuadro": "A1",
+      "titulo": "Conecta tus cuentas",
+      "explicacion": "Al crear la cuenta: Google y Outlook como dos filas grandes; «Ahora no» siempre visible.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Primer uso",
+      "orden": 17,
+      "cuadro": "A2",
+      "titulo": "Al volver de Google",
+      "explicacion": "Confirma lo traído (eventos y correo), ofrece Outlook y sigue con Continuar.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Cuentas conectadas",
+      "orden": 18,
+      "cuadro": "B1",
+      "titulo": "Ajustes → Cuentas conectadas",
+      "explicacion": "Estado de cada cuenta, destino de lo creado en Nekal (calendario «Nekal») y agregar otra.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Cuentas conectadas",
+      "orden": 19,
+      "cuadro": "B2",
+      "titulo": "Permiso vencido y desconectar",
+      "explicacion": "Botón grande para actualizar; desconectar confirma qué pasa con los eventos.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Calendario en espejo",
+      "orden": 20,
+      "cuadro": "C1",
+      "titulo": "Agenda con Google y Outlook",
+      "explicacion": "Eventos de afuera con ícono de calendario y logo de la cuenta; lo de Nekal copiado dice «en Google».",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Calendario en espejo",
+      "orden": 21,
+      "cuadro": "C2",
+      "titulo": "Detalle de un evento de afuera",
+      "explicacion": "Se edita como todo; avisa que el cambio también llega a Outlook.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 2,
+      "flujo": "Correo con Neka",
+      "orden": 22,
+      "cuadro": "D1",
+      "titulo": "Pestaña IA → Correo: solo lo importante",
+      "explicacion": "v2 (13/11): filtro del proveedor (Principal/Prioritarios) + Neka deja solo lo que pide algo, pregunta, trae fecha o se relaciona con Nekal; cada fila dice por qué y tiene una acción; el resto en «23 correos más».",
+      "estado": "propuesta v2 (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Correo con Neka",
+      "orden": 23,
+      "cuadro": "D2",
+      "titulo": "Correo abierto",
+      "explicacion": "Texto simple sin rastreo; Responder y Crear tarea abajo.",
+      "estado": "aprobada (13/11/2026)"
+    },
+    {
+      "archivo": "05-conexiones-correo-calendario.html",
+      "version": 1,
+      "flujo": "Correo con Neka",
+      "orden": 24,
+      "cuadro": "D3",
+      "titulo": "Responder con Neka",
+      "explicacion": "Indicación a Neka, borrador editable, Enviar; ofrece agendar la fecha del correo.",
+      "estado": "aprobada (13/11/2026)"
+    }
+  ]
+}

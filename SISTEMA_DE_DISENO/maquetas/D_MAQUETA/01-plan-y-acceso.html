@@ -1,0 +1,226 @@
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .phones { display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin:14px 0 6px; }
+  .phone { width:300px; color:#241D38; background:#FAF8FF; border:1px solid #E4DDF0; border-radius:36px; padding:12px 10px 8px; box-shadow:0 12px 40px rgba(60,30,120,.10); font-family:"Plus Jakarta Sans",system-ui,sans-serif; display:flex; flex-direction:column; height:560px; position:relative; overflow:hidden; }
+  .ph-title { font-size:22px; font-weight:800; padding:4px 10px 8px; }
+  .thread { flex:1; display:flex; flex-direction:column; gap:8px; padding:0 6px; overflow:hidden; }
+  .b { max-width:82%; padding:8px 11px; border-radius:16px; font-size:12.5px; line-height:1.4; }
+  .b.me { align-self:flex-end; background:#7546EC; color:#fff; border-bottom-right-radius:5px; }
+  .b.neka { align-self:flex-start; background:#fff; border:1px solid #EEE9F6; border-bottom-left-radius:5px; }
+  .audio { display:flex; align-items:center; gap:7px; }
+  .wave { display:flex; gap:2px; align-items:center; }
+  .wave i { display:block; width:2.5px; border-radius:2px; background:rgba(255,255,255,.85); }
+  .heard { font-size:10.5px; opacity:.8; margin-top:3px; font-style:italic; }
+  .spk { display:inline-flex; vertical-align:-2px; margin-left:4px; color:#7546EC; }
+  .plan { background:#fff; border:1px solid #E2DBF0; border-radius:18px; padding:10px; align-self:stretch; margin:0 2px; box-shadow:0 4px 14px rgba(60,30,120,.06); }
+  .plan h4 { margin:0 0 6px; font-size:12px; font-weight:800; color:#7546EC; letter-spacing:.3px; text-transform:uppercase; }
+  .row { display:flex; align-items:center; gap:8px; padding:6px 2px; border-top:1px solid #F3EFFA; font-size:12px; }
+  .row:first-of-type { border-top:none; }
+  .ck { width:18px; height:18px; border-radius:6px; background:#7546EC; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ck.off { background:#fff; border:1.5px solid #CFC6E2; }
+  .ck.lock { background:#F3EFFA; color:#948BA6; }
+  .row .t { flex:1; font-weight:700; }
+  .row .t small { display:block; font-weight:600; color:#6F6683; font-size:10.5px; }
+  .old { color:#948BA6; text-decoration:line-through; font-size:11px; }
+  .new { color:#7546EC; font-weight:800; }
+  .btns { display:flex; gap:6px; margin-top:8px; }
+  .btn { flex:1; text-align:center; padding:9px 6px; border-radius:12px; font-size:12px; font-weight:700; }
+  .btn.p { background:#7546EC; color:#fff; }
+  .btn.s { background:#EFE7FF; color:#7546EC; }
+  .link { font-size:11px; font-weight:700; color:#7546EC; text-align:center; margin-top:6px; }
+  .input { display:flex; align-items:center; gap:6px; margin:6px 4px 4px; background:#fff; border:1px solid #EEE9F6; border-radius:20px; padding:6px 6px 6px 12px; font-size:12px; color:#948BA6; }
+  .input .grow { flex:1; }
+  .mic { width:30px; height:30px; border-radius:15px; background:#7546EC; color:#fff; display:flex; align-items:center; justify-content:center; }
+  .tabbar { display:flex; justify-content:space-around; align-items:center; padding:8px 4px 2px; border-top:1px solid #EEE9F6; background:#fff; margin:4px -10px -8px; padding-bottom:10px; }
+  .tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:8.5px; font-weight:700; color:#948BA6; }
+  .tab .ic { width:20px; height:20px; border-radius:7px; border:1.7px solid #948BA6; }
+  .tab.on { color:#7546EC; } .tab.on .ic { border-color:#7546EC; background:#EFE7FF; }
+  /* B: línea del día */
+  .sheet { position:absolute; left:0; right:0; bottom:0; top:120px; background:#fff; border-radius:24px 24px 0 0; box-shadow:0 -8px 30px rgba(60,30,120,.18); padding:10px 12px; display:flex; flex-direction:column; }
+  .grab { width:36px; height:4px; border-radius:2px; background:#DDD6EA; align-self:center; margin-bottom:8px; }
+  .sh-t { font-size:15px; font-weight:800; margin-bottom:2px; }
+  .sh-s { font-size:11px; color:#6F6683; margin-bottom:8px; }
+  .day { position:relative; flex:1; border-left:1px solid #EEE9F6; margin-left:34px; }
+  .hr { position:absolute; left:-34px; font-size:9.5px; font-weight:700; color:#948BA6; width:28px; text-align:right; }
+  .hl { position:absolute; left:0; right:0; border-top:1px dashed #F0ECF7; }
+  .blk { position:absolute; left:8px; right:8px; border-radius:9px; font-size:10.5px; font-weight:700; padding:4px 7px; }
+  .ghost { border:1.5px dashed #CFC6E2; color:#948BA6; background:transparent; right:auto; width:44%; }
+  .solid { background:#EFE7FF; color:#4B2BB0; border:1.5px solid #7546EC; left:auto; width:44%; right:8px; }
+  .fixed { background:#F3EFFA; color:#6F6683; border:1.5px solid #DDD6EA; }
+  .now { position:absolute; left:-4px; right:0; border-top:2px solid #B42A55; }
+  .now:before { content:""; position:absolute; left:-3px; top:-5px; width:8px; height:8px; border-radius:4px; background:#B42A55; }
+  /* C: uno por uno */
+  .one { background:#fff; border:1px solid #E2DBF0; border-radius:18px; padding:12px; margin:0 2px; box-shadow:0 4px 14px rgba(60,30,120,.06); }
+  .one .k { font-size:10.5px; font-weight:800; color:#948BA6; text-transform:uppercase; letter-spacing:.5px; }
+  .one .n { font-size:15px; font-weight:800; margin:4px 0; }
+  .dots { display:flex; gap:4px; justify-content:center; margin-top:8px; }
+  .dots i { width:6px; height:6px; border-radius:3px; background:#DDD6EA; } .dots i.on { background:#7546EC; width:14px; }
+  /* acceso */
+  .screen-res { flex:1; padding:0 6px; display:flex; flex-direction:column; gap:8px; }
+  .card { background:#fff; border:1px solid #EEE9F6; border-radius:16px; padding:10px; font-size:12px; }
+  .nekacard { display:flex; gap:9px; align-items:center; }
+  .av { width:38px; height:38px; border-radius:19px; background:linear-gradient(135deg,#9C7BFF,#7546EC); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:15px; }
+  .ghostline { height:9px; border-radius:5px; background:#F0ECF7; margin:5px 0; }
+  .rec { position:absolute; left:14px; right:14px; bottom:78px; background:#241D38; color:#fff; border-radius:20px; padding:12px; display:flex; align-items:center; gap:10px; font-size:12px; font-weight:700; box-shadow:0 10px 30px rgba(36,29,56,.35); }
+  .rec .wave i { background:#C9B6FF; }
+  .reddot { width:10px; height:10px; border-radius:5px; background:#FF5C8A; }
+  .press { position:absolute; width:46px; height:46px; border-radius:23px; border:2px solid #7546EC; background:rgba(117,70,236,.12); }
+  .bubble { position:absolute; right:16px; bottom:70px; width:50px; height:50px; border-radius:25px; background:linear-gradient(135deg,#9C7BFF,#7546EC); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow:0 8px 20px rgba(117,70,236,.4); }
+  .fab { position:absolute; right:16px; bottom:128px; width:44px; height:44px; border-radius:22px; background:#241D38; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:600; }
+  .note { font-size:12.5px; color:var(--text-secondary); text-align:center; line-height:1.5; max-width:300px; margin:6px auto 0; }
+  .qhead { margin-top:28px; }
+  .options .option .content p { margin-top:2px; }
+</style>
+
+<h2>1 · El plan de cambios</h2>
+<p class="subtitle">Son las 9:10. Le mandas un audio a Neka: <b>"voy atrasado como 20 minutos"</b>. Neka te contesta escrito y en voz alta, y te propone correr lo que viene. ¿Cómo prefieres ver y aceptar esos cambios?</p>
+
+<div class="phones">
+  <!-- A -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Neka</div>
+      <div class="thread">
+        <div class="b me"><div class="audio">
+          <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="#fff"/></svg>
+          <span class="wave"><i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:14px"></i><i style="height:7px"></i><i style="height:11px"></i><i style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:6px"></i></span> 0:04</div>
+          <div class="heard">«voy atrasado como 20 minutos»</div></div>
+        <div class="b neka">Tranqui. Te corro 20 min lo que viene hasta el almuerzo. La reunión con la profe no se mueve.<span class="spk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg></span></div>
+        <div class="plan">
+          <h4>Plan de Neka · 2 cambios</h4>
+          <div class="row"><span class="ck">✓</span><span class="t">Gimnasio<small>60 min</small></span><span><span class="old">9:30</span> → <span class="new">9:50</span></span></div>
+          <div class="row"><span class="ck">✓</span><span class="t">Estudiar para la prueba<small>90 min</small></span><span><span class="old">10:30</span> → <span class="new">10:50</span></span></div>
+          <div class="row"><span class="ck lock">🔒</span><span class="t">Reunión con la profe<small>hora fija, se queda</small></span><span class="old" style="text-decoration:none">12:30</span></div>
+          <div class="btns"><span class="btn p">Aceptar 2 cambios</span><span class="btn s">Descartar</span></div>
+          <div class="link">Ver en mi día</div>
+        </div>
+      </div>
+      <div class="input"><span class="grow">Escríbele a Neka…</span><span class="mic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+      <div class="tabbar"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab on"><span class="ic"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+  </div>
+  <!-- B -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Neka</div>
+      <div class="thread">
+        <div class="b me"><div class="audio"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="#fff"/></svg><span class="wave"><i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:14px"></i><i style="height:7px"></i><i style="height:11px"></i></span> 0:04</div></div>
+      </div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh-t">Tu mañana, corrida 20 min</div>
+        <div class="sh-s">Punteado = como estaba · Violeta = como quedaría</div>
+        <div class="day">
+          <span class="hr" style="top:-6px">9:00</span><span class="hl" style="top:0"></span>
+          <span class="hr" style="top:44px">10:00</span><span class="hl" style="top:50px"></span>
+          <span class="hr" style="top:94px">11:00</span><span class="hl" style="top:100px"></span>
+          <span class="hr" style="top:144px">12:00</span><span class="hl" style="top:150px"></span>
+          <span class="hr" style="top:194px">13:00</span><span class="hl" style="top:200px"></span>
+          <div class="now" style="top:8px"></div>
+          <div class="blk ghost" style="top:25px;height:44px">Gimnasio</div>
+          <div class="blk solid" style="top:42px;height:44px">Gimnasio 9:50</div>
+          <div class="blk ghost" style="top:76px;height:68px">Estudiar</div>
+          <div class="blk solid" style="top:92px;height:68px">Estudiar 10:50</div>
+          <div class="blk fixed" style="top:176px;height:40px">🔒 Reunión con la profe 12:30</div>
+        </div>
+        <div class="btns"><span class="btn p">Aceptar</span><span class="btn s">Descartar</span></div>
+        <div class="link">Elegir cuáles</div>
+      </div>
+    </div>
+  </div>
+  <!-- C -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Neka</div>
+      <div class="thread">
+        <div class="b me"><div class="audio"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="#fff"/></svg><span class="wave"><i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:14px"></i><i style="height:7px"></i><i style="height:11px"></i></span> 0:04</div><div class="heard">«voy atrasado como 20 minutos»</div></div>
+        <div class="b neka">Te propongo 2 cambios. Vamos uno por uno.<span class="spk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg></span></div>
+        <div class="one">
+          <div class="k">Cambio 1 de 2</div>
+          <div class="n">Gimnasio</div>
+          <div style="font-size:13px"><span class="old">9:30</span> → <span class="new">9:50</span></div>
+          <div class="btns"><span class="btn p">Sí</span><span class="btn s">Saltar</span></div>
+          <div class="dots"><i class="on"></i><i></i></div>
+        </div>
+      </div>
+      <div class="input"><span class="grow">Escríbele a Neka…</span><span class="mic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+      <div class="tabbar"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab on"><span class="ic"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="plan-a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>Lista en el chat (recomendado)</h3><p>Todos los cambios en una tarjeta: antes → después. Desmarcas los que no quieres y aceptas con un toque. Lo fijo aparece con candado. "Ver en mi día" abre la vista B si quieres mirarlo dibujado.</p></div>
+  </div>
+  <div class="option" data-choice="plan-b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Dibujado en tu día</h3><p>Se abre una hoja con tu mañana: punteado como estaba, violeta como quedaría. Muy claro para ver el efecto, pero ocupa la pantalla y cuesta más elegir uno por uno.</p></div>
+  </div>
+  <div class="option" data-choice="plan-c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content"><h3>Uno por uno</h3><p>Neka te pregunta cada cambio por separado (Sí / Saltar). Muy controlado, pero lento si son 5 cambios y vas apurado.</p></div>
+  </div>
+</div>
+
+<h2 class="qhead">2 · Hablarle rápido sin ir al chat</h2>
+<p class="subtitle">Estás en cualquier pantalla y quieres decirle algo a Neka ya. ¿Por dónde? (puedes elegir más de uno). En el chat, el micrófono al lado de escribir está siempre.</p>
+
+<div class="phones">
+  <!-- A mantener tab -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Espacio</div>
+      <div class="screen-res">
+        <div class="card"><div class="ghostline" style="width:60%"></div><div class="ghostline"></div><div class="ghostline" style="width:80%"></div></div>
+        <div class="card"><div class="ghostline" style="width:45%"></div><div class="ghostline"></div></div>
+        <div class="card"><div class="ghostline" style="width:70%"></div><div class="ghostline" style="width:50%"></div></div>
+      </div>
+      <div class="rec"><span class="reddot"></span><span class="wave"><i style="height:8px"></i><i style="height:14px"></i><i style="height:10px"></i><i style="height:16px"></i><i style="height:7px"></i><i style="height:12px"></i><i style="height:9px"></i></span><span style="flex:1">Te escucho… suelta para enviar</span>0:03</div>
+      <div class="press" style="right:62px;bottom:4px"></div>
+      <div class="tabbar"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab on"><span class="ic"></span>Espacio</span><span class="tab" style="color:#7546EC"><span class="ic" style="border-color:#7546EC;background:#7546EC"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+  </div>
+  <!-- B tarjeta resumen -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Resumen</div>
+      <div class="screen-res">
+        <div class="card nekacard"><span class="av">N</span><div style="flex:1"><b>Hoy tienes 4 cosas.</b><div style="color:#6F6683;font-size:11px">La siguiente es a las 9:30.</div></div><span class="mic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+        <div class="card"><div class="ghostline" style="width:40%"></div><div class="ghostline"></div><div class="ghostline"></div><div class="ghostline" style="width:70%"></div></div>
+        <div class="card"><div class="ghostline" style="width:55%"></div><div class="ghostline"></div></div>
+      </div>
+      <div class="tabbar"><span class="tab on"><span class="ic"></span>Resumen</span><span class="tab"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab"><span class="ic"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+  </div>
+  <!-- C burbuja -->
+  <div>
+    <div class="phone">
+      <div class="ph-title">Calendario</div>
+      <div class="screen-res">
+        <div class="card"><div class="ghostline" style="width:50%"></div><div class="ghostline"></div><div class="ghostline"></div></div>
+        <div class="card"><div class="ghostline"></div><div class="ghostline" style="width:65%"></div></div>
+        <div class="card"><div class="ghostline" style="width:35%"></div><div class="ghostline"></div></div>
+      </div>
+      <div class="fab">+</div>
+      <div class="bubble">N</div>
+      <div class="tabbar"><span class="tab"><span class="ic"></span>Resumen</span><span class="tab on"><span class="ic"></span>Calendario</span><span class="tab"><span class="ic"></span>Espacio</span><span class="tab"><span class="ic"></span>Neka</span><span class="tab"><span class="ic"></span>Perfil</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="acceso-a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>Mantener apretada la pestaña Neka (recomendado)</h3><p>Desde cualquier pantalla: dejas el dedo en "Neka" abajo, hablas y sueltas. La respuesta y el plan salen en una hoja encima de donde estás, sin cambiarte de pantalla. Un toque normal sigue abriendo el chat.</p></div>
+  </div>
+  <div class="option" data-choice="acceso-b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Micrófono en la tarjeta de Neka del Resumen (recomendado junto con A)</h3><p>Se ve a simple vista al abrir la app, que es donde caes primero. Solo está en Resumen.</p></div>
+  </div>
+  <div class="option" data-choice="acceso-c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content"><h3>Burbuja de Neka flotando en todas las pantallas</h3><p>Siempre visible, pero tapa contenido y choca con el botón + del Espacio y del Calendario.</p></div>
+  </div>
+</div>

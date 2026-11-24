@@ -1,0 +1,162 @@
+{
+ "v": 3,
+ "layout": "files",
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-14T12:00:00Z"
+ },
+ "title": "Nekal",
+ "namespace": "Nekal",
+ "libraries": [],
+ "sections": {},
+ "groups": [
+  "Neka"
+ ],
+ "assetGroups": {
+  "Neka": {
+   "name": "Neka",
+   "tile": "l",
+   "order": [
+    "Neka_Pose1.png",
+    "Neka_Pose2.png",
+    "Neka_Pose3.png",
+    "Neka_Pose4.png",
+    "Neka_Pose5.png",
+    "Neka_Pose6.png",
+    "Neka_Pose7.png",
+    "Neka_Pose8.png",
+    "Neka_Pose9.png",
+    "Neka_Pose10.png",
+    "Neka_Pose11.png",
+    "Neka_Pose12.png",
+    "Neka_Pose13.png",
+    "Neka_Pose14.png",
+    "Neka_Pose15.png",
+    "Neka_Pose16.png",
+    "Neka_Pose17.png",
+    "Neka_Pose18.png"
+   ],
+   "files": {
+    "Neka_Pose1.png": {
+     "name": "Neka_Pose1.png",
+     "blob": "a4b0e4a97f279ca275c6602cd2bc30b5",
+     "size": 34561,
+     "type": "image/png"
+    },
+    "Neka_Pose2.png": {
+     "name": "Neka_Pose2.png",
+     "blob": "5c8b54e9329ecd36c496074310a95598",
+     "size": 32099,
+     "type": "image/png"
+    },
+    "Neka_Pose3.png": {
+     "name": "Neka_Pose3.png",
+     "blob": "5357306ebaaac21dfa1d81b2fbf68c85",
+     "size": 32668,
+     "type": "image/png"
+    },
+    "Neka_Pose4.png": {
+     "name": "Neka_Pose4.png",
+     "blob": "bd4f71dfbec42094dabe51d743758b49",
+     "size": 31957,
+     "type": "image/png"
+    },
+    "Neka_Pose5.png": {
+     "name": "Neka_Pose5.png",
+     "blob": "798f16ff5b79dbf188c1f634a7e5e8f9",
+     "size": 34045,
+     "type": "image/png"
+    },
+    "Neka_Pose6.png": {
+     "name": "Neka_Pose6.png",
+     "blob": "84962367ca431bd3d063bcfcb34fefb3",
+     "size": 34131,
+     "type": "image/png"
+    },
+    "Neka_Pose7.png": {
+     "name": "Neka_Pose7.png",
+     "blob": "b8de440757138d61793d4b74edf3ea9e",
+     "size": 32937,
+     "type": "image/png"
+    },
+    "Neka_Pose8.png": {
+     "name": "Neka_Pose8.png",
+     "blob": "edf1e1c32c8651f12deb1e62e87f1061",
+     "size": 32590,
+     "type": "image/png"
+    },
+    "Neka_Pose9.png": {
+     "name": "Neka_Pose9.png",
+     "blob": "fd8efd82bbdb56c2385b5666e8355940",
+     "size": 34422,
+     "type": "image/png"
+    },
+    "Neka_Pose10.png": {
+     "name": "Neka_Pose10.png",
+     "blob": "8a3634aeb5499c89dd049963c6b71b10",
+     "size": 31494,
+     "type": "image/png"
+    },
+    "Neka_Pose11.png": {
+     "name": "Neka_Pose11.png",
+     "blob": "63f2a9c3e33901bcbe3d2500fc1c6365",
+     "size": 34082,
+     "type": "image/png"
+    },
+    "Neka_Pose12.png": {
+     "name": "Neka_Pose12.png",
+     "blob": "9a44a94a761e1aa20f8132c03d415d60",
+     "size": 32836,
+     "type": "image/png"
+    },
+    "Neka_Pose13.png": {
+     "name": "Neka_Pose13.png",
+     "blob": "3278307b7ae2ac8a3f7a853162a1117d",
+     "size": 33540,
+     "type": "image/png"
+    },
+    "Neka_Pose14.png": {
+     "name": "Neka_Pose14.png",
+     "blob": "b84ead71efd7fc96de89430235b5df4a",
+     "size": 40311,
+     "type": "image/png"
+    },
+    "Neka_Pose15.png": {
+     "name": "Neka_Pose15.png",
+     "blob": "69f813f5c3e9a0d7c661ad60f62c288b",
+     "size": 51537,
+     "type": "image/png"
+    },
+    "Neka_Pose16.png": {
+     "name": "Neka_Pose16.png",
+     "blob": "f13155da5ea44242a8f002c9063ed969",
+     "size": 34335,
+     "type": "image/png"
+    },
+    "Neka_Pose17.png": {
+     "name": "Neka_Pose17.png",
+     "blob": "a14c5db26c6c228856c130f58925f41b",
+     "size": 33588,
+     "type": "image/png"
+    },
+    "Neka_Pose18.png": {
+     "name": "Neka_Pose18.png",
+     "blob": "342ca64660c90996070039d618bb2602",
+     "size": 34874,
+     "type": "image/png"
+    }
+   }
+  }
+ },
+ "blobs": {},
+ "docs": {
+  "readme": "project/README.md",
+  "sections": []
+ },
+ "lastChange": {
+  "by": "Claude",
+  "at": "2026-11-14T12:00:00Z",
+  "via": "Claude Code",
+  "note": "Primera versión desde SISTEMA_DE_DISENO/ del repositorio de Nekal."
+ }
+}

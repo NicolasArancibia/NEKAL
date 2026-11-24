@@ -1,0 +1,28 @@
+<!-- @dsCard group="Listas" height=200 -->
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>ListRow — vista previa</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0}
+body{padding:var(--space-lg);background:var(--background);color:var(--ink);font:500 14px/20px var(--font-sans)}
+.row{display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:center}
+.col{display:flex;flex-direction:column;gap:var(--space-md)}
+.cap{font:500 12px/16px var(--font-sans);color:var(--ink-secondary)}
+.sec{font:700 12px/16px var(--font-sans);color:var(--ink-secondary);margin:0 0 var(--space-sm)}
+
+.card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-card);padding:var(--space-xs) var(--space-lg)}
+.r{display:flex;align-items:center;gap:var(--space-md);min-height:52px;border-bottom:1px solid var(--line)}.r:last-child{border:0}
+.o{width:22px;height:22px;border-radius:50%;border:2px solid var(--mesa-violet);flex:none;box-sizing:border-box}
+.o.g{border-color:var(--mesa-green)}.o.dn{background:var(--success);border-color:var(--success)}
+.t{flex:1;font:600 14px/20px var(--font-sans)}.t.dn{text-decoration:line-through;color:var(--ink-done)}
+.h{font:500 13px/18px var(--font-sans);color:var(--ink-secondary);font-variant-numeric:tabular-nums}
+.tag{padding:2px 9px;border-radius:var(--radius-pill);font:700 12px/16px var(--font-sans);background:var(--danger-soft);color:var(--danger)}
+
+</style></head>
+<body>
+<div class="card">
+<div class="r"><span class="o"></span><span class="t">Revisión de sprint</span><span class="tag">Choca</span><span class="h">14:00</span></div>
+<div class="r"><span class="o g"></span><span class="t">Clase de estadística</span><span class="h">14:00</span></div>
+<div class="r"><span class="o dn"></span><span class="t dn">Estirar 10 minutos</span><span class="h">07:30</span></div></div>
+</body></html>

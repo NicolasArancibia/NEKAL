@@ -1,0 +1,24 @@
+<!-- @dsCard group="Progreso" height=170 -->
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>ProgressBar — vista previa</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0}
+body{padding:var(--space-lg);background:var(--background);color:var(--ink);font:500 14px/20px var(--font-sans)}
+.row{display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:center}
+.col{display:flex;flex-direction:column;gap:var(--space-md)}
+.cap{font:500 12px/16px var(--font-sans);color:var(--ink-secondary)}
+.sec{font:700 12px/16px var(--font-sans);color:var(--ink-secondary);margin:0 0 var(--space-sm)}
+
+.card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-card);padding:var(--space-lg);margin-bottom:var(--space-md)}
+.f{background:var(--primary-soft);border-radius:var(--radius-lg);padding:var(--space-xl)}
+.bar{height:10px;border-radius:var(--radius-pill);background:var(--line);overflow:hidden;margin-top:var(--space-sm)}
+.f .bar{background:var(--surface)}.bar i{display:block;height:10px;border-radius:var(--radius-pill);background:var(--primary)}
+.h{display:flex;justify-content:space-between;font:700 15px/20px var(--font-sans)}.h span+span{font:500 13px/18px var(--font-sans);color:var(--ink-secondary)}.f .h span+span{color:var(--ink)}
+
+</style></head>
+<body>
+<div class="card"><div class="h"><span>Hoy</span><span>3 de 5 listo</span></div><div class="bar"><i style="width:60%"></i></div></div>
+<div class="f"><div class="h"><span>Nivel 3</span><span>345 pts</span></div><div class="bar"><i style="width:30%"></i></div></div>
+</body></html>
